@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="pungmul.pungmul.repository.member.mapper.UserMapper">
+<mapper namespace="pungmul.pungmul.repository.member.base.mapper.UserMapper">
 
     <!-- User ResultMap -->
     <resultMap id="UserResultMap" type="pungmul.pungmul.domain.member.User">
@@ -27,13 +27,13 @@
         VALUES (#{accountId}, #{name}, #{clubName}, #{birth}, #{clubAge}, #{gender}, #{phoneNumber}, #{email}, #{clubId}, #{area})
     </insert>
 
-    <!-- Select the last inserted ID -->
-    <select id="selectLastInsertId" resultType="java.lang.Long">
-        SELECT LAST_INSERT_ID()
-    </select>
+<!--    &lt;!&ndash; Select the last inserted ID &ndash;&gt;-->
+<!--    <select id="selectLastInsertUserId" resultType="java.lang.Long">-->
+<!--        SELECT LAST_INSERT_ID()-->
+<!--    </select>-->
 
     <!-- Select User By Id -->
-    <select id="getUserById" resultMap="UserResultMap">
+    <select id="getUserByUserId" resultMap="UserResultMap">
         SELECT * FROM user WHERE id = #{id}
     </select>
 
@@ -41,4 +41,16 @@
     <select id="getUserByAccountId" resultMap="UserResultMap">
         SELECT * FROM user WHERE account_id = #{accountId}
     </select>
+
+    <!-- Select Users By LoginId -->
+    <select id="getUserByLoginId" resultMap="UserResultMap">
+        SELECT * FROM user WHERE login_id = #{loginId}
+    </select>
+
+    <!-- Select Users By Email -->
+    <select id="getUserByEmail" resultMap="UserResultMap">
+        SELECT * FROM user WHERE email = #{email}
+    </select>
+
+
 </mapper>
