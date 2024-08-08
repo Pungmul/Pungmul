@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.member.mapper.AccountMapper">
+
+    <!-- Account ResultMap -->
+    <resultMap id="AccountResultMap" type="pungmul.pungmul.domain.member.Account">
+        <id property="id" column="id" />
+        <result property="loginId" column="login_id" />
+        <result property="password" column="password" />
+        <result property="withdraw" column="withdraw" />
+        <result property="lastPasswordChanged" column="last_password_changed" />
+        <result property="enabled" column="enabled" />
+        <result property="accountExpired" column="account_expired" />
+        <result property="accountLocked" column="account_locked" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!-- Insert Account -->
+    <insert id="saveAccount" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO account (login_id, password)
+        VALUES (#{loginId}, #{password})
+    </insert>
+
+    <!-- Select Account By Id -->
+    <select id="getAccountById" resultMap="AccountResultMap">
+        SELECT * FROM account WHERE id = #{id}
+    </select>
+</mapper>

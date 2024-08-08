@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.member.mapper.UserMapper">
+
+    <!-- User ResultMap -->
+    <resultMap id="UserResultMap" type="pungmul.pungmul.domain.member.User">
+        <id property="id" column="id" />
+        <result property="accountId" column="account_id" />
+        <result property="name" column="name" />
+        <result property="clubName" column="club_name" />
+        <result property="birth" column="birth" />
+        <result property="clubAge" column="club_age" />
+        <result property="gender" column="gender" />
+        <result property="phoneNumber" column="phone_number" />
+        <result property="email" column="email" />
+        <result property="clubId" column="club_id" />
+        <result property="area" column="area" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!-- Insert User -->
+    <insert id="saveUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO user (account_id, name, club_name, birth, club_age, gender, phone_number, email, club_id, area)
+        VALUES (#{accountId}, #{name}, #{clubName}, #{birth}, #{clubAge}, #{gender}, #{phoneNumber}, #{email}, #{clubId}, #{area})
+    </insert>
+
+    <!-- Select the last inserted ID -->
+    <select id="selectLastInsertId" resultType="java.lang.Long">
+        SELECT LAST_INSERT_ID()
+    </select>
+
+    <!-- Select User By Id -->
+    <select id="getUserById" resultMap="UserResultMap">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <!-- Select Users By AccountId -->
+    <select id="getUserByAccountId" resultMap="UserResultMap">
+        SELECT * FROM user WHERE account_id = #{accountId}
+    </select>
+</mapper>
