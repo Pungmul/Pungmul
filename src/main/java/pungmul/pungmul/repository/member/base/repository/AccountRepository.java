@@ -1,0 +1,16 @@
+package pungmul.pungmul.repository.member.base.repository;
+
+import pungmul.pungmul.domain.member.Account;
+
+import java.util.Optional;
+
+public interface AccountRepository {
+    void saveAccount(Account account);
+
+    public Optional<Account> getAccountByAccountId(Long accountId);
+
+    public Optional<Account> getAccountByLoginId(String loginId);
+
+    public Optional<Account> getAccountByEmail(String email);
+
+    }

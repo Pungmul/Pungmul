@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateAccountResponseDto {
+public class CreateAccountResponseDTO {
     private String status;          // 회원가입 성공 여부 (success, fail)
     private String message;         // 응답 메시지
     private UserData data;          // 가입된 사용자 정보 (UserData로 정의된 내부 클래스)

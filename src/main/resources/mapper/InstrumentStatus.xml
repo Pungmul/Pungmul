@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="pungmul.pungmul.repository.member.mapper.InstrumentStatusMapper">
+<mapper namespace="pungmul.pungmul.repository.member.base.mapper.InstrumentStatusMapper">
 
     <resultMap id="InstrumentStatusResultMap" type="InstrumentStatus">
         <id property="id" column="id" />
@@ -19,4 +19,27 @@
         INSERT INTO instrument_status (user_id, instrument, instrument_ability, major)
         VALUES (#{userId}, #{instrument}, #{instrumentAbility}, #{major})
     </insert>
+
+    <!-- 특정 사용자(userId)의 모든 InstrumentStatus 조회 -->
+    <select id="getAllInstrumentStatusByUserId" parameterType="java.lang.Long" resultMap="InstrumentStatusResultMap">
+        SELECT *
+        FROM instrument_status
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 특정 InstrumentStatus를 instrumentId로 조회 -->
+    <select id="getInstrumentStatusByInstrumentId" parameterType="java.lang.Long" resultMap="InstrumentStatusResultMap">
+        SELECT *
+        FROM instrument_status
+        WHERE id = #{id}
+    </select>
+
+    <!-- 특정 사용자(userId)와 InstrumentType으로 InstrumentStatus 조회 -->
+    <select id="getInstrumentStatusByUserIdAndInstrumentType" parameterType="map" resultMap="InstrumentStatusResultMap">
+        SELECT *
+        FROM instrument_status
+        WHERE user_id = #{userId}
+          AND instrument = #{instrument}
+    </select>
+
 </mapper>

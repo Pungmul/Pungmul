@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="pungmul.pungmul.repository.member.mapper.AccountMapper">
+<mapper namespace="pungmul.pungmul.repository.member.base.mapper.AccountMapper">
 
     <!-- Account ResultMap -->
     <resultMap id="AccountResultMap" type="pungmul.pungmul.domain.member.Account">
@@ -24,8 +24,27 @@
         VALUES (#{loginId}, #{password})
     </insert>
 
+<!--    &lt;!&ndash; Select the last inserted ID &ndash;&gt;-->
+<!--    <select id="selectLastInsertAccountId" resultType="java.lang.Long">-->
+<!--        SELECT LAST_INSERT_ID()-->
+<!--    </select>-->
+
     <!-- Select Account By Id -->
-    <select id="getAccountById" resultMap="AccountResultMap">
+    <select id="getAccountByAccountId" resultMap="AccountResultMap">
         SELECT * FROM account WHERE id = #{id}
+    </select>
+
+    <!-- Email로 Account 조회 -->
+    <select id="getAccountByEmail" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.Account">
+        SELECT *
+        FROM account
+        WHERE email = #{email};
+    </select>
+
+    <!-- Login ID로 Account 조회 -->
+    <select id="getAccountByLoginId" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.Account">
+        SELECT *
+        FROM account
+        WHERE login_id = #{loginId};
     </select>
 </mapper>

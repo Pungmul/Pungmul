@@ -7,34 +7,58 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.InstrumentStatus;
-import pungmul.pungmul.domain.member.LoginForm;
 import pungmul.pungmul.domain.member.User;
-import pungmul.pungmul.repository.member.CreateMemberRepository;
-import pungmul.pungmul.repository.member.MybatisCreateMemberRepository;
-import pungmul.pungmul.web.member.dto.CreateAccountRequestDto;
-import pungmul.pungmul.web.member.dto.CreateAccountResponseDto;
+import pungmul.pungmul.repository.member.base.repository.AccountRepository;
+import pungmul.pungmul.repository.member.base.repository.InstrumentStatusRepository;
+import pungmul.pungmul.repository.member.base.repository.UserRepository;
+import pungmul.pungmul.repository.member.signup.CreateMemberRepository;
+import pungmul.pungmul.web.member.dto.CreateAccountRequestDTO;
+import pungmul.pungmul.web.member.dto.CreateAccountResponseDTO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class CreateMemberService {
-    private final CreateMemberRepository createMemberRepository;
+    private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
+    private final InstrumentStatusRepository instrumentStatusRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public CreateAccountResponseDto createMember(CreateAccountRequestDto createAccountRequestDto) {
-        Account account = createAccount(createAccountRequestDto);
-        log.info("ID : {}" ,  account.getId());
-        User user = createUser(createAccountRequestDto, account.getId());
-        log.info("ID : {}" , user.getId());
-        createInstrument(createAccountRequestDto.getInstrumentStatusList(), user.getId());
+    public CreateAccountResponseDTO createMember(CreateAccountRequestDTO createAccountRequestDto) {
+        Long accountId = createAccount(createAccountRequestDto);
+        Long userId = createUser(createAccountRequestDto, accountId);
+        createInstrument(createAccountRequestDto.getInstrumentStatusList(), userId);
+
+        Account account = accountRepository.getAccountByAccountId(accountId)
+                .orElseThrow(() -> new RuntimeException("Account 생성 실패"));
+
+        User user = userRepository.getUserByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User 생성 실패"));
 
         return getCreateAccountResponse(account, user);
     }
 
-    private void createInstrument(List<InstrumentStatus> instrumentStatusList, Long userId) {
+    private Long createAccount(CreateAccountRequestDTO createAccountRequestDto) {
+        Account account = Account.builder()
+                .loginId(createAccountRequestDto.getLoginId())
+                .password(passwordEncoder.encode(createAccountRequestDto.getPassword()))
+                .build();
+        accountRepository.saveAccount(account);
+        return account.getId();
+    }
+
+    private Long createUser(CreateAccountRequestDTO createAccountRequestDto, Long accountId) {
+        User user = getUser(createAccountRequestDto, accountId);
+        userRepository.saveUser(user);
+        return user.getId();
+    }
+
+    private List<Long> createInstrument(List<InstrumentStatus> instrumentStatusList, Long userId) {
+        ArrayList<Long> arrayList = new ArrayList<>();
         for (InstrumentStatus instrumentStatus : instrumentStatusList) {
             InstrumentStatus status = InstrumentStatus.builder()
                     .userId(userId)
@@ -42,15 +66,17 @@ public class CreateMemberService {
                     .instrumentAbility(instrumentStatus.getInstrumentAbility())
                     .major(instrumentStatus.isMajor())
                     .build();
-            createMemberRepository.saveInstrument(status);
+            instrumentStatusRepository.saveInstrument(status);
+            arrayList.add(status.getId());
         }
+        return arrayList;
     }
 
-    private static CreateAccountResponseDto getCreateAccountResponse(Account account, User user) {
-        return CreateAccountResponseDto.builder()
+    private CreateAccountResponseDTO getCreateAccountResponse(Account account, User user) {
+        return CreateAccountResponseDTO.builder()
                 .status("success")
                 .message("회원가입이 성공적으로 완료되었습니다.")
-                .data(CreateAccountResponseDto.UserData.builder()
+                .data(CreateAccountResponseDTO.UserData.builder()
                         .userId(account.getId())
                         .username(account.getLoginId())
                         .email(user.getEmail())
@@ -60,20 +86,7 @@ public class CreateMemberService {
                 .build();
     }
 
-    private Account createAccount(CreateAccountRequestDto createAccountRequestDto) {
-        Account account = Account.builder()
-                .loginId(createAccountRequestDto.getLoginId())
-                .password(passwordEncoder.encode(createAccountRequestDto.getPassword()))
-                .build();
-        return createMemberRepository.saveAccount(account);
-    }
-
-    private User createUser(CreateAccountRequestDto createAccountRequestDto, Long accountId) {
-        return createMemberRepository.saveUser(getUser(createAccountRequestDto, accountId));
-
-    }
-
-    private static User getUser(CreateAccountRequestDto createAccountRequestDto, Long accountId) {
+    private User getUser(CreateAccountRequestDTO createAccountRequestDto, Long accountId) {
         return User.builder()
                 .accountId(accountId)
                 .name(createAccountRequestDto.getName())

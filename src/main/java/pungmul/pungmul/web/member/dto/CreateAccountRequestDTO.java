@@ -6,11 +6,10 @@ import pungmul.pungmul.domain.member.Gender;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Data
-public class CreateAccountRequestDto {
+public class CreateAccountRequestDTO {
 
     @NotEmpty @Email
     private String loginId;

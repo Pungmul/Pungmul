@@ -1,4 +1,4 @@
-package pungmul.pungmul.repository.member;
+package pungmul.pungmul.repository.member.signup;
 
 import org.apache.ibatis.annotations.Mapper;
 import pungmul.pungmul.domain.member.Account;
@@ -7,13 +7,9 @@ import pungmul.pungmul.domain.member.User;
 
 @Mapper
 public interface CreateMemberMapper {
-    public Long saveAccount(String loginId, String password);
+    public Long saveAccount(Account account);
 
     public Long saveUser(User user);
-
-    public Account getAccountById(Long loginId);
-
-    public User getUserById(Long loginId);
 
     void saveInstrument(InstrumentStatus instrumentStatus, Long userId);
 }
