@@ -5,6 +5,8 @@ import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.repository.member.base.repository.UserRepository;
 import pungmul.pungmul.repository.member.base.mapper.UserMapper;
 
+import java.util.Optional;
+
 @Repository
 public class MybatisUserRepository implements UserRepository {
     private final UserMapper userMapper;
@@ -19,22 +21,22 @@ public class MybatisUserRepository implements UserRepository {
     }
 
     @Override
-    public User getUserByUserId(Long userId) {
-        return userMapper.getUserByUserId(userId);
+    public Optional<User> getUserByUserId(Long userId) {
+        return Optional.ofNullable(userMapper.getUserByUserId(userId));
     }
 
     @Override
-    public User getUserByAccountId(Long accountId) {
-        return userMapper.getUserByAccountId(accountId);
+    public Optional<User> getUserByAccountId(Long accountId) {
+        return Optional.ofNullable(userMapper.getUserByAccountId(accountId));
     }
 
     @Override
-    public User getUserByLoginId(String loginId) {
-        return userMapper.getUserByLoginId(loginId);
+    public Optional<User> getUserByLoginId(String loginId) {
+        return Optional.ofNullable(userMapper.getUserByLoginId(loginId));
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        return userMapper.getUserByEmail(email);
+    public Optional<User> getUserByEmail(String email) {
+        return Optional.ofNullable(userMapper.getUserByEmail(email));
     }
 }

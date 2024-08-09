@@ -17,5 +17,6 @@ public class SessionUser implements Serializable {
 //    private List<String> roles;
     private LocalDateTime sessionCreationTime;
     private boolean isLoggedIn;
-    private Map<String, String> preferences;
+//    private Map<String, String> preferences;
 }
+

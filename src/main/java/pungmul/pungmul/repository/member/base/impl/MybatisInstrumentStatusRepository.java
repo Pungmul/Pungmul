@@ -7,6 +7,7 @@ import pungmul.pungmul.repository.member.base.mapper.InstrumentStatusMapper;
 import pungmul.pungmul.repository.member.base.repository.InstrumentStatusRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MybatisInstrumentStatusRepository implements InstrumentStatusRepository {
@@ -22,17 +23,17 @@ public class MybatisInstrumentStatusRepository implements InstrumentStatusReposi
     }
 
     @Override
-    public List<InstrumentStatus> getAllInstrumentStatusByUserId(Long userId) {
-        return instrumentStatusMapper.getAllInstrumentStatusByUserId(userId);
+    public Optional<List<InstrumentStatus>> getAllInstrumentStatusByUserId(Long userId) {
+        return Optional.ofNullable(instrumentStatusMapper.getAllInstrumentStatusByUserId(userId));
     }
 
     @Override
-    public InstrumentStatus getInstrumentStatusByInstrumentId(Long instrumentStatusId) {
-        return instrumentStatusMapper.getInstrumentStatusByInstrumentId(instrumentStatusId);
+    public Optional<InstrumentStatus> getInstrumentStatusByInstrumentId(Long instrumentStatusId) {
+        return Optional.ofNullable(instrumentStatusMapper.getInstrumentStatusByInstrumentId(instrumentStatusId));
     }
 
     @Override
-    public InstrumentStatus getInstrumentStatusByUserIdAndInstrumentType(Long userId, Instrument instrument) {
-        return instrumentStatusMapper.getInstrumentStatusByUserIdAndInstrumentType(userId, instrument);
+    public Optional<InstrumentStatus> getInstrumentStatusByUserIdAndInstrumentType(Long userId, Instrument instrument) {
+        return Optional.ofNullable(instrumentStatusMapper.getInstrumentStatusByUserIdAndInstrumentType(userId, instrument));
     }
 }

@@ -33,8 +33,13 @@ public class CreateMemberService {
         Long userId = createUser(createAccountRequestDto, accountId);
         createInstrument(createAccountRequestDto.getInstrumentStatusList(), userId);
 
-        return getCreateAccountResponse(accountRepository.getAccountByAccountId(accountId),
-                userRepository.getUserByUserId(userId));
+        Account account = accountRepository.getAccountByAccountId(accountId)
+                .orElseThrow(() -> new RuntimeException("Account 생성 실패"));
+
+        User user = userRepository.getUserByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User 생성 실패"));
+
+        return getCreateAccountResponse(account, user);
     }
 
     private Long createAccount(CreateAccountRequestDTO createAccountRequestDto) {

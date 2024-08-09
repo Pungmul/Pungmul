@@ -2,14 +2,16 @@ package pungmul.pungmul.repository.member.base.repository;
 
 import pungmul.pungmul.domain.member.User;
 
+import java.util.Optional;
+
 public interface UserRepository {
     void saveUser(User user);
 
-    public User getUserByUserId(Long userId);
+    public Optional<User> getUserByUserId(Long userId);
 
-    public User getUserByAccountId(Long accountId);
+    public Optional<User> getUserByAccountId(Long accountId);
 
-    public User getUserByLoginId(String loginId);
+    public Optional<User> getUserByLoginId(String loginId);
 
-    public User getUserByEmail(String email);
+    public Optional<User> getUserByEmail(String email);
 }
