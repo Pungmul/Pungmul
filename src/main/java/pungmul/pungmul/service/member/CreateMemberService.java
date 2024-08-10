@@ -8,12 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 import pungmul.pungmul.domain.member.User;
-import pungmul.pungmul.repository.member.base.repository.AccountRepository;
-import pungmul.pungmul.repository.member.base.repository.InstrumentStatusRepository;
-import pungmul.pungmul.repository.member.base.repository.UserRepository;
-import pungmul.pungmul.repository.member.signup.CreateMemberRepository;
-import pungmul.pungmul.web.member.dto.CreateAccountRequestDTO;
-import pungmul.pungmul.web.member.dto.CreateAccountResponseDTO;
+import pungmul.pungmul.repository.member.repository.AccountRepository;
+import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
+import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.dto.member.CreateAccountRequestDTO;
+import pungmul.pungmul.dto.member.CreateAccountResponseDTO;
 
 import java.util.ArrayList;
 import java.util.List;

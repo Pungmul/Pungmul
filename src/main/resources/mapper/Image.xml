@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.image.mapper.ImageMapper">
+
+    <!-- ResultMap for Image -->
+    <resultMap id="ImageResultMap" type="pungmul.pungmul.domain.file.Image">
+        <id property="id" column="id" />
+        <result property="convertedFileName" column="converted_filename" />
+        <result property="originalFilename" column="original_filename" />
+        <result property="fullFilePath" column="full_file_path" />
+        <result property="fileType" column="file_type" />
+        <result property="fileSize" column="size" />
+        <result property="createdAt" column="created_at" />
+    </resultMap>
+
+    <!-- Insert Image -->
+    <insert id="save" parameterType="pungmul.pungmul.domain.file.Image" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO image (
+            original_filename,
+            converted_filename,
+            full_file_path,
+            file_type,
+            size,
+            userId
+        ) VALUES (
+             #{originalFilename},
+             #{convertedFileName},
+             #{fullFilePath},
+             #{fileType},
+             #{fileSize},
+             #{userId}
+        )
+    </insert>
+
+    <!-- Select Image By Id -->
+    <select id="getImageByImageId" resultMap="ImageResultMap" parameterType="java.lang.Long">
+        SELECT * FROM image WHERE id = #{id}
+    </select>
+
+    <!-- Select Image By Id -->
+    <select id="getImageByOriginalFilenameAndUserId" resultMap="ImageResultMap">
+        SELECT * FROM image
+        WHERE original_filename = #{originalFilename}
+          AND userId = #{userId}
+    </select>
+
+</mapper>

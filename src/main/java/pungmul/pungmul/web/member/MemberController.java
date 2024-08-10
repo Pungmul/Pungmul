@@ -1,17 +1,18 @@
 package pungmul.pungmul.web.member;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pungmul.pungmul.domain.member.SessionUser;
+import pungmul.pungmul.dto.member.CreateAccountRequestDTO;
+import pungmul.pungmul.dto.member.CreateAccountResponseDTO;
+import pungmul.pungmul.dto.member.LoginDTO;
+import pungmul.pungmul.dto.member.LoginResponseDTO;
 import pungmul.pungmul.service.member.CreateMemberService;
 import pungmul.pungmul.service.member.LoginService;
-import pungmul.pungmul.web.member.dto.*;
 
 import javax.naming.AuthenticationException;
 

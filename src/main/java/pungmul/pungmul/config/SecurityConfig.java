@@ -23,7 +23,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/member/login", "/member/create", "/public/**").permitAll()
+                        .requestMatchers("/member/login", "/member/create", "/public/**", "/image/**").permitAll()
                         .anyRequest().authenticated()
                 );
 //                .sessionManagement(session -> session

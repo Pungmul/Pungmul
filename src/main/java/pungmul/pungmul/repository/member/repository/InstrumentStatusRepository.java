@@ -1,4 +1,4 @@
-package pungmul.pungmul.repository.member.base.repository;
+package pungmul.pungmul.repository.member.repository;
 
 import pungmul.pungmul.domain.member.Instrument;
 import pungmul.pungmul.domain.member.InstrumentStatus;

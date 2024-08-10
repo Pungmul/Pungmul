@@ -1,4 +1,4 @@
-package pungmul.pungmul.web.member.dto;
+package pungmul.pungmul.dto.member;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
