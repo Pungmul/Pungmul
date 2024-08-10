@@ -73,14 +73,15 @@ CREATE TABLE if not exists content (
 );
 
 CREATE TABLE if not exists image (
-                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                       name VARCHAR(225) NULL,
-                       org_name VARCHAR(255) NULL,
-                       path VARCHAR(255) NULL,
-                       type VARCHAR(50) NULL,
-                       size BIGINT NULL,
-                       created_at TIMESTAMP NULL,
-                       updated_at TIMESTAMP NULL
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        converted_filename VARCHAR(225) NOT NULL,
+                        original_filename VARCHAR(255) NOT NULL,
+                        full_file_path VARCHAR(255) NOT NULL,
+                        file_type VARCHAR(50) NOT NULL,
+                        size BIGINT NOT NULL,
+                        userId BIGINT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (userId) REFERENCES user(id)
 );
 
 CREATE TABLE if not exists content_image (

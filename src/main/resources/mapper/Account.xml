@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="pungmul.pungmul.repository.member.base.mapper.AccountMapper">
+<mapper namespace="pungmul.pungmul.repository.member.mapper.AccountMapper">
 
     <!-- Account ResultMap -->
     <resultMap id="AccountResultMap" type="pungmul.pungmul.domain.member.Account">

@@ -1,10 +1,10 @@
-package pungmul.pungmul.repository.member.base.impl;
+package pungmul.pungmul.repository.member.impl;
 
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.domain.member.Instrument;
 import pungmul.pungmul.domain.member.InstrumentStatus;
-import pungmul.pungmul.repository.member.base.mapper.InstrumentStatusMapper;
-import pungmul.pungmul.repository.member.base.repository.InstrumentStatusRepository;
+import pungmul.pungmul.repository.member.mapper.InstrumentStatusMapper;
+import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 
 import java.util.List;
 import java.util.Optional;

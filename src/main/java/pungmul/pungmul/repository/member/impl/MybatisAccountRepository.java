@@ -1,9 +1,9 @@
-package pungmul.pungmul.repository.member.base.impl;
+package pungmul.pungmul.repository.member.impl;
 
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.domain.member.Account;
-import pungmul.pungmul.repository.member.base.repository.AccountRepository;
-import pungmul.pungmul.repository.member.base.mapper.AccountMapper;
+import pungmul.pungmul.repository.member.repository.AccountRepository;
+import pungmul.pungmul.repository.member.mapper.AccountMapper;
 
 import java.util.Optional;
 

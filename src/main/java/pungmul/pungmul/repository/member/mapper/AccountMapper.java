@@ -1,4 +1,4 @@
-package pungmul.pungmul.repository.member.base.mapper;
+package pungmul.pungmul.repository.member.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

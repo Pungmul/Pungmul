@@ -1,15 +1,5 @@
 package pungmul.pungmul.config;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpFilter;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import pungmul.pungmul.web.member.dto.SessionConst;
-
-import java.io.IOException;
-
 //public class SessionCheckFilter extends HttpFilter {
 //
 //    @Override

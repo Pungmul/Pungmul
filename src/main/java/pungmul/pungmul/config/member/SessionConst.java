@@ -1,4 +1,4 @@
-package pungmul.pungmul.web.member.dto;
+package pungmul.pungmul.config.member;
 
 public class SessionConst {
     public static final String SESSION_USER = "sessionUser";

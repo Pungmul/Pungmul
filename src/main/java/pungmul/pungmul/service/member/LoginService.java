@@ -6,25 +6,21 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.domain.member.User;
-import pungmul.pungmul.repository.member.base.repository.AccountRepository;
-import pungmul.pungmul.repository.member.base.repository.UserRepository;
-import pungmul.pungmul.repository.member.login.LoginRepository;
-import pungmul.pungmul.web.member.dto.LoginDTO;
-import pungmul.pungmul.web.member.dto.LoginResponseDTO;
-import pungmul.pungmul.web.member.dto.SessionConst;
+import pungmul.pungmul.repository.member.repository.AccountRepository;
+import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.dto.member.LoginDTO;
+import pungmul.pungmul.dto.member.LoginResponseDTO;
+import pungmul.pungmul.config.member.SessionConst;
 
 import javax.naming.AuthenticationException;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

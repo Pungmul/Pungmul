@@ -1,4 +1,4 @@
-package pungmul.pungmul.web.member.dto;
+package pungmul.pungmul.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
