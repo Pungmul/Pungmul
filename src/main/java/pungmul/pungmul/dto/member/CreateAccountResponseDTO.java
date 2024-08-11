@@ -21,8 +21,8 @@ public class CreateAccountResponseDTO {
     @AllArgsConstructor
     public static class UserData {
         private Long userId;       // 회원 ID
-        private String username;   // 사용자 이름 (혹은 로그인 ID)
-        private String email;      // 이메일
-        private String token;      // 인증 토큰 (JWT 등)
+        private String loginId;   // 사용자 이름 (혹은 로그인 ID)
+        private String userName;      // 이메일
+//        private String token;      // 인증 토큰 (JWT 등)
     }
 }

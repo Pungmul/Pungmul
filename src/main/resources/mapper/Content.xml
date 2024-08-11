@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.post.mapper.ContentMapper">
+
+    <!-- ResultMap for Content -->
+    <resultMap id="ContentResultMap" type="pungmul.pungmul.domain.post.Content">
+        <id property="id" column="id" />
+        <result property="postId" column="post_id" />
+        <result property="writerId" column="writer_id" />
+        <result property="anonymity" column="anonymity" />
+        <result property="title" column="title" />
+        <result property="text" column="text" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!-- Insert Content -->
+    <insert id="save" parameterType="pungmul.pungmul.domain.post.Content" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO content (
+            post_id,
+            writer_id,
+            anonymity,
+            title,
+            text
+        ) VALUES (
+            #{postId},
+            #{writerId},
+            #{anonymity},
+            #{title},
+            #{text}
+        )
+    </insert>
+
+    <!-- Select Content By Id -->
+    <select id="getContentById" resultMap="ContentResultMap" parameterType="java.lang.Long">
+        SELECT * FROM content WHERE id = #{id}
+    </select>
+
+    <!-- Select Contents By PostId -->
+    <select id="getContentsByPostId" resultMap="ContentResultMap" parameterType="java.lang.Long">
+        SELECT * FROM content WHERE post_id = #{postId}
+    </select>
+
+</mapper>

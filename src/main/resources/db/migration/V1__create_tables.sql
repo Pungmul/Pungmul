@@ -13,20 +13,21 @@ CREATE TABLE if not exists account  (
 );
 
 CREATE TABLE if not exists user (
-                      id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                      account_id BIGINT NOT NULL,
-                      name VARCHAR(20) NOT NULL,
-                      club_name VARCHAR(50),
-                      birth DATE NOT NULL,
-                      club_age INT,
-                      gender ENUM('MALE', 'FEMALE') NOT NULL,
-                      phone_number VARCHAR(20) NOT NULL,
-                      email VARCHAR(50) UNIQUE NOT NULL,
-                      club_id BIGINT,
-                      area VARCHAR(255),
-                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                      FOREIGN KEY (account_id) REFERENCES account(id)
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        account_id BIGINT NOT NULL,
+                        name VARCHAR(20) NOT NULL,
+                        club_name VARCHAR(50),
+                        birth DATE NOT NULL,
+                        club_age INT,
+                        gender ENUM('MALE', 'FEMALE') NOT NULL,
+                        phone_number VARCHAR(20) NOT NULL,
+                        email VARCHAR(50) UNIQUE NOT NULL,
+                        club_id BIGINT,
+                        profile_image BIGINT,
+                        area VARCHAR(255),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        FOREIGN KEY (account_id) REFERENCES account(id)
 );
 
 CREATE TABLE if not exists club (
@@ -60,8 +61,8 @@ CREATE TABLE if not exists post (
                             deleted BOOLEAN DEFAULT FALSE,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                            FOREIGN KEY (writer_id) REFERENCES user(id)
-    -- FOREIGN KEY (category_id) REFERENCES category(id)
+                            FOREIGN KEY (writer_id) REFERENCES user(id),
+                            FOREIGN KEY (category_id) REFERENCES category(id)
 );
 
 CREATE TABLE if not exists content (
@@ -100,10 +101,13 @@ CREATE TABLE IF NOT EXISTS domain_image (
                         INDEX (domain_type, domain_id)     -- 조회 성능을 위한 복합 인덱스
 );
 
-# CREATE TABLE if not exists content_image (
-#                                content_id BIGINT NOT NULL,
-#                                image_id BIGINT NOT NULL,
-#                                PRIMARY KEY (content_id, image_id),
-#                                FOREIGN KEY (content_id) REFERENCES content(id),
-#                                FOREIGN KEY (image_id) REFERENCES image(id)
-# );
+CREATE TABLE IF NOT EXISTS category (
+                                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                        parent_id BIGINT DEFAULT NULL,  -- 대분류의 경우 NULL, 소분류는 대분류의 ID를 참조
+                                        name VARCHAR(255) NOT NULL,     -- 카테고리 이름
+                                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                        FOREIGN KEY (parent_id) REFERENCES category(id) ON DELETE SET NULL
+);
+
+

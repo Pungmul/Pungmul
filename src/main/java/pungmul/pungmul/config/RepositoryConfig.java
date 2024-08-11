@@ -12,6 +12,12 @@ import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.member.mapper.AccountMapper;
 import pungmul.pungmul.repository.member.mapper.InstrumentStatusMapper;
 import pungmul.pungmul.repository.member.mapper.UserMapper;
+import pungmul.pungmul.repository.post.impl.MybatisContentRepository;
+import pungmul.pungmul.repository.post.impl.MybatisPostRepository;
+import pungmul.pungmul.repository.post.mapper.ContentMapper;
+import pungmul.pungmul.repository.post.mapper.PostMapper;
+import pungmul.pungmul.repository.post.repository.ContentRepository;
+import pungmul.pungmul.repository.post.repository.PostRepository;
 
 @Configuration
 @RequiredArgsConstructor
@@ -19,6 +25,8 @@ public class RepositoryConfig {
     private final AccountMapper accountMapper;
     private final UserMapper userMapper;
     private final InstrumentStatusMapper instrumentStatusMapper;
+    private final PostMapper postMapper;
+    private final ContentMapper contentMapper;
 
     @Bean
     public AccountRepository accountRepository(){
@@ -32,6 +40,16 @@ public class RepositoryConfig {
 
     public InstrumentStatusRepository instrumentStatusRepository(){
         return new MybatisInstrumentStatusRepository(instrumentStatusMapper);
+    }
+
+    @Bean
+    public PostRepository postRepository(){
+        return new MybatisPostRepository(postMapper);
+    }
+
+    @Bean
+    public ContentRepository contentRepository(){
+        return new MybatisContentRepository(contentMapper);
     }
 
 }
