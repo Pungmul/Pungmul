@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.image.mapper.DomainImageMapper">
+
+    <!-- ResultMap for DomainImage -->
+    <resultMap id="DomainImageResultMap" type="pungmul.pungmul.domain.file.DomainImage">
+        <id property="id" column="id" />
+        <result property="domainType" column="domain_type" />
+        <result property="domainId" column="domain_id" />
+        <result property="imageId" column="image_id" />
+        <result property="isPrimary" column="is_primary" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!-- Insert DomainImage -->
+    <insert id="save" parameterType="pungmul.pungmul.dto.file.DomainImageDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO domain_image (
+            domain_type,
+            domain_id,
+            image_id
+        ) VALUES (
+            #{domainType},
+            #{domainId},
+            #{imageId}
+        )
+    </insert>
+
+</mapper>

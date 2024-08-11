@@ -109,9 +109,9 @@ public class CreateMemberService {
                 .message("회원가입이 성공적으로 완료되었습니다.")
                 .data(CreateAccountResponseDTO.UserData.builder()
                         .userId(account.getId())
-                        .username(account.getLoginId())
-                        .email(user.getEmail())
-                        .token("생성된 JWT 토큰")
+                        .loginId(account.getLoginId())
+                        .userName(user.getName())
+//                        .token("생성된 JWT 토큰")
                         .build())
                 .redirectUrl("/login")
                 .build();

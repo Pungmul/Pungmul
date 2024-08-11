@@ -12,6 +12,7 @@
         <result property="fullFilePath" column="full_file_path" />
         <result property="fileType" column="file_type" />
         <result property="fileSize" column="size" />
+        <result property="userId" column="user_id" />
         <result property="createdAt" column="created_at" />
     </resultMap>
 
@@ -23,7 +24,7 @@
             full_file_path,
             file_type,
             size,
-            userId
+            user_id
         ) VALUES (
              #{originalFilename},
              #{convertedFileName},
