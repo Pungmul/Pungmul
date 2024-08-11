@@ -51,26 +51,30 @@ CREATE TABLE if not exists instrument_status (
 );
 
 CREATE TABLE if not exists post (
-                      id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                      writer_id BIGINT NOT NULL,
-                      category_id BIGINT NOT NULL,
-                      title VARCHAR(255) NOT NULL,
-                      view_count INT DEFAULT 0,
-                      status ENUM('DRAFT', 'PUBLISH', 'ARCHIVE', 'DELETE') NOT NULL,
-                      like_num INT DEFAULT 0,
-                      anonymity BOOLEAN DEFAULT FALSE,
-                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                      FOREIGN KEY (writer_id) REFERENCES user(id)
+                            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            writer_id BIGINT NOT NULL,
+                            category_id BIGINT NOT NULL,
+                            title VARCHAR(255) NOT NULL,
+                            view_count INT DEFAULT 0,
+                            like_num INT DEFAULT 0,
+                            deleted BOOLEAN DEFAULT FALSE,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            FOREIGN KEY (writer_id) REFERENCES user(id)
     -- FOREIGN KEY (category_id) REFERENCES category(id)
 );
 
 CREATE TABLE if not exists content (
-                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                         post_id BIGINT NOT NULL,
-                         text TEXT,
-                         FOREIGN KEY (post_id) REFERENCES post(id)
-);
+                            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            post_id BIGINT NOT NULL,
+                            anonymity BOOLEAN DEFAULT FALSE,
+                            title VARCHAR(255),
+                            text TEXT,
+                            writer_id BIGINT NOT NULL,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            FOREIGN KEY (post_id) REFERENCES post(id)
+                    );
 
 CREATE TABLE if not exists image (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -84,10 +88,22 @@ CREATE TABLE if not exists image (
                         FOREIGN KEY (userId) REFERENCES user(id)
 );
 
-CREATE TABLE if not exists content_image (
-                               content_id BIGINT NOT NULL,
-                               image_id BIGINT NOT NULL,
-                               PRIMARY KEY (content_id, image_id),
-                               FOREIGN KEY (content_id) REFERENCES content(id),
-                               FOREIGN KEY (image_id) REFERENCES image(id)
+CREATE TABLE IF NOT EXISTS domain_image (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        domain_type VARCHAR(50) NOT NULL,  -- 도메인 타입
+                        domain_id BIGINT NOT NULL,         -- 도메인 객체의 ID
+                        image_id BIGINT NOT NULL,          -- 이미지 ID
+                        is_primary BOOLEAN DEFAULT FALSE,  -- 기본 이미지 여부
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        FOREIGN KEY (image_id) REFERENCES image(id) ON DELETE CASCADE,
+                        INDEX (domain_type, domain_id)     -- 조회 성능을 위한 복합 인덱스
 );
+
+# CREATE TABLE if not exists content_image (
+#                                content_id BIGINT NOT NULL,
+#                                image_id BIGINT NOT NULL,
+#                                PRIMARY KEY (content_id, image_id),
+#                                FOREIGN KEY (content_id) REFERENCES content(id),
+#                                FOREIGN KEY (image_id) REFERENCES image(id)
+# );
