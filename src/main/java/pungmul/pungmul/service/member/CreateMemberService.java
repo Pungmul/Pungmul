@@ -17,6 +17,10 @@ import pungmul.pungmul.dto.member.CreateAccountResponseDTO;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * CreateMemberService 클래스는 회원 가입 로직을 처리하는 서비스입니다.
+ * 회원 생성 요청에 따라 Account, User, InstrumentStatus 엔티티를 생성하고 저장합니다.
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -26,6 +30,11 @@ public class CreateMemberService {
     private final InstrumentStatusRepository instrumentStatusRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 회원 생성 메서드.
+     * @param createAccountRequestDto 회원 생성 요청 데이터
+     * @return 회원 생성 응답 데이터
+     */
     @Transactional
     public CreateAccountResponseDTO createMember(CreateAccountRequestDTO createAccountRequestDto) {
         Long accountId = createAccount(createAccountRequestDto);
@@ -41,6 +50,11 @@ public class CreateMemberService {
         return getCreateAccountResponse(account, user);
     }
 
+    /**
+     * Account 엔티티 생성 및 저장 메서드.
+     * @param createAccountRequestDto 회원 생성 요청 데이터
+     * @return 생성된 Account의 ID
+     */
     private Long createAccount(CreateAccountRequestDTO createAccountRequestDto) {
         Account account = Account.builder()
                 .loginId(createAccountRequestDto.getLoginId())
@@ -50,12 +64,24 @@ public class CreateMemberService {
         return account.getId();
     }
 
+    /**
+     * User 엔티티 생성 및 저장 메서드.
+     * @param createAccountRequestDto 회원 생성 요청 데이터
+     * @param accountId 연결된 Account의 ID
+     * @return 생성된 User의 ID
+     */
     private Long createUser(CreateAccountRequestDTO createAccountRequestDto, Long accountId) {
         User user = getUser(createAccountRequestDto, accountId);
         userRepository.saveUser(user);
         return user.getId();
     }
 
+    /**
+     * InstrumentStatus 엔티티 생성 및 저장 메서드.
+     * @param instrumentStatusList 악기 상태 목록
+     * @param userId 연결된 User의 ID
+     * @return 생성된 InstrumentStatus의 ID 리스트
+     */
     private List<Long> createInstrument(List<InstrumentStatus> instrumentStatusList, Long userId) {
         ArrayList<Long> arrayList = new ArrayList<>();
         for (InstrumentStatus instrumentStatus : instrumentStatusList) {
@@ -71,6 +97,12 @@ public class CreateMemberService {
         return arrayList;
     }
 
+    /**
+     * CreateAccountResponseDTO 객체 생성 메서드.
+     * @param account 생성된 Account 엔티티
+     * @param user 생성된 User 엔티티
+     * @return 생성된 회원의 응답 데이터
+     */
     private CreateAccountResponseDTO getCreateAccountResponse(Account account, User user) {
         return CreateAccountResponseDTO.builder()
                 .status("success")
@@ -85,6 +117,12 @@ public class CreateMemberService {
                 .build();
     }
 
+    /**
+     * User 엔티티 생성 메서드.
+     * @param createAccountRequestDto 회원 생성 요청 데이터
+     * @param accountId 연결된 Account의 ID
+     * @return 생성된 User 엔티티
+     */
     private User getUser(CreateAccountRequestDTO createAccountRequestDto, Long accountId) {
         return User.builder()
                 .accountId(accountId)
@@ -99,6 +137,4 @@ public class CreateMemberService {
                 .clubId(createAccountRequestDto.getClubId())
                 .build();
     }
-
-
 }
