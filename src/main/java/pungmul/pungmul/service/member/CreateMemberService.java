@@ -112,7 +112,7 @@ public class CreateMemberService {
      * CreateAccountResponseDTO 객체 생성 메서드.
      * @param accountId 생성된 Account 엔티티 id
      * @param userId 생성된 User 엔티티 id
-     * @return 생성된 회원의s 응답 데이터
+     * @return 생성된 회원의 응답 데이터
      */
     private CreateAccountResponseDTO getCreateMemberResponse(Long accountId, Long userId) {
         // 계정 정보 가져오기

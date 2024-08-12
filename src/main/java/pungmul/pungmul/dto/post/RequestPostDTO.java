@@ -16,7 +16,5 @@ public class RequestPostDTO {
     private String title;
     private String text;
     private boolean anonymity;
-    private List<MultipartFile> files;
     private Long categoryId;
-
 }
