@@ -30,32 +30,26 @@ public class PostService {
     private final DomainImageService domainImageService;
 
     @Transactional
-    public Long addPost(Long userId, RequestPostDTO requestPostDTO) throws IOException {
-        log.info("PostService");
+    public Long addPost(Long userId, RequestPostDTO requestPostDTO, List<MultipartFile> files) throws IOException {
         Long postId = savePost(requestPostDTO);
-        saveContent(userId, postId, requestPostDTO);
+        saveContent(userId, postId, requestPostDTO, files);
 
         return postId;
     }
 
     private Long savePost(RequestPostDTO requestPostDTO) throws IOException {
         Post post = getPost(requestPostDTO);
-
-        log.info("save Post");
         postRepository.save(post);
-        log.info("save Post done, {}", post.getId());
+
         return post.getId();
     }
 
-    private void saveContent(Long userId, Long postId, RequestPostDTO requestPostDTO) throws IOException {
+    private void saveContent(Long userId, Long postId, RequestPostDTO requestPostDTO, List<MultipartFile> files) throws IOException {
         Content content = getContent(userId, postId, requestPostDTO);
         contentRepository.save(content);
 
-        log.info("save Content id {}", content.getId());
-        List<Long> imageIdList = saveImage(userId, content.getId(), requestPostDTO.getFiles());
-        content.setImageIdList(imageIdList);
-
-        log.info("save Content done, {}", content.getId());
+        saveImage(userId, content.getId(),files);
+//        content.setImageIdList(imageIdList);
     }
 
     private List<Long> saveImage(Long userId, Long contentId, List<MultipartFile> images) throws IOException {
@@ -63,18 +57,15 @@ public class PostService {
 
         for (MultipartFile image : images) {
             Image savedImage = getImage(userId, image, imageIdList);
-            log.info("save Image done, {}", savedImage.getId());
             domainImageService.saveDomainImage(DomainType.CONTENT, contentId, savedImage.getId());
-            log.info("save domainImage done, {}", savedImage.getId());
         }
         return imageIdList;
     }
 
     private static Post getPost(RequestPostDTO requestPostDTO) {
-        Post post = Post.builder()
+        return Post.builder()
                 .categoryId(requestPostDTO.getCategoryId())
                 .build();
-        return post;
     }
 
     private static Content getContent(Long userId, Long postId, RequestPostDTO requestPostDTO) {
@@ -91,6 +82,7 @@ public class PostService {
         RequestImageDTO imageDTO = RequestImageDTO.builder()
                 .imageFile(image)
                 .userId(userId)
+                .domainType(DomainType.CONTENT)
                 .build();
         Image savedImage = imageService.saveImage(imageDTO);
         log.info("domainId : {}", savedImage.getId());

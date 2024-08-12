@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class CreateAccountRequestDTO {
+public class CreateMemberRequestDTO {
 
     @NotEmpty @Email
     private String loginId;
@@ -42,6 +42,6 @@ public class CreateAccountRequestDTO {
 
     private Long clubId;
 
-    private List<InstrumentStatus> instrumentStatusList;
+//    private List<InstrumentStatus> instrumentStatusList;
 
 }

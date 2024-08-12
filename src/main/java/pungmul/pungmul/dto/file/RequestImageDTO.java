@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
+import pungmul.pungmul.domain.file.DomainType;
 
 @Data
 @Builder
@@ -12,5 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class RequestImageDTO {
     private Long userId;
+    private DomainType domainType;
     private MultipartFile imageFile;
 }
