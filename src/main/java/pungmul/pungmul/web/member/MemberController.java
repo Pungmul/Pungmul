@@ -4,17 +4,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import pungmul.pungmul.dto.member.CreateAccountRequestDTO;
-import pungmul.pungmul.dto.member.CreateAccountResponseDTO;
-import pungmul.pungmul.dto.member.LoginDTO;
-import pungmul.pungmul.dto.member.LoginResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
+import pungmul.pungmul.domain.member.InstrumentStatus;
+import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.service.member.CreateMemberService;
 import pungmul.pungmul.service.member.LoginService;
 
 import javax.naming.AuthenticationException;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * MemberController 클래스는 회원 관련 요청을 처리하는 REST 컨트롤러입니다.
@@ -32,13 +34,28 @@ public class MemberController {
 
     /**
      * 새로운 회원을 생성하는 메서드.
-     * @param createAccountRequestDto 회원 생성 요청 데이터
+     * @param createMemberRequestDto 회원 생성 요청 데이터
      * @return 생성된 회원 정보와 함께 201(CREATED) 상태 반환
      */
-    @PostMapping("/signup")
-    public ResponseEntity<CreateAccountResponseDTO> createMember(@Validated @RequestBody CreateAccountRequestDTO createAccountRequestDto) {
-        CreateAccountResponseDTO accountResponseDto = createMemberService.createMember(createAccountRequestDto);
+//    @PostMapping("/signup")
+//    public ResponseEntity<CreateAccountResponseDTO> createMember(
+//            @Validated @RequestPart("accountData") CreateMemberRequestDTO createMemberRequestDto,
+//            @RequestPart("profile") MultipartFile profile) throws IOException {
+//        CreateAccountResponseDTO accountResponseDto = createMemberService.createMember(createMemberRequestDto, profile);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(accountResponseDto);
+//    }
+
+    @PostMapping(value = "/signup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<CreateAccountResponseDTO> createMember(
+            @Validated @RequestPart("accountData") CreateMemberRequestDTO createMemberRequestDto,
+            @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+        CreateAccountResponseDTO accountResponseDto = createMemberService.createMember(createMemberRequestDto, profile);
         return ResponseEntity.status(HttpStatus.CREATED).body(accountResponseDto);
+    }
+
+    @PostMapping("/inst")
+    public ResponseEntity<List<Long>> regInstrument(@RequestParam Long userId, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList){
+        return ResponseEntity.ok(createMemberService.createInstrument(userId, instrumentStatusList));
     }
 
     /**
