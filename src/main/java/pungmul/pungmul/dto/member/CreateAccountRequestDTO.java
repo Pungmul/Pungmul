@@ -18,7 +18,7 @@ public class CreateAccountRequestDTO {
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$", message = "8자 이상의 영문자와 숫자 조합")
     private String password;
 
-    @NotEmpty   @Size(min = 2, max = 10)
+    @NotEmpty   @Size(min = 2, max = 20)
     private String name;
 
     @Size(min = 1, max = 10)
