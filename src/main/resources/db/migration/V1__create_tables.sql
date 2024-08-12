@@ -41,14 +41,14 @@ CREATE TABLE if not exists club (
 );
 
 CREATE TABLE if not exists instrument_status (
-                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                        user_id BIGINT NOT NULL,
-                        instrument ENUM('KKWAENGGWARI', 'JING', 'JANGGU', 'BUK', 'SOGO', 'TAEPYUNGSO') NOT NULL,
-                        instrument_ability ENUM('UNSKILLED', 'BASIC', 'INTERMEDIATE', 'ADVANCED', 'EXPERT') NOT NULL,
-                        major BOOLEAN DEFAULT FALSE,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (user_id) REFERENCES user(id)
+                            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            user_id BIGINT NOT NULL,
+                            instrument ENUM('KKWAENGGWARI', 'JING', 'JANGGU', 'BUK', 'SOGO', 'TAEPYUNGSO') NOT NULL,
+                            instrument_ability ENUM('UNSKILLED', 'BASIC', 'INTERMEDIATE', 'ADVANCED', 'EXPERT') NOT NULL,
+                            major BOOLEAN DEFAULT FALSE,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
 CREATE TABLE if not exists post (
@@ -102,12 +102,12 @@ CREATE TABLE IF NOT EXISTS domain_image (
 );
 
 CREATE TABLE IF NOT EXISTS category (
-                                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                        parent_id BIGINT DEFAULT NULL,  -- 대분류의 경우 NULL, 소분류는 대분류의 ID를 참조
-                                        name VARCHAR(255) NOT NULL,     -- 카테고리 이름
-                                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                        FOREIGN KEY (parent_id) REFERENCES category(id) ON DELETE SET NULL
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        parent_id BIGINT DEFAULT NULL,  -- 대분류의 경우 NULL, 소분류는 대분류의 ID를 참조
+                        name VARCHAR(255) NOT NULL,     -- 카테고리 이름
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        FOREIGN KEY (parent_id) REFERENCES category(id) ON DELETE SET NULL
 );
 
 

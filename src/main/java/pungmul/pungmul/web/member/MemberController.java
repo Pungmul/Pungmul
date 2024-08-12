@@ -35,7 +35,7 @@ public class MemberController {
      * @param createAccountRequestDto 회원 생성 요청 데이터
      * @return 생성된 회원 정보와 함께 201(CREATED) 상태 반환
      */
-    @PostMapping("/create")
+    @PostMapping("/signup")
     public ResponseEntity<CreateAccountResponseDTO> createMember(@Validated @RequestBody CreateAccountRequestDTO createAccountRequestDto) {
         CreateAccountResponseDTO accountResponseDto = createMemberService.createMember(createAccountRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(accountResponseDto);
