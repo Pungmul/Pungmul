@@ -10,12 +10,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import pungmul.pungmul.service.member.loginvalidation.user.LoginUserArgumentResolver;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
 //    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
@@ -30,6 +35,11 @@ public class SecurityConfig {
 //                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
         return http.build();
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new LoginUserArgumentResolver());
     }
 
     public void addCorsMappings(CorsRegistry registry) {

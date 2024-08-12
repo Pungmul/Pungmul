@@ -13,10 +13,9 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SessionUser implements Serializable {
     private Long accountId;
+    private Long userId;
     private String username;
-//    private List<String> roles;
     private LocalDateTime sessionCreationTime;
     private boolean isLoggedIn;
-//    private Map<String, String> preferences;
 }
 

@@ -60,6 +60,7 @@ public class LoginService {
 
         return SessionUser.builder()
                 .accountId(loginAccount.getId())
+                .userId(loginUser.getId())
                 .username(loginUser.getName())
                 .sessionCreationTime(LocalDateTime.now()) // 현재 시간을 세션 생성 시간으로 설정
                 .isLoggedIn(true) // 로그인 상태를 true로 설정

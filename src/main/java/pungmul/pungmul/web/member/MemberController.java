@@ -1,6 +1,7 @@
 package pungmul.pungmul.web.member;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,9 +11,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.member.InstrumentStatus;
+import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.service.member.CreateMemberService;
 import pungmul.pungmul.service.member.LoginService;
+import pungmul.pungmul.service.member.loginvalidation.user.User;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
@@ -56,8 +59,8 @@ public class MemberController {
     }
 
     @PostMapping("/inst")
-    public ResponseEntity<List<Long>> regInstrument(@RequestParam Long userId, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList){
-        return ResponseEntity.ok(createMemberService.createInstrument(userId, instrumentStatusList));
+    public ResponseEntity<List<Long>> regInstrument(@User SessionUser sessionUser, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList){
+        return ResponseEntity.ok(createMemberService.createInstrument(sessionUser.getUserId(), instrumentStatusList));
     }
 
     /**
@@ -73,4 +76,21 @@ public class MemberController {
         LoginResponseDTO loginResponseDTO = loginService.processLogin(loginDTO, request);
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        // 기존 세션이 있는지 확인
+        HttpSession session = request.getSession(false);  // false -> 새로운 세션을 생성하지 않고, 기존 세션을 반환
+        if (session == null) {
+            // 세션이 없으면 사용자가 로그인되어 있지 않은 상태이므로 401 UNAUTHORIZED 반환
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("로그인 상태 아님");
+        }
+        // 세션 무효화하여 로그아웃 처리
+        session.invalidate();
+        return ResponseEntity.ok()
+                .body("로그아웃 되었습니다.");
+    }
+
+
 }
