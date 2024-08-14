@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.post.mapper.CommentMapper">
+
+    <!-- ResultMap for Comment -->
+    <resultMap id="CommentResultMap" type="pungmul.pungmul.domain.post.Comment">
+        <id property="id" column="id"/>
+        <result property="postId" column="post_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="content" column="content"/>
+        <result property="deleted" column="deleted"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- Insert Comment -->
+    <insert id="save" parameterType="pungmul.pungmul.domain.post.Comment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comment (post_id, user_id, parent_id, content)
+        VALUES (#{postId}, #{userId}, #{parentId}, #{content})
+    </insert>
+
+    <!-- Insert like record -->
+    <insert id="likeComment" parameterType="map">
+        INSERT INTO comment_likes (comment_id, user_id)
+        VALUES (#{commentId}, #{userId})
+            ON DUPLICATE KEY UPDATE created_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <!-- Get the number of likes for a specific comment -->
+    <select id="getCommentLikesNum" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM comment_likes
+        WHERE comment_id = #{commentId}
+    </select>
+</mapper>
