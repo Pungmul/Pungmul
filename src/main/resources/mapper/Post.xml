@@ -21,4 +21,25 @@
         VALUES (#{categoryId})
     </insert>
 
+
+    <!-- Insert like record -->
+    <insert id="likePost" parameterType="map">
+        INSERT INTO post_likes (post_id, user_id)
+        VALUES (#{postId}, #{userId})
+            ON DUPLICATE KEY UPDATE created_at = CURRENT_TIMESTAMP
+    </insert>
+
+    <!-- Update like count for a post -->
+    <update id="plusPostLikeCount" parameterType="java.lang.Long">
+        UPDATE post
+        SET like_num = like_num + 1
+        WHERE id = #{postId}
+    </update>
+
+    <select id="postLikedNum" parameterType="java.lang.Long">
+        SELECT like_num
+        FROM post
+        WHERE id = #{postId}
+    </select>
+
 </mapper>

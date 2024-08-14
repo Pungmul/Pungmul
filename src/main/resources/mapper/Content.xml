@@ -18,19 +18,8 @@
 
     <!-- Insert Content -->
     <insert id="save" parameterType="pungmul.pungmul.domain.post.Content" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO content (
-            post_id,
-            writer_id,
-            anonymity,
-            title,
-            text
-        ) VALUES (
-            #{postId},
-            #{writerId},
-            #{anonymity},
-            #{title},
-            #{text}
-        )
+        INSERT INTO content (post_id, writer_id, anonymity, title, text)
+        VALUES (#{postId}, #{writerId}, #{anonymity}, #{title}, #{text})
     </insert>
 
     <!-- Select Content By Id -->

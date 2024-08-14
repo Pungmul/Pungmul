@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RequestPostDTO {
-    private Long userId;
+//    private Long userId;
     private String title;
     private String text;
     private boolean anonymity;

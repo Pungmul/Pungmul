@@ -17,4 +17,19 @@ public class MybatisPostRepository implements PostRepository {
     public void save(Post post) {
         postMapper.save(post);
     }
+
+    @Override
+    public void likePost(Long userId, Long postId) {
+        postMapper.likePost(userId, postId);
+    }
+
+    @Override
+    public void plusPostLikeCount(Long postId) {
+        postMapper.plusPostLikeCount(postId);
+    }
+
+    @Override
+    public Integer postLikedNum(Long postId) {
+        return postMapper.postLikedNum(postId);
+    }
 }

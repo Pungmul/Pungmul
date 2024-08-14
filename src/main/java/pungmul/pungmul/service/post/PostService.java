@@ -90,4 +90,10 @@ public class PostService {
         return savedImage;
     }
 
+    public Integer likePost(Long userId, Long postId) {
+        postRepository.likePost(userId, postId);
+        postRepository.plusPostLikeCount(postId);
+
+        return postRepository.postLikedNum(postId);
+    }
 }

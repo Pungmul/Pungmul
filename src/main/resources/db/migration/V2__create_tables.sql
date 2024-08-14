@@ -106,3 +106,36 @@ CREATE TABLE IF NOT EXISTS content (
                                 FOREIGN KEY (post_id) REFERENCES post(id),
                                 FOREIGN KEY (writer_id) REFERENCES user(id)
     );
+
+CREATE TABLE IF NOT EXISTS post_likes (
+                                post_id BIGINT NOT NULL,                -- 좋아요가 눌린 게시물의 ID (외래키로 post 테이블 참조)
+                                user_id BIGINT NOT NULL,                -- 좋아요를 누른 사용자의 ID (외래키로 user 테이블 참조)
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 좋아요를 누른 시간
+                                FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE,
+                                FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+                                UNIQUE(post_id, user_id)                -- 같은 사용자가 동일한 게시물에 중복으로 좋아요를 누를 수 없도록 유니크 제약 조건 설정
+);
+
+CREATE TABLE IF NOT EXISTS comment (
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY,    -- 댓글의 고유 ID
+                                post_id BIGINT NOT NULL,                 -- 댓글이 달린 게시글의 ID (외래키로 post 테이블 참조)
+                                user_id BIGINT,                          -- 댓글 작성자의 사용자 ID (외래키로 user 테이블 참조)
+                                parent_id BIGINT DEFAULT NULL,           -- 부모 댓글의 ID (NULL이면 최상위 댓글, 외래키로 comment 테이블의 id 참조)
+                                content TEXT NOT NULL,                   -- 댓글의 내용
+                                deleted BOOLEAN DEFAULT FALSE,
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 댓글 작성 시간
+                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 댓글 수정 시간
+                                FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE, -- 게시글이 삭제되면 댓글도 삭제
+                                FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE SET NULL, -- 사용자가 탈퇴해도 댓글은 남기되, user_id는 NULL로 설정
+                                FOREIGN KEY (parent_id) REFERENCES comment(id) -- 부모 댓글이 삭제되도 자식 댓글은 남음
+    );
+
+CREATE TABLE IF NOT EXISTS comment_likes (
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY,   -- 좋아요 기록의 고유 ID
+                                comment_id BIGINT NOT NULL,             -- 좋아요가 눌린 댓글의 ID (외래키로 comment 테이블 참조)
+                                user_id BIGINT NOT NULL,                -- 좋아요를 누른 사용자의 ID (외래키로 user 테이블 참조)
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 좋아요를 누른 시간
+                                FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+                                FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+                                UNIQUE(comment_id, user_id)             -- 같은 사용자가 동일한 댓글에 중복으로 좋아요를 누를 수 없도록 유니크 제약 조건 설정
+);
