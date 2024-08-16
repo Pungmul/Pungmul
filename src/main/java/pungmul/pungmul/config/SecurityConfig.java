@@ -1,6 +1,7 @@
 package pungmul.pungmul.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,7 @@ import pungmul.pungmul.service.member.loginvalidation.user.LoginUserArgumentReso
 
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -28,12 +30,18 @@ public class SecurityConfig implements WebMvcConfigurer {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/member/**", "/public/**", "/image/**", "/posts/**").permitAll()
+                        .requestMatchers("/member/**", "/public/**", "/image/**", "/posts/**", "/ws/**", "/chat/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(customizer ->
+                        customizer
+                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                    log.error("Access Denied: ", accessDeniedException);
+                                })
+                                .authenticationEntryPoint((request, response, authException) -> {
+                                    log.error("Authentication Failed: ", authException);
+                                })
                 );
-//                .sessionManagement(session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
-
         return http.build();
     }
 
