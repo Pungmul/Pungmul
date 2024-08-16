@@ -139,3 +139,15 @@ CREATE TABLE IF NOT EXISTS comment_likes (
                                 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
                                 UNIQUE(comment_id, user_id)             -- 같은 사용자가 동일한 댓글에 중복으로 좋아요를 누를 수 없도록 유니크 제약 조건 설정
 );
+
+CREATE TABLE IF NOT EXISTS chat_messages (
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                sender_username VARCHAR(255) NOT NULL,
+                                recipient_username VARCHAR(255) NOT NULL,
+                                content TEXT NOT NULL,
+                                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                chat_room_id BIGINT,
+                                message_type VARCHAR(50),
+                                image_url VARCHAR(255)
+);
+
