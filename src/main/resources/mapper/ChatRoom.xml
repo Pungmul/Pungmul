@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.chat.mapper.ChatRoomMapper">
+
+    <!-- Result Map for ChatRoom -->
+    <resultMap id="ChatRoomResultMap" type="pungmul.pungmul.domain.chat.ChatRoom">
+        <id property="id" column="id" />
+        <result property="roomUUID" column="room_uuid" />
+        <result property="createdBy" column="created_by" />
+        <result property="lastMessageId" column="last_message_id" />
+        <result property="lastMessageTime" column="last_message_time" />
+        <result property="createdAt" column="created_at" />
+        <collection property="chatRoomMemberIds" ofType="java.lang.Long" column="user_id"
+                    select="selectMembersByChatRoomId" />
+    </resultMap>
+
+    <!-- Insert ChatRoom -->
+    <insert id="createPersonalChatRoom" parameterType="pungmul.pungmul.domain.chat.ChatRoom" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO chat_room (room_uuid, created_by, last_message_id)
+        VALUES (#{roomUUID}, #{createdBy}, #{lastMessageId})
+    </insert>
+
+    <!-- Insert ChatRoom Members -->
+    <insert id="addChatRoomMembers">
+        INSERT INTO chat_room_members (chat_room_id, user_id)
+        VALUES
+        <foreach collection="memberIds" item="memberId" separator=",">
+            (#{chatRoomId}, #{memberId})
+        </foreach>
+    </insert>
+
+
+    <!-- Select ChatRoom by id -->
+    <select id="selectChatRoomById" parameterType="long" resultMap="ChatRoomResultMap">
+        SELECT *
+        FROM chat_room cr
+                 LEFT JOIN chat_room_members crm ON cr.id = crm.chat_room_id
+        WHERE cr.id = #{id}
+    </select>
+
+    <!-- Select members by chat room id -->
+    <select id="selectMembersByChatRoomId" parameterType="long" resultType="java.lang.Long">
+        SELECT user_id
+        FROM chat_room_members
+        WHERE chat_room_id = #{chatRoomId}
+    </select>
+
+</mapper>
