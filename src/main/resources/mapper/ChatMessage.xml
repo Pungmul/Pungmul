@@ -4,36 +4,48 @@
 
 <mapper namespace="pungmul.pungmul.repository.chat.mapper.ChatMapper">
 
+    <!-- ChatMessage ResultMap -->
+    <resultMap id="ChatMessageResultMap" type="pungmul.pungmul.domain.chat.ChatMessage">
+        <id property="id" column="id" />
+        <result property="senderUsername" column="sender_username" />
+        <result property="receiverUsername" column="receiver_username" />
+        <result property="content" column="content" />
+        <result property="chatRoomUUID" column="chat_room_uuid" />
+        <result property="messageType" column="message_type" />
+        <result property="imageUrl" column="image_url" />
+        <result property="timestamp" column="timestamp" />
+    </resultMap>
+
     <!-- 채팅 메시지 삽입 -->
-    <insert id="save" parameterType="pungmul.pungmul.dto.chat.ChatMessage">
-        INSERT INTO chat_messages (sender_username, recipient_username, content, chat_room_id, message_type, image_url)
-        VALUES (#{senderUsername}, #{recipientUsername}, #{content}, #{chatRoomId}, #{messageType}, #{imageUrl})
+    <insert id="save" parameterType="pungmul.pungmul.domain.chat.ChatMessage">
+        INSERT INTO chat_messages (sender_username, receiver_username, content, chat_room_uuid, message_type, image_url)
+        VALUES (#{senderUsername}, #{receiverUsername}, #{content}, #{chatRoomUUID}, #{messageType}, #{imageUrl})
     </insert>
 
     <!-- 특정 채팅방의 메시지 조회 -->
-    <select id="selectChatMessagesByRoom" parameterType="long" resultType="pungmul.pungmul.dto.chat.ChatMessage">
+    <select id="selectChatMessagesByRoom" parameterType="long" resultMap="ChatMessageResultMap">
         SELECT * FROM chat_messages
-        WHERE chat_room_id = #{chatRoomId}
+        WHERE chat_room_uuid = #{chatRoomUUID}
         ORDER BY timestamp ASC
     </select>
 
     <!-- 특정 사용자가 보낸/받은 메시지 조회 -->
-    <select id="selectChatMessagesByUser" parameterType="string" resultType="pungmul.pungmul.dto.chat.ChatMessage">
+    <select id="selectChatMessagesByUser" parameterType="string" resultMap="ChatMessageResultMap">
         SELECT * FROM chat_messages
-        WHERE sender_username = #{username} OR recipient_username = #{username}
+        WHERE sender_username = #{username} OR receiver_username = #{username}
         ORDER BY timestamp ASC
     </select>
 
     <!-- 메시지 ID로 특정 메시지 조회 -->
-    <select id="selectChatMessageById" parameterType="long" resultType="pungmul.pungmul.dto.chat.ChatMessage">
+    <select id="selectChatMessageById" parameterType="long" resultMap="ChatMessageResultMap">
         SELECT * FROM chat_messages
         WHERE id = #{id}
     </select>
 
     <!-- 사용자가 보낸 또는 받은 메시지 조회 (같은 기능의 메서드와 중복, 필요시 삭제 가능) -->
-    <select id="findBySenderOrRecipient" parameterType="string" resultType="pungmul.pungmul.dto.chat.ChatMessage">
+    <select id="findBySenderOrRecipient" parameterType="string" resultMap="ChatMessageResultMap">
         SELECT * FROM chat_messages
-        WHERE sender_username = #{username} OR recipient_username = #{username}
+        WHERE sender_username = #{username} OR receiver_username = #{username}
         ORDER BY timestamp ASC
     </select>
 

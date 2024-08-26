@@ -27,21 +27,27 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+//                        .requestMatchers("/member/**", "/public/**", "/image/**", "/posts/**", "/ws/**", "/chat/**").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .exceptionHandling(customizer ->
+//                        customizer
+//                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+//                                    log.error("Access Denied: ", accessDeniedException);
+//                                })
+//                                .authenticationEntryPoint((request, response, authException) -> {
+//                                    log.error("Authentication Failed: ", authException);
+//                                })
+//                );
         http
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/member/**", "/public/**", "/image/**", "/posts/**", "/ws/**", "/chat/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // 모든 요청 허용
                 )
-                .exceptionHandling(customizer ->
-                        customizer
-                                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                                    log.error("Access Denied: ", accessDeniedException);
-                                })
-                                .authenticationEntryPoint((request, response, authException) -> {
-                                    log.error("Authentication Failed: ", authException);
-                                })
-                );
+                .csrf(csrf -> csrf.disable());  // 새로운 람다 문법을 사용하여 CSRF 보호 비활성화
+
         return http.build();
     }
 

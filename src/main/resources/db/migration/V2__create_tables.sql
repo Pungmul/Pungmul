@@ -140,13 +140,31 @@ CREATE TABLE IF NOT EXISTS comment_likes (
                                 UNIQUE(comment_id, user_id)             -- 같은 사용자가 동일한 댓글에 중복으로 좋아요를 누를 수 없도록 유니크 제약 조건 설정
 );
 
+CREATE TABLE IF NOT EXISTS chat_room (
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                room_uuid varchar(36) UNIQUE NOT NULL,
+                                created_by varchar(36) NOT NULL,
+                                last_message_id BIGINT,  -- 마지막 메시지 ID
+                                last_message_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 마지막 메시지 시간
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- 방 생성 시간
+);
+
+CREATE TABLE IF NOT EXISTS chat_room_members (
+                                                 chat_room_id varchar(36) NOT NULL,
+                                                 user_id BIGINT NOT NULL,
+                                                 PRIMARY KEY (chat_room_id, user_id),
+                                                 FOREIGN KEY (chat_room_id) REFERENCES chat_room(room_uuid) ON DELETE CASCADE,
+                                                 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE IF NOT EXISTS chat_messages (
                                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                 sender_username VARCHAR(255) NOT NULL,
-                                recipient_username VARCHAR(255) NOT NULL,
+                                receiver_username VARCHAR(255) NOT NULL,
                                 content TEXT NOT NULL,
                                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                chat_room_id BIGINT,
+                                chat_room_uuid VARCHAR(36) NOT NULL ,
                                 message_type VARCHAR(50),
                                 image_url VARCHAR(255)
 );
