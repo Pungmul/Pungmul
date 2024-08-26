@@ -161,10 +161,10 @@ CREATE TABLE IF NOT EXISTS chat_room_members (
 CREATE TABLE IF NOT EXISTS chat_messages (
                                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                 sender_username VARCHAR(255) NOT NULL,
-                                recipient_username VARCHAR(255) NOT NULL,
+                                receiver_username VARCHAR(255) NOT NULL,
                                 content TEXT NOT NULL,
                                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                chat_room_id BIGINT,
+                                chat_room_uuid VARCHAR(36) NOT NULL ,
                                 message_type VARCHAR(50),
                                 image_url VARCHAR(255)
 );

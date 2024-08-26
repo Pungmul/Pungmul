@@ -3,7 +3,7 @@ package pungmul.pungmul.repository.chat.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import pungmul.pungmul.dto.chat.ChatMessage;
+import pungmul.pungmul.domain.chat.ChatMessage;
 import pungmul.pungmul.repository.chat.mapper.ChatMapper;
 import pungmul.pungmul.repository.chat.repository.ChatRepository;
 
@@ -13,16 +13,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @Repository
 public class MybatisChatRepository implements ChatRepository {
-
     private final ChatMapper chatMapper;
 
     @Override
-    public void save(ChatMessage chatMessage) {
+    public ChatMessage save(ChatMessage chatMessage) {
         chatMapper.save(chatMessage);
+//        return chatMapper.selectChatMessageById(saveId);
+        return chatMessage;
     }
 
     @Override
-    public List<ChatMessage> findByChatRoomId(Long chatRoomId) {
+    public ChatMessage findByChatRoomId(Long chatRoomId) {
         return chatMapper.findByChatRoomId(chatRoomId);
     }
 
