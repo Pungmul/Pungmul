@@ -21,7 +21,6 @@ import pungmul.pungmul.service.member.loginvalidation.user.User;
 @RequiredArgsConstructor
 @RequestMapping("/chat")
 public class ChatController {
-//    private final WebSocketChatHandler webSocketChatHandler;
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -40,24 +39,4 @@ public class ChatController {
         return chatMessage;
     }
 
-//    @PostMapping("/connect")
-//    public ResponseEntity<String> connect(@User SessionUser sessionUser, @RequestParam String username) {
-//        WebSocketSession webSocketSession = webSocketChatHandler.connectUser(username);
-//
-//        if (webSocketSession != null)
-//            return ResponseEntity.ok("WebSocket 연결 성공");
-//        else
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("WebSocket 연결 실패");
-//    }
-
-//    @PostMapping("/send")
-//    public ResponseEntity<String> send(@User SessionUser sessionUser, @Valid @RequestBody ChatMessageRequestDTO chatMessageRequestDTO) {
-//        ChatMessage chatMessage = chatService.saveMessage(chatMessageRequestDTO);
-//        boolean isSent = webSocketChatHandler.sendMessageToUser(chatMessage);
-//
-//        if (isSent)
-//            return ResponseEntity.ok("메세지 전송 성공");
-//        else
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("메세지 전송 실패");
-//    }
 }
