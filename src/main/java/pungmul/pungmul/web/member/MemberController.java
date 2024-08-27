@@ -77,6 +77,17 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
     }
 
+    @PostMapping("/login-jwt")
+    public ResponseEntity<AuthenticationResponseDTO> loginJwt(@Validated @RequestBody LoginDTO loginDTO,
+                                                     HttpServletRequest request) throws AuthenticationException {
+        loginService.isValidCredentials(loginDTO);
+        AuthenticationResponseDTO response = loginService.authenticate(loginDTO);
+
+        log.info("[authenticate] login response: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         // 기존 세션이 있는지 확인
