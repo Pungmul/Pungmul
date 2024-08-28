@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.domain.member.Account;
@@ -36,7 +37,7 @@ public class LoginService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
     private final TokenProvider tokenProvider;
     private final JwtTokenService jwtTokenService;
 
@@ -65,6 +66,7 @@ public class LoginService {
         return getSessionUser(loginAccount);
     }
 
+    @Transactional
     public AuthenticationResponseDTO authenticate(LoginDTO loginDTO) {
 
         //jwt, refresh token 발급
