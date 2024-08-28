@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import pungmul.pungmul.config.security.JsonUsernamePasswordAuthenticationFilter;
 import pungmul.pungmul.config.security.JwtAuthenticationProvider;
+import pungmul.pungmul.config.security.LogoutHandlerImpl;
 import pungmul.pungmul.service.member.UserDetailsServiceImpl;
 import pungmul.pungmul.service.member.loginvalidation.user.LoginUserArgumentResolver;
 
@@ -33,6 +35,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     private final ObjectMapper objectMapper;
     private final UserDetailsServiceImpl userDetailsService;
+    private final LogoutHandlerImpl logoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -45,6 +48,9 @@ public class SecurityConfig implements WebMvcConfigurer {
 //                        .anyRequest().authenticated()
                         .anyRequest().permitAll()) // 모든 요청 허용. 인증 로직 설계 이후 변경
                 .logout((logout) -> logout
+                        .logoutUrl("/member/logout-jwt")
+                        .addLogoutHandler(logoutHandler)
+                        .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()))
                         .logoutSuccessUrl("/member/login")      //  로그아웃 후 해당 url로 이동
                         .invalidateHttpSession(true))           //  로그아웃 후 세션 삭제. 굳이 필요?
                 .sessionManagement(session -> session

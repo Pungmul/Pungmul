@@ -15,6 +15,12 @@
         WHERE account_id = #{accountId} AND expired = false AND revoked = false
     </update>
 
+    <update id="revokeTokenByToken">
+        UPDATE tokens
+        SET expired = true, revoked = true
+        WHERE token = #{token} AND expired = false AND revoked = false
+    </update>
+
     <!-- 토큰 저장 -->
     <insert id="save" parameterType="pungmul.pungmul.domain.member.JwtToken" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tokens (account_id, token, token_type, expired, revoked)
@@ -29,5 +35,9 @@
             WHERE id = #{token.id};
         </foreach>
     </update>
+
+    <select id="findByToken" parameterType="string" resultType="JwtToken">
+        SELECT * FROM tokens WHERE token = #{token}
+    </select>
 
 </mapper>

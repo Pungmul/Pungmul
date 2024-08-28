@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,6 +32,7 @@ import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginService {
@@ -72,7 +74,11 @@ public class LoginService {
         //jwt, refresh token 발급
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginDTO.getLoginId());
         String accessToken = tokenProvider.generateToken(userDetails);
+        log.info("generated access Token : {}",accessToken);
+
         String refreshToken = tokenProvider.generateRefreshToken(userDetails);
+        log.info("generated refresh Token : {}",refreshToken);
+
 
         //이전 토큰 무효화 및 새 토큰 저장
         Account account = accountRepository.getAccountByLoginId(loginDTO.getLoginId())

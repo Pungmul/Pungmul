@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import pungmul.pungmul.config.JwtConfig;
 
 import java.util.Date;
 
@@ -23,7 +24,7 @@ public class TokenProvider {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .signWith(JwtConfig.SIGNATURE_ALGORITHM, secretKey)
                 .compact();
     }
     // 리프레시 토큰 생성
@@ -32,7 +33,7 @@ public class TokenProvider {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationTime))
-                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .signWith(JwtConfig.SIGNATURE_ALGORITHM, secretKey)
                 .compact();
     }
 

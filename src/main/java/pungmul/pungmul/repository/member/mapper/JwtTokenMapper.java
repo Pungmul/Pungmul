@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import pungmul.pungmul.domain.member.JwtToken;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface JwtTokenMapper {
@@ -18,4 +19,8 @@ public interface JwtTokenMapper {
 
     // 여러 개의 토큰을 저장 (갱신)
     void saveAll(@Param("tokens") List<JwtToken> tokens);
+
+    Optional<JwtToken> findByToken(String token);
+
+    void revokeTokenByToken(String token);
 }
