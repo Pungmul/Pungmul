@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pungmul.pungmul.repository.member.impl.MybatisInstrumentStatusRepository;
+import pungmul.pungmul.repository.member.impl.MybatisJwtTokenRepository;
 import pungmul.pungmul.repository.member.impl.MybatisUserRepository;
+import pungmul.pungmul.repository.member.mapper.JwtTokenMapper;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.impl.MybatisAccountRepository;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
+import pungmul.pungmul.repository.member.repository.JwtTokenRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.member.mapper.AccountMapper;
 import pungmul.pungmul.repository.member.mapper.InstrumentStatusMapper;
@@ -27,6 +30,7 @@ public class RepositoryConfig {
     private final InstrumentStatusMapper instrumentStatusMapper;
     private final PostMapper postMapper;
     private final ContentMapper contentMapper;
+    private final JwtTokenMapper jwtTokenMapper;
 
     @Bean
     public AccountRepository accountRepository(){
@@ -51,5 +55,10 @@ public class RepositoryConfig {
     public ContentRepository contentRepository(){
         return new MybatisContentRepository(contentMapper);
     }
+
+//    @Bean
+//    public JwtTokenRepository jwtTokenRepository(){
+//        return new MybatisJwtTokenRepository(jwtTokenMapper);
+//    }
 
 }

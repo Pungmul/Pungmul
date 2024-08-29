@@ -11,6 +11,7 @@ import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.post.RequestPostDTO;
+import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.ContentRepository;
 import pungmul.pungmul.repository.post.repository.PostRepository;
 import pungmul.pungmul.service.file.DomainImageService;
@@ -28,11 +29,12 @@ public class PostService {
     private final PostRepository postRepository;
     private final ContentRepository contentRepository;
     private final DomainImageService domainImageService;
+    private final UserRepository userRepository;
 
     @Transactional
-    public Long addPost(Long userId, RequestPostDTO requestPostDTO, List<MultipartFile> files) throws IOException {
+    public Long addPost(Long accountId, RequestPostDTO requestPostDTO, List<MultipartFile> files) throws IOException {
         Long postId = savePost(requestPostDTO);
-        saveContent(userId, postId, requestPostDTO, files);
+        saveContent(userRepository.getUserIdByAccountId(accountId), postId, requestPostDTO, files);
 
         return postId;
     }
@@ -90,10 +92,11 @@ public class PostService {
         return savedImage;
     }
 
-    public Integer likePost(Long userId, Long postId) {
-        postRepository.likePost(userId, postId);
+    public Integer likePost(Long accountId, Long postId) {
+        postRepository.likePost(userRepository.getUserIdByAccountId(accountId), postId);
         postRepository.plusPostLikeCount(postId);
 
         return postRepository.postLikedNum(postId);
     }
+
 }

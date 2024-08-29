@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Builder
@@ -19,6 +20,9 @@ public class Account {
     private String loginId;
     @NotEmpty   @Size(min = 8, max = 20)
     private String password;
+
+    @NotEmpty
+    private Set<UserRole> roles;
 
     private boolean withdraw;
 

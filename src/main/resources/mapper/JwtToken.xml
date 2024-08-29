@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pungmul.pungmul.repository.member.mapper.JwtTokenMapper">
+
+    <!-- 특정 사용자의 모든 유효한 토큰 조회 -->
+    <select id="findAllValidTokensByUser" parameterType="long" resultType="pungmul.pungmul.domain.member.JwtToken">
+        SELECT * FROM tokens
+        WHERE account_id = #{accountId} AND expired = false AND revoked = false
+    </select>
+
+    <update id="revokeTokensByAccountId">
+        UPDATE tokens
+        SET expired = true, revoked = true
+        WHERE account_id = #{accountId} AND expired = false AND revoked = false
+    </update>
+
+    <update id="revokeTokenByToken">
+        UPDATE tokens
+        SET expired = true, revoked = true
+        WHERE token = #{token} AND expired = false AND revoked = false
+    </update>
+
+    <!-- 토큰 저장 -->
+    <insert id="save" parameterType="pungmul.pungmul.domain.member.JwtToken" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tokens (account_id, token, token_type, expired, revoked)
+        VALUES (#{accountId}, #{token}, #{tokenType}, #{expired}, #{revoked})
+    </insert>
+
+    <!-- 여러 개의 토큰을 갱신 -->
+    <update id="saveAll">
+        <foreach collection="tokens" item="token" separator="">
+            UPDATE tokens
+            SET expired = #{token.expired}, revoked = #{token.revoked}
+            WHERE id = #{token.id};
+        </foreach>
+    </update>
+
+    <select id="findByToken" parameterType="string" resultType="JwtToken">
+        SELECT * FROM tokens WHERE token = #{token}
+    </select>
+
+</mapper>

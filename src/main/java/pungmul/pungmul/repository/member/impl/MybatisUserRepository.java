@@ -5,6 +5,7 @@ import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.member.mapper.UserMapper;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
@@ -38,5 +39,12 @@ public class MybatisUserRepository implements UserRepository {
     @Override
     public Optional<User> getUserByEmail(String email) {
         return Optional.ofNullable(userMapper.getUserByEmail(email));
+    }
+
+    public Long getUserIdByAccountId(Long accountId) {
+        User user = getUserByAccountId(accountId)
+                .orElseThrow(NoSuchElementException::new);
+
+        return user.getId();
     }
 }

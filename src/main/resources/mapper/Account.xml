@@ -38,7 +38,7 @@
     <select id="getAccountByEmail" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.Account">
         SELECT *
         FROM account
-        WHERE email = #{email};
+        WHERE login_id = #{email};
     </select>
 
     <!-- Login ID로 Account 조회 -->

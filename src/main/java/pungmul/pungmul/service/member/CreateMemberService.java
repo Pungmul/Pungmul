@@ -1,11 +1,7 @@
 package pungmul.pungmul.service.member;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +10,8 @@ import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 import pungmul.pungmul.domain.member.User;
+import pungmul.pungmul.domain.member.UserRole;
+import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
@@ -26,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * CreateMemberService 클래스는 회원 가입 로직을 처리하는 서비스입니다.
@@ -40,6 +39,8 @@ public class CreateMemberService {
     private final InstrumentStatusRepository instrumentStatusRepository;
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
+    private final UserRoleService userRoleService;
+
 
     /**
      * 회원 생성 메서드.
@@ -64,10 +65,10 @@ public class CreateMemberService {
      * @param instrumentStatusList 악기 상태 목록
      * @return 생성된 InstrumentStatus의 ID 리스트
      */
-    public List<Long> createInstrument(Long userId, List<InstrumentStatus> instrumentStatusList) {
+    public List<Long> createInstrument(Long accountId, List<InstrumentStatus> instrumentStatusList) {
         ArrayList<Long> arrayList = new ArrayList<>();
         for (InstrumentStatus instrumentStatus : instrumentStatusList) {
-            InstrumentStatus status = getInstrumentStatus(userId, instrumentStatus);
+            InstrumentStatus status = getInstrumentStatus(userRepository.getUserIdByAccountId(accountId), instrumentStatus);
             instrumentStatusRepository.saveInstrument(status);
             arrayList.add(status.getId());
         }
@@ -82,8 +83,16 @@ public class CreateMemberService {
     private Long createAccount(CreateMemberRequestDTO createMemberRequestDto) {
         Account account = getAccount(createMemberRequestDto);
         accountRepository.saveAccount(account);
+        userRoleService.addRoleToAccount(getRoleRequestDTO(account));
 
         return account.getId();
+    }
+
+    private static SetRoleRequestDTO getRoleRequestDTO(Account account) {
+        return SetRoleRequestDTO.builder()
+                .username(account.getLoginId())
+                .roleName(UserRole.ROLE_USER.getAuthority())
+                .build();
     }
 
     /**
@@ -144,6 +153,15 @@ public class CreateMemberService {
         return Account.builder()
                 .loginId(createMemberRequestDto.getLoginId())
                 .password(passwordEncoder.encode(createMemberRequestDto.getPassword()))
+                .roles(Set.of(UserRole.ROLE_USER))
+                .build();
+    }
+
+    private Account getAdminAccount(CreateMemberRequestDTO createMemberRequestDto) {
+        return Account.builder()
+                .loginId(createMemberRequestDto.getLoginId())
+                .password(passwordEncoder.encode(createMemberRequestDto.getPassword()))
+                .roles(Set.of(UserRole.ROLE_ADMIN))
                 .build();
     }
 

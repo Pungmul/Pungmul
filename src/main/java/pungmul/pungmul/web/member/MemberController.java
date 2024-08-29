@@ -7,15 +7,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.member.InstrumentStatus;
-import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.service.member.CreateMemberService;
 import pungmul.pungmul.service.member.LoginService;
-import pungmul.pungmul.service.member.loginvalidation.user.User;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
@@ -37,7 +38,6 @@ public class MemberController {
 
     /**
      * 사용자의 회원가입 요청을 처리하는 메서드
-     *
      * 이 메서드는 `/signup` 엔드포인트와 매핑되어 있으며, `multipart/form-data` 형식의 요청을 처리
      * 요청은 회원가입 정보를 담은 JSON 데이터(`accountData`)와 선택적인 프로필 이미지(`profile`)를 포함
      *
@@ -58,9 +58,17 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountResponseDto);
     }
 
+//    @PreAuthorize("hasRole('USER')")
+//    @PostMapping("/inst")
+//    public ResponseEntity<List<Long>> regInstrument(@User SessionUser sessionUser, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList){
+//        return ResponseEntity.ok(createMemberService.createInstrument(sessionUser.getUserId(), instrumentStatusList));
+//    }
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/inst")
-    public ResponseEntity<List<Long>> regInstrument(@User SessionUser sessionUser, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList){
-        return ResponseEntity.ok(createMemberService.createInstrument(sessionUser.getUserId(), instrumentStatusList));
+    public ResponseEntity<List<Long>> regInstrument(@AuthenticationPrincipal UserDetailsImpl userDetails, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
+        log.info("instrument request : {}",request.getHeader("Authorization"));
+
+        return ResponseEntity.ok(createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList));
     }
 
     /**
@@ -77,6 +85,16 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
     }
 
+    @PostMapping("/login-jwt")
+    public ResponseEntity<AuthenticationResponseDTO> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
+        loginService.isValidCredentials(loginDTO);
+        AuthenticationResponseDTO response = loginService.authenticate(loginDTO);
+
+        log.info("[authenticate] login response: {}", response);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
         // 기존 세션이 있는지 확인
@@ -91,6 +109,5 @@ public class MemberController {
         return ResponseEntity.ok()
                 .body("로그아웃 되었습니다.");
     }
-
 
 }
