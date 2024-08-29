@@ -1,9 +1,6 @@
 package pungmul.pungmul.config.security;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pungmul.pungmul.domain.member.Account;
@@ -16,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {

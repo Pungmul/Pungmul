@@ -11,6 +11,20 @@ CREATE TABLE IF NOT EXISTS account (
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS roles (
+                                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                     role_name VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS account_roles (
+                                             account_id BIGINT NOT NULL,
+                                             role_id BIGINT NOT NULL,
+                                             PRIMARY KEY (account_id, role_id),
+                                             FOREIGN KEY (account_id) REFERENCES account(id) ON DELETE CASCADE,
+                                             FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE if not exists tokens (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         account_id BIGINT NOT NULL,

@@ -14,6 +14,8 @@ import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 import pungmul.pungmul.domain.member.User;
+import pungmul.pungmul.domain.member.UserRole;
+import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * CreateMemberService 클래스는 회원 가입 로직을 처리하는 서비스입니다.
@@ -40,6 +43,8 @@ public class CreateMemberService {
     private final InstrumentStatusRepository instrumentStatusRepository;
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
+    private final UserRoleService userRoleService;
+
 
     /**
      * 회원 생성 메서드.
@@ -82,8 +87,16 @@ public class CreateMemberService {
     private Long createAccount(CreateMemberRequestDTO createMemberRequestDto) {
         Account account = getAccount(createMemberRequestDto);
         accountRepository.saveAccount(account);
+        userRoleService.addRoleToAccount(getRoleRequestDTO(account));
 
         return account.getId();
+    }
+
+    private static SetRoleRequestDTO getRoleRequestDTO(Account account) {
+        return SetRoleRequestDTO.builder()
+                .username(account.getLoginId())
+                .roleName(UserRole.ROLE_USER.getAuthority())
+                .build();
     }
 
     /**
@@ -144,6 +157,15 @@ public class CreateMemberService {
         return Account.builder()
                 .loginId(createMemberRequestDto.getLoginId())
                 .password(passwordEncoder.encode(createMemberRequestDto.getPassword()))
+                .roles(Set.of(UserRole.ROLE_USER))
+                .build();
+    }
+
+    private Account getAdminAccount(CreateMemberRequestDTO createMemberRequestDto) {
+        return Account.builder()
+                .loginId(createMemberRequestDto.getLoginId())
+                .password(passwordEncoder.encode(createMemberRequestDto.getPassword()))
+                .roles(Set.of(UserRole.ROLE_ADMIN))
                 .build();
     }
 

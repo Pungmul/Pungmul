@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pungmul.pungmul.repository.member.mapper.UserRoleMapper">
+
+    <!-- 새로운 역할(Role) 추가 -->
+    <insert id="insertRole" parameterType="pungmul.pungmul.domain.member.UserRole" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO roles (role_name)
+        VALUES (#{role})
+    </insert>
+
+    <!-- 계정에 역할 추가 -->
+    <insert id="addRoleToAccount" parameterType="map">
+        INSERT INTO account_roles (account_id, role_id)
+        VALUES (#{accountId},
+                (SELECT id FROM roles WHERE role_name = #{role}))
+    </insert>
+
+    <!-- 특정 계정의 모든 역할 조회 -->
+    <select id="getRolesByAccountId" resultType="pungmul.pungmul.domain.member.UserRole">
+        SELECT r.role_name
+        FROM roles r
+                 INNER JOIN account_roles ar ON r.id = ar.role_id
+        WHERE ar.account_id = #{accountId}
+    </select>
+
+    <!-- 계정에서 특정 역할 제거 -->
+    <delete id="removeRoleFromAccount" parameterType="map">
+        DELETE FROM account_roles
+        WHERE account_id = #{accountId}
+          AND role_id = (SELECT id FROM roles WHERE role_name = #{role})
+    </delete>
+
+    <!-- 계정의 모든 역할 제거 -->
+    <delete id="removeAllRolesFromAccount" parameterType="long">
+        DELETE FROM account_roles
+        WHERE account_id = #{accountId}
+    </delete>
+</mapper>

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.domain.chat.ChatMessage;
@@ -25,12 +26,14 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
 
     //  개인 DM 방 생성
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/personal")
     public CreateChatRoomResponseDTO createPersonalChatRoom(@RequestBody CreateChatRoomRequestDTO createChatRoomRequestDTO){
         return chatService.createPersonalChatRoom(createChatRoomRequestDTO);
     }
 
     //  메세지 전송
+    @PreAuthorize("hasRole('USER')")
     @MessageMapping("/message")
     public ChatMessage sendMessage(ChatMessageRequestDTO chatMessageRequestDTO){
         ChatMessage chatMessage = chatService.saveMessage(chatMessageRequestDTO);
