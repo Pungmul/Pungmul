@@ -1,15 +1,11 @@
 package pungmul.pungmul.service.member;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.domain.member.Account;
-import pungmul.pungmul.domain.member.JwtToken;
 import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.dto.member.AuthenticationResponseDTO;
@@ -28,9 +23,7 @@ import pungmul.pungmul.dto.member.LoginResponseDTO;
 import pungmul.pungmul.config.member.SessionConst;
 
 import javax.naming.AuthenticationException;
-import java.security.Key;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Slf4j
 @Service
@@ -86,8 +79,8 @@ public class LoginService {
 
         jwtTokenService.revokeUserAllTokens(account);
 
-        JwtToken savedAccessToken = jwtTokenService.saveUserToken(account, accessToken, JwtConfig.ACCESS_TOKEN_TYPE);
-        JwtToken savedRefreshToken = jwtTokenService.saveUserToken(account, refreshToken, JwtConfig.REFRESH_TOKEN_TYPE);
+        jwtTokenService.saveUserToken(account, accessToken, JwtConfig.ACCESS_TOKEN_TYPE);
+        jwtTokenService.saveUserToken(account, refreshToken, JwtConfig.REFRESH_TOKEN_TYPE);
 
         return getAuthenticationResponseDTO(accessToken, refreshToken);
     }

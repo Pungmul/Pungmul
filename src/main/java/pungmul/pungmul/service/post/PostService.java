@@ -2,15 +2,11 @@ package pungmul.pungmul.service.post;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
-import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
 import pungmul.pungmul.dto.file.RequestImageDTO;
@@ -24,7 +20,6 @@ import pungmul.pungmul.service.file.ImageService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service

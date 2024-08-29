@@ -10,16 +10,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
-import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.dto.post.RequestCommentDTO;
 import pungmul.pungmul.dto.post.RequestPostDTO;
-import pungmul.pungmul.service.member.loginvalidation.user.User;
 import pungmul.pungmul.service.post.CommentService;
 import pungmul.pungmul.service.post.PostService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController

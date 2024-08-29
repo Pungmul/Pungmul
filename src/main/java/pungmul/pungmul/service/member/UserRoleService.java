@@ -2,6 +2,7 @@ package pungmul.pungmul.service.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.UserRole;
 import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
 import pungmul.pungmul.dto.admin.SetRoleResponseDTO;
@@ -25,7 +26,7 @@ public class UserRoleService {
         String roleName = setRoleRequestDTO.getRoleName();
 
         Long accountId = accountRepository.getAccountByLoginId(username)
-                .map(account -> account.getId())
+                .map(Account::getId)
                 .orElseThrow(() -> new IllegalArgumentException("Account not found for username: " + username));
         userRoleRepository.addRoleToAccount(accountId, roleName);
 

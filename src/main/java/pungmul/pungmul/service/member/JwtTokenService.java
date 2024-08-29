@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.JwtToken;
-import pungmul.pungmul.repository.member.mapper.JwtTokenMapper;
 import pungmul.pungmul.repository.member.repository.JwtTokenRepository;
 
 import java.util.Date;
@@ -19,7 +18,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class JwtTokenService {
-    private final JwtTokenMapper tokenMapper;
     private final JwtTokenRepository jwtTokenRepository;
     private final JwtConfig jwtConfig;
 

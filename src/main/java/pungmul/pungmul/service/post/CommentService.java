@@ -2,10 +2,7 @@ package pungmul.pungmul.service.post;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
-import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.domain.post.Comment;
 import pungmul.pungmul.dto.post.RequestCommentDTO;

@@ -10,14 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
-import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.file.ImageService;
-import pungmul.pungmul.service.member.loginvalidation.user.User;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @RestController

@@ -9,17 +9,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.member.InstrumentStatus;
-import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.service.member.CreateMemberService;
 import pungmul.pungmul.service.member.LoginService;
-import pungmul.pungmul.service.member.loginvalidation.user.User;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
@@ -41,7 +38,6 @@ public class MemberController {
 
     /**
      * 사용자의 회원가입 요청을 처리하는 메서드
-     *
      * 이 메서드는 `/signup` 엔드포인트와 매핑되어 있으며, `multipart/form-data` 형식의 요청을 처리
      * 요청은 회원가입 정보를 담은 JSON 데이터(`accountData`)와 선택적인 프로필 이미지(`profile`)를 포함
      *
@@ -90,8 +86,7 @@ public class MemberController {
     }
 
     @PostMapping("/login-jwt")
-    public ResponseEntity<AuthenticationResponseDTO> loginJwt(@Validated @RequestBody LoginDTO loginDTO,
-                                                     HttpServletRequest request) throws AuthenticationException {
+    public ResponseEntity<AuthenticationResponseDTO> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
         loginService.isValidCredentials(loginDTO);
         AuthenticationResponseDTO response = loginService.authenticate(loginDTO);
 
