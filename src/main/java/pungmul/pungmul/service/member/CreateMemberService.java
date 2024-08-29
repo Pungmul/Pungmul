@@ -69,10 +69,10 @@ public class CreateMemberService {
      * @param instrumentStatusList 악기 상태 목록
      * @return 생성된 InstrumentStatus의 ID 리스트
      */
-    public List<Long> createInstrument(Long userId, List<InstrumentStatus> instrumentStatusList) {
+    public List<Long> createInstrument(Long accountId, List<InstrumentStatus> instrumentStatusList) {
         ArrayList<Long> arrayList = new ArrayList<>();
         for (InstrumentStatus instrumentStatus : instrumentStatusList) {
-            InstrumentStatus status = getInstrumentStatus(userId, instrumentStatus);
+            InstrumentStatus status = getInstrumentStatus(userRepository.getUserIdByAccountId(accountId), instrumentStatus);
             instrumentStatusRepository.saveInstrument(status);
             arrayList.add(status.getId());
         }

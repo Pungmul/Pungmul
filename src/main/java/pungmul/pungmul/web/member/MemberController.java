@@ -7,10 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 import pungmul.pungmul.domain.member.SessionUser;
 import pungmul.pungmul.dto.member.*;
@@ -59,9 +62,17 @@ public class MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountResponseDto);
     }
 
+//    @PreAuthorize("hasRole('USER')")
+//    @PostMapping("/inst")
+//    public ResponseEntity<List<Long>> regInstrument(@User SessionUser sessionUser, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList){
+//        return ResponseEntity.ok(createMemberService.createInstrument(sessionUser.getUserId(), instrumentStatusList));
+//    }
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/inst")
-    public ResponseEntity<List<Long>> regInstrument(@User SessionUser sessionUser, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList){
-        return ResponseEntity.ok(createMemberService.createInstrument(sessionUser.getUserId(), instrumentStatusList));
+    public ResponseEntity<List<Long>> regInstrument(@AuthenticationPrincipal UserDetailsImpl userDetails, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
+        log.info("instrument request : {}",request.getHeader("Authorization"));
+
+        return ResponseEntity.ok(createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList));
     }
 
     /**

@@ -20,6 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Account account = accountRepository.getAccountByEmail(username)
                 .orElseThrow(() -> new IllegalArgumentException(username));
         return UserDetailsImpl.builder()
+                .accountId(account.getId())
                 .loginId(account.getLoginId())
                 .password(account.getPassword())
                 .authorities(account.getRoles())

@@ -17,6 +17,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 public class UserDetailsImpl implements UserDetails {
+    private Long accountId;
     private String loginId;
     private String password;
     private Set<UserRole> authorities;
@@ -25,6 +26,7 @@ public class UserDetailsImpl implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
+
 
     @Override
     public String getPassword() {
