@@ -11,5 +11,5 @@ public interface ChatRoomRepository {
 
     void addChatRoomMembers(String chatRoomId, List<Long> memberIds);
 
-
+    Optional<ChatRoom> findChatRoomByUsers(String senderUsername, String receiverUsername);
 }

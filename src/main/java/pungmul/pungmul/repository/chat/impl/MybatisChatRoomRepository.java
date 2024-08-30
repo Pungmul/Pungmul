@@ -9,6 +9,7 @@ import pungmul.pungmul.repository.chat.mapper.ChatRoomMapper;
 import pungmul.pungmul.repository.chat.repository.ChatRoomRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,5 +26,10 @@ public class MybatisChatRoomRepository implements ChatRoomRepository {
     public void addChatRoomMembers(String chatRoomId, List<Long> memberIds) {
         log.info("call members");
         chatRoomMapper.addChatRoomMembers(chatRoomId, memberIds);
+    }
+
+    @Override
+    public Optional<ChatRoom> findChatRoomByUsers(String senderUsername, String receiverUsername) {
+        return chatRoomMapper.findChatRoomByUsers(senderUsername, receiverUsername);
     }
 }

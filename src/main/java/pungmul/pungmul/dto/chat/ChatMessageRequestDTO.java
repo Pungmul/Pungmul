@@ -10,10 +10,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageRequestDTO {
-    private String senderUsername;
     private String receiverUsername;
     private String content;
     private MessageType messageType;
     private String imageUrl;
-    private String chatRoomUUID;
 }
