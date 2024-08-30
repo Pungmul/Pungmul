@@ -15,6 +15,8 @@ public class ChatRoom {
     private String createdBy;
     private Long lastMessageId;
     private LocalDateTime lastMessageTime;
-    private List<Long> chatRoomMemberIds;
     private LocalDateTime createdAt;
+//    private List<Long> chatRoomMemberIds;
+    private Long senderId;
+    private Long receiverId;
 }

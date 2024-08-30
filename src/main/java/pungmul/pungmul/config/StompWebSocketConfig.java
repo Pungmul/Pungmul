@@ -1,21 +1,47 @@
 package pungmul.pungmul.config;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import pungmul.pungmul.config.security.JwtAuthenticationProvider;
+import pungmul.pungmul.config.security.TokenProvider;
+import pungmul.pungmul.service.chat.CustomHandshakeInterceptor;
+import org.springframework.messaging.simp.stomp.StompCommand;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 
+import java.nio.file.AccessDeniedException;
+
+@Slf4j
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSocketMessageBroker
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    private final CustomHandshakeInterceptor handshakeInterceptor;
+    private final TokenProvider tokenProvider;
+    private final AuthenticationManager authenticationManager;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 //        registry.addEndpoint("/ws/stomp").setAllowedOrigins("*")
 //                .addInterceptors(new CustomHandshakeInterceptor())
 //                .withSockJS();
 
-        registry.addEndpoint("/ws/chat").setAllowedOrigins("*");
+        registry.addEndpoint("/ws/chat").setAllowedOrigins("*")
+            .addInterceptors(handshakeInterceptor);
 //                .withSockJS();
     }
 
@@ -24,4 +50,30 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/sub");
         registry.setApplicationDestinationPrefixes("/pub");
     }
+
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(new ChannelInterceptor() {
+//            @Override
+//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+//                StompHeaderAccessor accessor =
+//                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+//
+//                if (StompHeaderAccessor.StompCommand.CONNECT.equals(accessor.getCommand())) {
+//                    String token = accessor.getFirstNativeHeader("Authorization");
+//                    if (token != null && token.startsWith("Bearer ")) {
+//                        token = token.substring(7);
+//                        try {
+//                            Authentication auth = jwtAuthenticationFilter.attemptAuthentication(
+//                                    accessor.getMessageHeaders(), token);
+//                            SecurityContextHolder.getContext().setAuthentication(auth);
+//                        } catch (Exception e) {
+//                            throw new RuntimeException("Invalid token", e);
+//                        }
+//                    }
+//                }
+//                return message;
+//            }
+//        });
+//    }
 }

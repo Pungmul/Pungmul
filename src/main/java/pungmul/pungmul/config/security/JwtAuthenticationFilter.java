@@ -48,11 +48,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        if (loginId == null)
-            log.info("loginId is null");
+//        if (loginId == null)
+//            log.info("loginId is null");
 
-        if (SecurityContextHolder.getContext().getAuthentication() != null)
-            log.info("SecurityContextHolder.getContext().getAuthentication(): " + SecurityContextHolder.getContext().getAuthentication());
+//        if (SecurityContextHolder.getContext().getAuthentication() != null)
+//            log.info("SecurityContextHolder.getContext().getAuthentication(): " + SecurityContextHolder.getContext().getAuthentication());
 
         // 로그인 ID가 있고, 현재 인증이 되어 있지 않은 경우
         if (loginId != null && SecurityContextHolder.getContext().getAuthentication() == null) {

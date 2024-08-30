@@ -12,8 +12,8 @@
         <result property="lastMessageId" column="last_message_id" />
         <result property="lastMessageTime" column="last_message_time" />
         <result property="createdAt" column="created_at" />
-        <collection property="chatRoomMemberIds" ofType="java.lang.Long" column="user_id"
-                    select="selectMembersByChatRoomId" />
+        <result property="senderId" column="senderId" /> <!-- 첫 번째 사용자 ID -->
+        <result property="receiverId" column="receiverId" /> <!-- 두 번째 사용자 ID -->
     </resultMap>
 
     <!-- Insert ChatRoom -->
@@ -45,6 +45,15 @@
         SELECT user_id
         FROM chat_room_members
         WHERE chat_room_id = #{chatRoomId}
+    </select>
+
+    <select id="findChatRoomByUsers" resultMap="ChatRoomResultMap">
+        SELECT cr.*, crm1.user_id AS senderId, crm2.user_id AS receiverId
+        FROM chat_room cr
+                 JOIN chat_room_members crm1 ON cr.room_uuid = crm1.chat_room_id
+                 JOIN chat_room_members crm2 ON cr.room_uuid = crm2.chat_room_id
+        WHERE crm1.user_id = (SELECT id FROM user WHERE email = #{senderUsername})
+          AND crm2.user_id = (SELECT id FROM user WHERE email = #{receiverUsername})
     </select>
 
 </mapper>
