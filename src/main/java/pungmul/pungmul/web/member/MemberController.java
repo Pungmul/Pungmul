@@ -13,10 +13,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.core.response.ResponseCode;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.service.member.CreateMemberService;
 import pungmul.pungmul.service.member.LoginService;
+import pungmul.pungmul.core.response.BaseResponse;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
@@ -51,24 +53,22 @@ public class MemberController {
 
 
     @PostMapping(value = "/signup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<CreateAccountResponseDTO> createMember(
+    public ResponseEntity<BaseResponse<CreateAccountResponseDTO>> createMember(
             @Validated @RequestPart("accountData") CreateMemberRequestDTO createMemberRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+
         CreateAccountResponseDTO accountResponseDto = createMemberService.createMember(createMemberRequestDto, profile);
-        return ResponseEntity.status(HttpStatus.CREATED).body(accountResponseDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.ofSuccess(accountResponseDto));
     }
 
-//    @PreAuthorize("hasRole('USER')")
-//    @PostMapping("/inst")
-//    public ResponseEntity<List<Long>> regInstrument(@User SessionUser sessionUser, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList){
-//        return ResponseEntity.ok(createMemberService.createInstrument(sessionUser.getUserId(), instrumentStatusList));
-//    }
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/inst")
-    public ResponseEntity<List<Long>> regInstrument(@AuthenticationPrincipal UserDetailsImpl userDetails, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
+    public ResponseEntity<BaseResponse<List<Long>>> regInstrument(@AuthenticationPrincipal UserDetailsImpl userDetails, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
         log.info("instrument request : {}",request.getHeader("Authorization"));
 
-        return ResponseEntity.ok(createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.ofSuccess(createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
     }
 
     /**
@@ -86,28 +86,28 @@ public class MemberController {
     }
 
     @PostMapping("/login-jwt")
-    public ResponseEntity<AuthenticationResponseDTO> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
+    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
         loginService.isValidCredentials(loginDTO);
         AuthenticationResponseDTO response = loginService.authenticate(loginDTO);
 
         log.info("[authenticate] login response: {}", response);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ofSuccess(response));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
+    public ResponseEntity<BaseResponse<Void>> logout(HttpServletRequest request) {
         // 기존 세션이 있는지 확인
         HttpSession session = request.getSession(false);  // false -> 새로운 세션을 생성하지 않고, 기존 세션을 반환
         if (session == null) {
             // 세션이 없으면 사용자가 로그인되어 있지 않은 상태이므로 401 UNAUTHORIZED 반환
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("로그인 상태 아님");
+                    .body(BaseResponse.ofFail(ResponseCode.UNAUTHORIZED));
         }
         // 세션 무효화하여 로그아웃 처리
         session.invalidate();
-        return ResponseEntity.ok()
-                .body("로그아웃 되었습니다.");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.ofSuccess());
     }
 
 }
