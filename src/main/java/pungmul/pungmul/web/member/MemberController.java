@@ -1,7 +1,6 @@
 package pungmul.pungmul.web.member;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
-import pungmul.pungmul.core.response.ResponseCode;
+import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.service.member.CreateMemberService;
@@ -59,7 +58,7 @@ public class MemberController {
 
         CreateAccountResponseDTO accountResponseDto = createMemberService.createMember(createMemberRequestDto, profile);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BaseResponse.ofSuccess(ResponseCode.CREATED, accountResponseDto));
+                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, accountResponseDto));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -67,25 +66,25 @@ public class MemberController {
     public ResponseEntity<BaseResponse<List<Long>>> regInstrument(@AuthenticationPrincipal UserDetailsImpl userDetails, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BaseResponse.ofSuccess(ResponseCode.CREATED, createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
+                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
     }
 
-    @PostMapping("/login-jwt")
+    @PostMapping("/login")
     public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
         loginService.isValidCredentials(loginDTO);
         AuthenticationResponseDTO response = loginService.authenticate(loginDTO);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.ofSuccess(ResponseCode.OK, response));
+                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<BaseResponse<Void>> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        log.info("logout - userName  : {} ", userDetails.getUsername());
-        loginService.logout(userDetails);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.ofSuccess(ResponseCode.NO_CONTENT));
-    }
+//    @GetMapping("/logout")
+//    public ResponseEntity<BaseResponse<Void>> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        log.info("logout - userName  : {} ", userDetails.getUsername());
+//        loginService.logout(userDetails);
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(BaseResponse.ofSuccess(ResponseCode.NO_CONTENT));
+//    }
 
 //    @PostMapping("/logout")
 //    public ResponseEntity<BaseResponse<Void>> logout(HttpServletRequest request) {
@@ -102,11 +101,11 @@ public class MemberController {
 //                .body(BaseResponse.ofSuccess(ResponseCode.NO_CONTENT));
 //    }
 
-    @PostMapping("/login")
-    public ResponseEntity<BaseResponse<LoginResponseDTO>> login(@Validated @RequestBody LoginDTO loginDTO,
-                                                                HttpServletRequest request) throws AuthenticationException {
-        LoginResponseDTO loginResponseDTO = loginService.processLogin(loginDTO, request);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.ofSuccess(ResponseCode.OK,loginResponseDTO));
-    }
+//    @PostMapping("/login")
+//    public ResponseEntity<BaseResponse<LoginResponseDTO>> login(@Validated @RequestBody LoginDTO loginDTO,
+//                                                                HttpServletRequest request) throws AuthenticationException {
+//        LoginResponseDTO loginResponseDTO = loginService.processLogin(loginDTO, request);
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(BaseResponse.ofSuccess(ResponseCode.OK,loginResponseDTO));
+//    }
 }

@@ -11,17 +11,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentTypeMismatchException;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import pungmul.pungmul.core.exception.custom.member.InvalidPasswordException;
 import pungmul.pungmul.core.exception.custom.member.InvalidProfileImageException;
 import pungmul.pungmul.core.exception.custom.member.TokenNotFoundException;
 import pungmul.pungmul.core.exception.custom.member.UsernameAlreadyExistsException;
 import pungmul.pungmul.core.response.BaseResponse;
-import pungmul.pungmul.core.response.ResponseCode;
+import pungmul.pungmul.core.response.BaseResponseCode;
+import pungmul.pungmul.core.response.code.MemberResponseCode;
 
 import javax.naming.ServiceUnavailableException;
 import java.nio.file.AccessDeniedException;
@@ -37,7 +39,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<BaseResponse<Void>> handleExpiredJwtException(ExpiredJwtException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.EXPIRED_JWT),
+                BaseResponse.ofFail(BaseResponseCode.EXPIRED_JWT),
                 HttpStatus.UNAUTHORIZED
         );
     }
@@ -46,7 +48,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<BaseResponse<Void>> handleJwtException(JwtException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.UNAUTHORIZED),
+                BaseResponse.ofFail(BaseResponseCode.UNAUTHORIZED),
                 HttpStatus.UNAUTHORIZED
         );
     }
@@ -55,7 +57,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnsupportedJwtException.class)
     public ResponseEntity<BaseResponse<Void>> handleUnsupportedJwtException(UnsupportedJwtException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.UNSUPPORTED_JWT),
+                BaseResponse.ofFail(BaseResponseCode.UNSUPPORTED_JWT),
                 HttpStatus.UNAUTHORIZED
         );
     }
@@ -64,7 +66,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<BaseResponse<Void>> handleInvalidJwtSignatureException(SignatureException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.INVALID_JWT_SIGNATURE),
+                BaseResponse.ofFail(BaseResponseCode.INVALID_JWT_SIGNATURE),
                 HttpStatus.UNAUTHORIZED
         );
     }
@@ -73,7 +75,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<BaseResponse<Void>> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.ACCESS_DENIED),
+                BaseResponse.ofFail(BaseResponseCode.ACCESS_DENIED),
                 HttpStatus.FORBIDDEN
         );
     }
@@ -81,7 +83,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TokenNotFoundException.class)
     public ResponseEntity<BaseResponse<Void>> handleTokenNotFoundException(TokenNotFoundException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.TOKEN_NOT_FOUND),
+                BaseResponse.ofFail(BaseResponseCode.TOKEN_NOT_FOUND),
                 HttpStatus.NOT_FOUND
         );
     }
@@ -90,7 +92,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<BaseResponse<Void>> handleBadRequest(MethodArgumentTypeMismatchException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.BAD_REQUEST),
+                BaseResponse.ofFail(BaseResponseCode.BAD_REQUEST),
                 HttpStatus.BAD_REQUEST
         );
     }
@@ -99,14 +101,31 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
+        boolean passwordError = false;
+
+        for (ObjectError error : ex.getBindingResult().getAllErrors()) {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
+
+            // password 필드에서 오류가 발생하면 플래그 설정
+            if ("password".equals(fieldName)) {
+                passwordError = true;
+                break;
+            }
+
             errors.put(fieldName, errorMessage);
-        });
+        }
+
+        // password 필드에서 오류가 발생했으면 InvalidPasswordException 대신 바로 응답 생성
+        if (passwordError) {
+            return new ResponseEntity<>(
+                    BaseResponse.ofFail(MemberResponseCode.INVALID_PASSWORD),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
 
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.VALIDATION_FAILED),
+                BaseResponse.ofFail(BaseResponseCode.VALIDATION_FAILED),
                 HttpStatus.BAD_REQUEST
         );
     }
@@ -115,7 +134,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<BaseResponse<Void>> handleResourceNotFoundException(NoHandlerFoundException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.RESOURCE_NOT_FOUND),
+                BaseResponse.ofFail(BaseResponseCode.RESOURCE_NOT_FOUND),
                 HttpStatus.NOT_FOUND
         );
     }
@@ -124,7 +143,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<BaseResponse<Void>> handleMethodNotAllowedException(org.springframework.web.HttpRequestMethodNotSupportedException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.METHOD_NOT_ALLOWED),
+                BaseResponse.ofFail(BaseResponseCode.METHOD_NOT_ALLOWED),
                 HttpStatus.METHOD_NOT_ALLOWED
         );
     }
@@ -133,7 +152,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.web.HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<BaseResponse<Void>> handleUnsupportedMediaTypeException(org.springframework.web.HttpMediaTypeNotSupportedException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.UNSUPPORTED_MEDIA_TYPE),
+                BaseResponse.ofFail(BaseResponseCode.UNSUPPORTED_MEDIA_TYPE),
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE
         );
     }
@@ -142,7 +161,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<BaseResponse<Void>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.USERNAME_ALREADY_EXISTS),
+                BaseResponse.ofFail(BaseResponseCode.USERNAME_ALREADY_EXISTS),
                 HttpStatus.CONFLICT
         );
     }
@@ -151,7 +170,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidProfileImageException.class)
     public ResponseEntity<BaseResponse<Void>> handleInvalidProfileImageException(InvalidProfileImageException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.INVALID_PROFILE_IMAGE),
+                BaseResponse.ofFail(BaseResponseCode.INVALID_PROFILE_IMAGE),
                 HttpStatus.BAD_REQUEST
         );
     }
@@ -160,7 +179,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<BaseResponse<Void>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.PAYLOAD_TOO_LARGE),
+                BaseResponse.ofFail(BaseResponseCode.PAYLOAD_TOO_LARGE),
                 HttpStatus.PAYLOAD_TOO_LARGE
         );
     }
@@ -169,7 +188,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)  // 포괄적인 예외 처리
     public ResponseEntity<BaseResponse<Void>> handleInternalServerError(Exception ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.INTERNAL_SERVER_ERROR),
+                BaseResponse.ofFail(BaseResponseCode.INTERNAL_SERVER_ERROR),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
@@ -178,7 +197,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnsupportedOperationException.class)
     public ResponseEntity<BaseResponse<Void>> handleNotImplemented(UnsupportedOperationException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.NOT_IMPLEMENTED),
+                BaseResponse.ofFail(BaseResponseCode.NOT_IMPLEMENTED),
                 HttpStatus.NOT_IMPLEMENTED
         );
     }
@@ -187,7 +206,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<BaseResponse<Void>> handleServiceUnavailable(ServiceUnavailableException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.SERVICE_UNAVAILABLE),
+                BaseResponse.ofFail(BaseResponseCode.SERVICE_UNAVAILABLE),
                 HttpStatus.SERVICE_UNAVAILABLE
         );
     }
@@ -196,7 +215,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<BaseResponse<Void>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.DATA_INTEGRITY_VIOLATION),
+                BaseResponse.ofFail(BaseResponseCode.DATA_INTEGRITY_VIOLATION),
                 HttpStatus.CONFLICT
         );
     }
@@ -205,7 +224,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<BaseResponse<Void>> handleConstraintViolation(ConstraintViolationException ex) {
         return new ResponseEntity<>(
-                BaseResponse.ofFail(ResponseCode.CONSTRAINT_VIOLATION),
+                BaseResponse.ofFail(BaseResponseCode.CONSTRAINT_VIOLATION),
                 HttpStatus.BAD_REQUEST
         );
     }
@@ -217,6 +236,6 @@ public class GlobalExceptionHandler {
         // 그 외에 발생할 수 있는 일반적인 예외 처리
         log.error("An error occurred: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(BaseResponse.ofFail(ResponseCode.INTERNAL_SERVER_ERROR));
+                .body(BaseResponse.ofFail(BaseResponseCode.INTERNAL_SERVER_ERROR));
     }
 }

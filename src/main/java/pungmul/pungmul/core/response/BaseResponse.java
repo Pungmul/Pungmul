@@ -3,8 +3,10 @@ package pungmul.pungmul.core.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class BaseResponse<E> {
     private static final String SUCCESS = "SUCCESS";
     private static final String FAIL = "FAIL";
@@ -35,8 +37,8 @@ public class BaseResponse<E> {
     // 반환 데이터가 있는 성공 메세지 템플릿
     public static <E> BaseResponse<E> ofSuccess(E response){
         return BaseResponse.<E>builder()
-                .code(ResponseCode.OK.getCode())
-                .message(ResponseCode.OK.getMessage())
+                .code(BaseResponseCode.OK.getCode())
+                .message(BaseResponseCode.OK.getMessage())
                 .success(true)
                 .response(response)
                 .build();
@@ -60,4 +62,5 @@ public class BaseResponse<E> {
                 .response(null)
                 .build();
     }
+
 }

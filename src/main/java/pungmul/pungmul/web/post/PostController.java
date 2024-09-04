@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.dto.post.RequestCommentDTO;
 import pungmul.pungmul.dto.post.RequestPostDTO;
 import pungmul.pungmul.service.post.CommentService;
@@ -29,8 +30,8 @@ public class PostController {
     @PreAuthorize("hasRole('USER')")
     @PostMapping(value = "/add", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Long> addPost(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                        @Validated @RequestPart("postData") RequestPostDTO requestPostDTO,
-                                        @RequestPart(value = "files", required = false) List<MultipartFile> files) throws IOException {
+                                                     @Validated @RequestPart("postData") RequestPostDTO requestPostDTO,
+                                                     @RequestPart(value = "files", required = false) List<MultipartFile> files) throws IOException {
 
 //        log.info("SessionUser: {}", sessionUser.getUserId());
         return ResponseEntity.ok(postService.addPost(userDetails.getAccountId(), requestPostDTO, files));
