@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.file.DomainType;
+import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 import pungmul.pungmul.domain.member.User;
@@ -18,6 +19,7 @@ import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.dto.member.CreateMemberRequestDTO;
 import pungmul.pungmul.dto.member.CreateAccountResponseDTO;
+import pungmul.pungmul.service.file.DomainImageService;
 import pungmul.pungmul.service.file.ImageService;
 
 import java.io.IOException;
@@ -40,6 +42,7 @@ public class CreateMemberService {
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final UserRoleService userRoleService;
+    private final DomainImageService domainImageService;
 
 
     /**
@@ -105,11 +108,10 @@ public class CreateMemberService {
         User user = getUser(createMemberRequestDTO, accountId);
         userRepository.saveUser(user);
 
-        imageService.saveImage(getRequestImageDTO(profile, user)
-        );
-
-//        domainImageService.saveDomainImage(DomainType.PROFILE,user.getId(), image.getId());
-
+        if (profile != null && !profile.isEmpty()) {
+            Image image = imageService.saveImage(getRequestImageDTO(profile, user));
+            domainImageService.saveDomainImage(DomainType.PROFILE,user.getId(), image.getId());
+        }
         return user.getId();
     }
 
@@ -137,15 +139,9 @@ public class CreateMemberService {
                 .orElseThrow(() -> new NoSuchElementException("사용자 생성 실패"));
 
         return CreateAccountResponseDTO.builder()
-                .status("success")
-                .message("회원가입이 성공적으로 완료되었습니다.")
-                .data(CreateAccountResponseDTO.UserData.builder()
-                        .userId(userId)
-                        .loginId(account.getLoginId())
-                        .userName(user.getName())
-                        //.token("생성된 JWT 토큰")
-                        .build())
-                .redirectUrl("/login")
+                .loginId(account.getLoginId())
+                .userName(user.getName())
+                .redirectUrl("/login-jwt")
                 .build();
     }
 

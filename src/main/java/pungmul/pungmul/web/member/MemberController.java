@@ -59,30 +59,15 @@ public class MemberController {
 
         CreateAccountResponseDTO accountResponseDto = createMemberService.createMember(createMemberRequestDto, profile);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BaseResponse.ofSuccess(accountResponseDto));
+                .body(BaseResponse.ofSuccess(ResponseCode.CREATED, accountResponseDto));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/inst")
     public ResponseEntity<BaseResponse<List<Long>>> regInstrument(@AuthenticationPrincipal UserDetailsImpl userDetails, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
-        log.info("instrument request : {}",request.getHeader("Authorization"));
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BaseResponse.ofSuccess(createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
-    }
-
-    /**
-     * 회원 로그인 요청을 처리하는 메서드.
-     * @param loginDTO 로그인 요청 데이터
-     * @param request HttpServletRequest 객체로 세션 정보 등을 활용 가능
-     * @return 로그인 결과와 함께 200(OK) 상태 반환
-     * @throws AuthenticationException 인증 실패 시 예외 발생
-     */
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@Validated @RequestBody LoginDTO loginDTO,
-                                                  HttpServletRequest request) throws AuthenticationException {
-        LoginResponseDTO loginResponseDTO = loginService.processLogin(loginDTO, request);
-        return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
+                .body(BaseResponse.ofSuccess(ResponseCode.CREATED, createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
     }
 
     @PostMapping("/login-jwt")
@@ -90,24 +75,38 @@ public class MemberController {
         loginService.isValidCredentials(loginDTO);
         AuthenticationResponseDTO response = loginService.authenticate(loginDTO);
 
-        log.info("[authenticate] login response: {}", response);
-
-        return ResponseEntity.status(HttpStatus.OK).body(BaseResponse.ofSuccess(response));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<BaseResponse<Void>> logout(HttpServletRequest request) {
-        // 기존 세션이 있는지 확인
-        HttpSession session = request.getSession(false);  // false -> 새로운 세션을 생성하지 않고, 기존 세션을 반환
-        if (session == null) {
-            // 세션이 없으면 사용자가 로그인되어 있지 않은 상태이므로 401 UNAUTHORIZED 반환
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(BaseResponse.ofFail(ResponseCode.UNAUTHORIZED));
-        }
-        // 세션 무효화하여 로그아웃 처리
-        session.invalidate();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.ofSuccess());
+                .body(BaseResponse.ofSuccess(ResponseCode.OK, response));
     }
 
+    @GetMapping("/logout")
+    public ResponseEntity<BaseResponse<Void>> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("logout - userName  : {} ", userDetails.getUsername());
+        loginService.logout(userDetails);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.ofSuccess(ResponseCode.NO_CONTENT));
+    }
+
+//    @PostMapping("/logout")
+//    public ResponseEntity<BaseResponse<Void>> logout(HttpServletRequest request) {
+//        // 기존 세션이 있는지 확인
+//        HttpSession session = request.getSession(false);  // false -> 새로운 세션을 생성하지 않고, 기존 세션을 반환
+//        if (session == null) {
+//            // 세션이 없으면 사용자가 로그인되어 있지 않은 상태이므로 401 UNAUTHORIZED 반환
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+//                    .body(BaseResponse.ofFail(ResponseCode.UNAUTHORIZED));
+//        }
+//        // 세션 무효화하여 로그아웃 처리
+//        session.invalidate();
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(BaseResponse.ofSuccess(ResponseCode.NO_CONTENT));
+//    }
+
+    @PostMapping("/login")
+    public ResponseEntity<BaseResponse<LoginResponseDTO>> login(@Validated @RequestBody LoginDTO loginDTO,
+                                                                HttpServletRequest request) throws AuthenticationException {
+        LoginResponseDTO loginResponseDTO = loginService.processLogin(loginDTO, request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.ofSuccess(ResponseCode.OK,loginResponseDTO));
+    }
 }

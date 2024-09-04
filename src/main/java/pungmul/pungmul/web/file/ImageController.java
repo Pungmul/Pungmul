@@ -27,7 +27,7 @@ public class ImageController {
     @PostMapping("/upload/chat")
     public ResponseEntity<Image> addImage(
                                     @AuthenticationPrincipal UserDetailsImpl userDetails,
-                                    @RequestParam("file") MultipartFile file) throws IOException {
+                                    @RequestParam("file") MultipartFile file) {
         try {
             Long userId = userRepository.getUserIdByAccountId(userDetails.getAccountId());
             RequestImageDTO requestImageDTO = new RequestImageDTO(userId, DomainType.CHAT, file);

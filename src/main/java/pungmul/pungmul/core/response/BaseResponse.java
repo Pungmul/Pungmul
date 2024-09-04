@@ -23,10 +23,10 @@ public class BaseResponse<E> {
     }
 
     // 반환 데이터가 없는 성공 메세지 템플릿
-    public static <E> BaseResponse<E> ofSuccess(){
+    public static <E> BaseResponse<E> ofSuccess(ResponseCode responseCode){
         return BaseResponse.<E>builder()
-                .code(ResponseCode.OK.getCode())
-                .message(ResponseCode.OK.getMessage())
+                .code(responseCode.getCode())
+                .message(responseCode.getMessage())
                 .success(true)
                 .response(null)
                 .build();

@@ -12,6 +12,7 @@ public enum ResponseCode {
     UNSUPPORTED_JWT("1002", "지원되지 않는 토큰 형식입니다."),
     INVALID_JWT_SIGNATURE("1003", "유효하지 않은 JWT 서명입니다."),
     ACCESS_DENIED("1004", "접근이 거부되었습니다."),
+    TOKEN_NOT_FOUND("1005", "존재하지 않는 토큰입니다."),
 
     // 2000 - 성공 관련
     OK("2000", "성공"),

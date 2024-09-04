@@ -24,6 +24,7 @@ import pungmul.pungmul.config.member.SessionConst;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -170,6 +171,13 @@ public class LoginService {
 
         LocalDateTime expiryTime = now.plusSeconds(tokenExpire / 1000);
         return java.time.Duration.between(now, expiryTime).getSeconds();
+    }
+
+    public void logout(UserDetails userDetails) {
+
+        Account account = accountRepository.getAccountByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException(userDetails.getUsername()));
+        jwtTokenService.revokeUserAllTokens(account);
     }
 }
 

@@ -53,12 +53,12 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/member/signup", "/member/login-jwt","/ws/chat").permitAll()
                         .anyRequest().authenticated())
 //                        .anyRequest().permitAll()) // 모든 요청 허용. 인증 로직 설계 이후 변경
-                .logout((logout) -> logout
-                        .logoutUrl("/member/logout-jwt")
-                        .addLogoutHandler(logoutHandler)
-                        .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()))
-                        .logoutSuccessUrl("/member/login-jwt")      //  로그아웃 후 해당 url로 이동
-                        .invalidateHttpSession(true))           //  로그아웃 후 세션 삭제. 굳이 필요?
+//                .logout((logout) -> logout
+//                        .logoutUrl("/member/logout-jwt")
+//                        .addLogoutHandler(logoutHandler)
+//                        .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()))
+//                        .logoutSuccessUrl("/member/login-jwt")      //  로그아웃 후 해당 url로 이동
+//                        .invalidateHttpSession(true))           //  로그아웃 후 세션 삭제. 굳이 필요?
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  세션 관리 정책. 세션 사용 안함
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 필터 순서 조정

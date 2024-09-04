@@ -18,6 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import pungmul.pungmul.core.exception.custom.member.InvalidProfileImageException;
+import pungmul.pungmul.core.exception.custom.member.TokenNotFoundException;
 import pungmul.pungmul.core.exception.custom.member.UsernameAlreadyExistsException;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.ResponseCode;
@@ -74,6 +75,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(
                 BaseResponse.ofFail(ResponseCode.ACCESS_DENIED),
                 HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ResponseEntity<BaseResponse<Void>> handleTokenNotFoundException(TokenNotFoundException ex, HttpServletRequest request) {
+        return new ResponseEntity<>(
+                BaseResponse.ofFail(ResponseCode.TOKEN_NOT_FOUND),
+                HttpStatus.NOT_FOUND
         );
     }
 
@@ -157,7 +166,7 @@ public class GlobalExceptionHandler {
     }
 
     // 4000 - 서버 내부 오류
-    @ExceptionHandler(Exception.class)  // 포괄적인 예외 처리
+    @ExceptionHandler(RuntimeException.class)  // 포괄적인 예외 처리
     public ResponseEntity<BaseResponse<Void>> handleInternalServerError(Exception ex) {
         return new ResponseEntity<>(
                 BaseResponse.ofFail(ResponseCode.INTERNAL_SERVER_ERROR),
@@ -210,5 +219,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(BaseResponse.ofFail(ResponseCode.INTERNAL_SERVER_ERROR));
     }
-
 }
