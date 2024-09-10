@@ -71,6 +71,7 @@ public class MemberController {
 
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
+        log.info("loginDTO {}", loginDTO);
         loginService.isValidCredentials(loginDTO);
         AuthenticationResponseDTO response = loginService.authenticate(loginDTO);
 

@@ -12,4 +12,10 @@ public interface PostMapper {
     void plusPostLikeCount(Long postId);
 
     Integer postLikedNum(Long postId);
+
+    boolean isPostLikedByUser(Long userId, Long postId);
+
+    void unlikePost(Long userId, Long postId);
+
+    void minusPostLikeNum(Long postId);
 }

@@ -31,11 +31,32 @@ import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+
+
 @Slf4j
+@Aspect
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public final class GlobalExceptionHandler {
+
+//    @AfterThrowing(pointcut = "execution(* pungmul.pungmul.core.exception.handler.GlobalExceptionHandler.*(..))", throwing = "ex")
+//    public void logException(Exception ex) {
+//        log.error("Exception caught in GlobalExceptionHandler: ", ex);
+//    }
+
+    @AfterThrowing(pointcut = "execution(* pungmul.pungmul.web..*(..))", throwing = "ex")
+    public void logControllerException(Exception ex) {
+        log.error("Exception occurred in controller layer: ", ex);
+    }
+
+    @AfterThrowing(pointcut = "execution(* pungmul.pungmul.service..*(..))", throwing = "ex")
+        public void logServiceException(Exception ex) {
+            log.error("Exception occurred in service layer: ", ex);
+        }
 
     // 1000 - 토큰 만료
+
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<BaseResponse<Void>> handleExpiredJwtException(ExpiredJwtException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
@@ -43,17 +64,18 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED
         );
     }
-
     // 1001 - 인증 필요
+
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<BaseResponse<Void>> handleJwtException(JwtException ex, HttpServletRequest request) {
+
         return new ResponseEntity<>(
                 BaseResponse.ofFail(BaseResponseCode.UNAUTHORIZED),
                 HttpStatus.UNAUTHORIZED
         );
     }
-
     // 1002 - 지원되지 않는 토큰 형식
+
     @ExceptionHandler(UnsupportedJwtException.class)
     public ResponseEntity<BaseResponse<Void>> handleUnsupportedJwtException(UnsupportedJwtException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
@@ -61,8 +83,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED
         );
     }
-
     // 1003 - 유효하지 않은 JWT 서명
+
     @ExceptionHandler(SignatureException.class)
     public ResponseEntity<BaseResponse<Void>> handleInvalidJwtSignatureException(SignatureException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
@@ -70,8 +92,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED
         );
     }
-
     // 1004 - 접근 거부
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<BaseResponse<Void>> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
@@ -79,7 +101,6 @@ public class GlobalExceptionHandler {
                 HttpStatus.FORBIDDEN
         );
     }
-
     @ExceptionHandler(TokenNotFoundException.class)
     public ResponseEntity<BaseResponse<Void>> handleTokenNotFoundException(TokenNotFoundException ex, HttpServletRequest request) {
         return new ResponseEntity<>(
@@ -89,6 +110,7 @@ public class GlobalExceptionHandler {
     }
 
     // 3000 - 잘못된 요청
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<BaseResponse<Void>> handleBadRequest(MethodArgumentTypeMismatchException ex) {
         return new ResponseEntity<>(
@@ -96,8 +118,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
-
     // 3001 - 입력 값 검증 실패
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -129,8 +151,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
-
     // 3002 - 요청한 리소스를 찾을 수 없음
+
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<BaseResponse<Void>> handleResourceNotFoundException(NoHandlerFoundException ex) {
         return new ResponseEntity<>(
@@ -138,8 +160,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND
         );
     }
-
     // 3003 - 허용되지 않은 HTTP 메서드
+
     @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<BaseResponse<Void>> handleMethodNotAllowedException(org.springframework.web.HttpRequestMethodNotSupportedException ex) {
         return new ResponseEntity<>(
@@ -147,8 +169,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.METHOD_NOT_ALLOWED
         );
     }
-
     // 3004 - 지원되지 않는 미디어 타입
+
     @ExceptionHandler(org.springframework.web.HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<BaseResponse<Void>> handleUnsupportedMediaTypeException(org.springframework.web.HttpMediaTypeNotSupportedException ex) {
         return new ResponseEntity<>(
@@ -156,8 +178,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNSUPPORTED_MEDIA_TYPE
         );
     }
-
     // 3005 - 이미 존재하는 이메일
+
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<BaseResponse<Void>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
         return new ResponseEntity<>(
@@ -165,8 +187,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT
         );
     }
-
     // 3006 - 허용되지 않는 프로필 이미지
+
     @ExceptionHandler(InvalidProfileImageException.class)
     public ResponseEntity<BaseResponse<Void>> handleInvalidProfileImageException(InvalidProfileImageException ex) {
         return new ResponseEntity<>(
@@ -174,8 +196,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
-
     // 3007 - 파일 크기 초과 시 발생하는 예외 처리
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<BaseResponse<Void>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
         return new ResponseEntity<>(
@@ -183,8 +205,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.PAYLOAD_TOO_LARGE
         );
     }
-
     // 4000 - 서버 내부 오류
+
     @ExceptionHandler(RuntimeException.class)  // 포괄적인 예외 처리
     public ResponseEntity<BaseResponse<Void>> handleInternalServerError(Exception ex) {
         return new ResponseEntity<>(
@@ -192,8 +214,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
-
     // 4001 - 구현되지 않은 기능 요청 시
+
     @ExceptionHandler(UnsupportedOperationException.class)
     public ResponseEntity<BaseResponse<Void>> handleNotImplemented(UnsupportedOperationException ex) {
         return new ResponseEntity<>(
@@ -201,8 +223,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_IMPLEMENTED
         );
     }
-
     // 4002 - 서비스 이용 불가 시
+
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<BaseResponse<Void>> handleServiceUnavailable(ServiceUnavailableException ex) {
         return new ResponseEntity<>(
@@ -210,8 +232,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.SERVICE_UNAVAILABLE
         );
     }
-
     // 5000 - 데이터 무결성 위반
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<BaseResponse<Void>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         return new ResponseEntity<>(
@@ -219,8 +241,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT
         );
     }
-
     // 5001 - 데이터베이스 제약 조건 위반
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<BaseResponse<Void>> handleConstraintViolation(ConstraintViolationException ex) {
         return new ResponseEntity<>(
@@ -228,14 +250,18 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
-
     // 6000 - 기타 예외 처리
     //  6000 - 모든 예외를 포괄적으로 처리 (개별적으로 처리되지 않은 예외들)
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<BaseResponse<Void>> handleAllExceptions(Exception ex) {
-        // 그 외에 발생할 수 있는 일반적인 예외 처리
-        log.error("An error occurred: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(BaseResponse.ofFail(BaseResponseCode.INTERNAL_SERVER_ERROR));
+    public ResponseEntity<BaseResponse<String>> handleGlobalException(Exception ex) {
+        // 스택 트레이스와 함께 예외를 로그로 출력
+        log.error("Exception caught: ", ex);
+
+        // 예외 처리 및 응답 반환
+        return new ResponseEntity<>(
+                BaseResponse.ofFail(BaseResponseCode.INTERNAL_SERVER_ERROR),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 }

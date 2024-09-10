@@ -2,6 +2,7 @@ package pungmul.pungmul.repository.post.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.domain.post.Comment;
 import pungmul.pungmul.repository.post.mapper.CommentMapper;
 import pungmul.pungmul.repository.post.repository.CommentRepository;
@@ -23,7 +24,27 @@ public class MybatisCommentRepository implements CommentRepository {
     }
 
     @Override
-    public Long getCommentLikesNum(Long commentId) {
+    public void unlikeComment(Long userId, Long commentId) {
+        commentMapper.unlikeComment(userId, commentId);
+    }
+
+    @Override
+    public void minusCommentLikeNum(Long commentId) {
+        commentMapper.minusCommentLikeNum(commentId);
+    }
+
+    @Override
+    public void plusCommentLikeNum(Long commentId) {
+        commentMapper.plusCommentLikeNum(commentId);
+    }
+
+    @Override
+    public Integer getCommentLikesNum(Long commentId) {
         return commentMapper.getCommentLikesNum(commentId);
+    }
+
+    @Override
+    public Boolean isCommentLikedByUser(Long userId, Long commentId) {
+        return commentMapper.isCommentLikedByUser(userId, commentId);
     }
 }

@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtConfig jwtConfig;
     private final TokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
 
@@ -36,6 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
         String jwt = null;
         String loginId = null;
+
+        log.info("Authorization header: {}", header);
 
         // Authorization 헤더에서 JWT 토큰 추출
         if (header != null && header.startsWith("Bearer ")) {

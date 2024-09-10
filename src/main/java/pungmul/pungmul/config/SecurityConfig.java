@@ -37,9 +37,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig implements WebMvcConfigurer {
 
-    private final ObjectMapper objectMapper;
     private final UserDetailsServiceImpl userDetailsService;
-    private final LogoutHandlerImpl logoutHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
 
@@ -50,15 +48,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .httpBasic(AbstractHttpConfigurer::disable)     //  Http Basic 인증 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)     //  폼 기반 로그인 방식 비활성화
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/member/signup", "/member/login-jwt","/ws/chat").permitAll()
+                        .requestMatchers("/member/signup", "/member/login","/ws/chat").permitAll()
                         .anyRequest().authenticated())
-//                        .anyRequest().permitAll()) // 모든 요청 허용. 인증 로직 설계 이후 변경
-//                .logout((logout) -> logout
-//                        .logoutUrl("/member/logout-jwt")
-//                        .addLogoutHandler(logoutHandler)
-//                        .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()))
-//                        .logoutSuccessUrl("/member/login-jwt")      //  로그아웃 후 해당 url로 이동
-//                        .invalidateHttpSession(true))           //  로그아웃 후 세션 삭제. 굳이 필요?
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  세션 관리 정책. 세션 사용 안함
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 필터 순서 조정
@@ -74,7 +65,6 @@ public class SecurityConfig implements WebMvcConfigurer {
         return roleHierarchy;
     }
 
-
     @Bean
     public AuthenticationManager authenticationManager() {
         JwtAuthenticationProvider provider = new JwtAuthenticationProvider(userDetailsService, passwordEncoder());
@@ -85,7 +75,6 @@ public class SecurityConfig implements WebMvcConfigurer {
     public static PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
-
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {

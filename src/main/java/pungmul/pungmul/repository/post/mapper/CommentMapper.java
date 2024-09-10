@@ -9,5 +9,13 @@ public interface CommentMapper {
 
     void likeComment(Long userId, Long commentId);
 
-    Long getCommentLikesNum(Long commentId);
+    void unlikeComment(Long userId, Long commentId);
+
+    Boolean isCommentLikedByUser(Long userId, Long commentId);
+
+    Integer getCommentLikesNum(Long commentId);
+
+    void plusCommentLikeNum(Long commentId);
+
+    void minusCommentLikeNum(Long commentId);
 }

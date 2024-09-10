@@ -8,7 +8,13 @@ public interface PostRepository {
 
     void likePost(Long userId, Long postId);
 
-    void plusPostLikeCount(Long postId);
+    void plusPostLikeNum(Long postId);
 
     Integer postLikedNum(Long postId);
+
+    boolean isPostLikedByUser(Long userId, Long postId);
+
+    void unlikePost(Long userId, Long postId);
+
+    void minusPostLikeNum(Long postId);
 }

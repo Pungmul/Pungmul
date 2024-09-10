@@ -49,6 +49,12 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// Spring AOP
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+	// AspectJ runtime
+	implementation 'org.aspectj:aspectjweaver:1.9.19'
+
 
 }
 

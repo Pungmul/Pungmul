@@ -29,8 +29,39 @@
             ON DUPLICATE KEY UPDATE created_at = CURRENT_TIMESTAMP
     </insert>
 
+    <!-- Increment the likedNum for a specific comment -->
+    <update id="plusCommentLikeNum" parameterType="java.lang.Long">
+        UPDATE comment
+        SET likedNum = likedNum + 1
+        WHERE id = #{commentId}
+    </update>
+
+
+    <!-- Insert like record -->
+    <!-- Delete like record -->
+    <delete id="unlikeComment" parameterType="map">
+        DELETE FROM comment_likes
+        WHERE comment_id = #{commentId}
+          AND user_id = #{userId}
+    </delete>
+
+    <!-- Decrement the likedNum for a specific comment -->
+    <update id="minusCommentLikeNum" parameterType="java.lang.Long">
+        UPDATE comment
+        SET likedNum = likedNum - 1
+        WHERE id = #{commentId}
+    </update>
+
+
+    <select id="isCommentLikedByUser" parameterType="map" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM comment_likes
+        WHERE comment_id = #{commentId}
+          AND user_id = #{userId}
+    </select>
+
     <!-- Get the number of likes for a specific comment -->
-    <select id="getCommentLikesNum" parameterType="java.lang.Long" resultType="java.lang.Long">
+    <select id="getCommentLikesNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
         SELECT COUNT(*)
         FROM comment_likes
         WHERE comment_id = #{commentId}

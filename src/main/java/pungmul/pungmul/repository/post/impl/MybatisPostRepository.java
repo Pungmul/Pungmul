@@ -24,12 +24,27 @@ public class MybatisPostRepository implements PostRepository {
     }
 
     @Override
-    public void plusPostLikeCount(Long postId) {
+    public void plusPostLikeNum(Long postId) {
         postMapper.plusPostLikeCount(postId);
     }
 
     @Override
     public Integer postLikedNum(Long postId) {
         return postMapper.postLikedNum(postId);
+    }
+
+    @Override
+    public boolean isPostLikedByUser(Long userId, Long postId) {
+        return postMapper.isPostLikedByUser(userId, postId);
+    }
+
+    @Override
+    public void unlikePost(Long userId, Long postId) {
+        postMapper.unlikePost(userId, postId);
+    }
+
+    @Override
+    public void minusPostLikeNum(Long postId) {
+        postMapper.minusPostLikeNum(postId);
     }
 }
