@@ -3,8 +3,11 @@ package pungmul.pungmul.service.post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.domain.post.Comment;
+import pungmul.pungmul.dto.post.CommentLikeResponseDTO;
+import pungmul.pungmul.dto.post.CommentResponseDTO;
 import pungmul.pungmul.dto.post.RequestCommentDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.CommentRepository;
@@ -17,14 +20,39 @@ import java.util.NoSuchElementException;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    public Long addComment(Long accountId, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
+    public CommentResponseDTO addComment(Long accountId, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
 
-        log.info("call addComment service");
         Comment comment = getComment(getUserIdByAccountId(accountId), postId, parentId, requestCommentDTO);
-
         commentRepository.save(comment);
-        log.info("save addComment done : {}", comment.getId());
-        return comment.getId();
+
+        return getCommentResponseDTO(comment);
+    }
+
+    @Transactional
+    public CommentLikeResponseDTO handleCommentLike(Long accountId, Long commentId) {
+        User user = userRepository.getUserByAccountId(accountId)
+                .orElseThrow(NoSuchElementException::new);
+
+        Boolean isLiked = commentRepository.isCommentLikedByUser(user.getId(), commentId);
+
+        if (isLiked) {
+            commentRepository.unlikeComment(userRepository.getUserIdByAccountId(accountId), commentId);
+            commentRepository.minusCommentLikeNum(commentId);
+        } else {
+            commentRepository.likeComment(userRepository.getUserIdByAccountId(accountId), commentId);
+            commentRepository.plusCommentLikeNum(commentId);
+        }
+
+        Integer commentLikesNum = commentRepository.getCommentLikesNum(commentId);
+
+        return getCommentLikeResponseDTO(commentId, commentLikesNum, !isLiked);
+    }
+
+    private Long getUserIdByAccountId(Long accountId) {
+        User user = userRepository.getUserByAccountId(accountId)
+                .orElseThrow(NoSuchElementException::new);
+
+        return user.getId();
     }
 
     private static Comment getComment(Long userId, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
@@ -36,15 +64,21 @@ public class CommentService {
                 .build();
     }
 
-    public Long likeComment(Long accountId, Long commentId) {
-        commentRepository.likeComment(userRepository.getUserIdByAccountId(accountId), commentId);
-        return commentRepository.getCommentLikesNum(commentId);
+    private static CommentResponseDTO getCommentResponseDTO(Comment comment) {
+        return CommentResponseDTO.builder()
+                .commentId(comment.getId())
+                .postId(comment.getPostId())
+                .parentId(comment.getParentId())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .build();
     }
 
-    private Long getUserIdByAccountId(Long accountId) {
-        User user = userRepository.getUserByAccountId(accountId)
-                .orElseThrow(NoSuchElementException::new);
-
-        return user.getId();
+    private static CommentLikeResponseDTO getCommentLikeResponseDTO(Long commentId, Integer commentLikesNum, Boolean isLiked) {
+        return CommentLikeResponseDTO.builder()
+                .commentId(commentId)
+                .liked(isLiked)
+                .likeCount(commentLikesNum)
+                .build();
     }
 }

@@ -10,7 +10,9 @@ import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
 import pungmul.pungmul.dto.file.RequestImageDTO;
-import pungmul.pungmul.dto.post.RequestPostDTO;
+import pungmul.pungmul.dto.post.PostLikeResponseDTO;
+import pungmul.pungmul.dto.post.PostRequestDTO;
+import pungmul.pungmul.dto.post.PostResponseDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.ContentRepository;
 import pungmul.pungmul.repository.post.repository.PostRepository;
@@ -32,22 +34,57 @@ public class PostService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long addPost(Long accountId, RequestPostDTO requestPostDTO, List<MultipartFile> files) throws IOException {
-        Long postId = savePost(requestPostDTO);
-        saveContent(userRepository.getUserIdByAccountId(accountId), postId, requestPostDTO, files);
+    public PostResponseDTO addPost(Long accountId, PostRequestDTO postRequestDTO, List<MultipartFile> files) throws IOException {
+        Long postId = savePost(postRequestDTO);
+        saveContent(userRepository.getUserIdByAccountId(accountId), postId, postRequestDTO, files);
 
-        return postId;
+        return PostResponseDTO.builder()
+                .postId(postId)
+                .build();
     }
 
-    private Long savePost(RequestPostDTO requestPostDTO) throws IOException {
-        Post post = getPost(requestPostDTO);
+    @Transactional
+    public PostLikeResponseDTO handlePostLike(Long accountId, Long postId) {
+        Long userId = userRepository.getUserIdByAccountId(accountId);
+
+        // 1. 사용자가 이미 해당 게시물에 좋아요를 눌렀는지 확인
+        boolean isLiked = postRepository.isPostLikedByUser(userId, postId);
+
+        if (isLiked) {
+            // 2. 이미 좋아요가 눌려 있으면 좋아요 취소 (데이터 삭제) 및 좋아요 수 감소
+            postRepository.unlikePost(userId, postId); // 좋아요 취소
+            postRepository.minusPostLikeNum(postId); // 좋아요 수 감소
+        } else {
+            // 3. 좋아요가 눌려 있지 않으면 좋아요 추가 (데이터 삽입) 및 좋아요 수 증가
+            postRepository.likePost(userId, postId);   // 좋아요 추가
+            postRepository.plusPostLikeNum(postId);  // 좋아요 수 증가
+        }
+
+        // 4. 게시물의 최신 좋아요 수를 가져옴
+        Integer likedNum = postRepository.postLikedNum(postId);
+
+        // 5. 결과 반환 (좋아요 상태 반영)
+        return getPostLikeResponseDTO(postId, !isLiked, likedNum);
+    }
+
+    private static PostLikeResponseDTO getPostLikeResponseDTO(Long postId, boolean isLiked, Integer likedNum) {
+        return PostLikeResponseDTO.builder()
+                .postId(postId)
+                .liked(isLiked)
+                .likedNum(likedNum)
+                .build();
+    }
+
+
+    private Long savePost(PostRequestDTO postRequestDTO) throws IOException {
+        Post post = getPost(postRequestDTO);
         postRepository.save(post);
 
         return post.getId();
     }
 
-    private void saveContent(Long userId, Long postId, RequestPostDTO requestPostDTO, List<MultipartFile> files) throws IOException {
-        Content content = getContent(userId, postId, requestPostDTO);
+    private void saveContent(Long userId, Long postId, PostRequestDTO postRequestDTO, List<MultipartFile> files) throws IOException {
+        Content content = getContent(userId, postId, postRequestDTO);
         contentRepository.save(content);
 
         saveImage(userId, content.getId(),files);
@@ -64,18 +101,18 @@ public class PostService {
         return imageIdList;
     }
 
-    private static Post getPost(RequestPostDTO requestPostDTO) {
+    private static Post getPost(PostRequestDTO postRequestDTO) {
         return Post.builder()
-                .categoryId(requestPostDTO.getCategoryId())
+                .categoryId(postRequestDTO.getCategoryId())
                 .build();
     }
 
-    private static Content getContent(Long userId, Long postId, RequestPostDTO requestPostDTO) {
+    private static Content getContent(Long userId, Long postId, PostRequestDTO postRequestDTO) {
         return Content.builder()
                 .postId(postId)
-                .title(requestPostDTO.getTitle())
-                .text(requestPostDTO.getText())
-                .anonymity(requestPostDTO.isAnonymity())
+                .title(postRequestDTO.getTitle())
+                .text(postRequestDTO.getText())
+                .anonymity(postRequestDTO.isAnonymity())
                 .writerId(userId)
                 .build();
     }
@@ -90,13 +127,6 @@ public class PostService {
         log.info("domainId : {}", savedImage.getId());
         imageIdList.add(savedImage.getId());
         return savedImage;
-    }
-
-    public Integer likePost(Long accountId, Long postId) {
-        postRepository.likePost(userRepository.getUserIdByAccountId(accountId), postId);
-        postRepository.plusPostLikeCount(postId);
-
-        return postRepository.postLikedNum(postId);
     }
 
 }

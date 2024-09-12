@@ -1,7 +1,9 @@
 package pungmul.pungmul.web.post;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,8 +12,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
-import pungmul.pungmul.dto.post.RequestCommentDTO;
-import pungmul.pungmul.dto.post.RequestPostDTO;
+import pungmul.pungmul.core.response.BaseResponse;
+import pungmul.pungmul.core.response.BaseResponseCode;
+import pungmul.pungmul.dto.post.*;
 import pungmul.pungmul.service.post.CommentService;
 import pungmul.pungmul.service.post.PostService;
 
@@ -28,38 +31,46 @@ public class PostController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping(value = "/add", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Long> addPost(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                        @Validated @RequestPart("postData") RequestPostDTO requestPostDTO,
-                                        @RequestPart(value = "files", required = false) List<MultipartFile> files) throws IOException {
-
-//        log.info("SessionUser: {}", sessionUser.getUserId());
-        return ResponseEntity.ok(postService.addPost(userDetails.getAccountId(), requestPostDTO, files));
+    public ResponseEntity<BaseResponse<PostResponseDTO>> addPost(
+                                                    HttpServletRequest request,
+                                                    @AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                     @Validated @RequestPart("postData") PostRequestDTO postRequestDTO,
+                                                     @RequestPart(value = "files", required = false) List<MultipartFile> files) throws IOException {
+        log.info(request.getHeader("Authorization"));
+        PostResponseDTO postResponseDTO = postService.addPost(userDetails.getAccountId(), postRequestDTO, files);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, postResponseDTO));
     }
 
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/{postId}/comments")
-    public ResponseEntity<Long> addComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                           @PathVariable Long postId,
-                                           @RequestParam(required = false) Long parentId,
-                                           @Validated @RequestBody RequestCommentDTO requestCommentDTO){
-        log.info("call addComment");
-        Long commentId = commentService.addComment(userDetails.getAccountId(), postId, parentId, requestCommentDTO);
+    public ResponseEntity<BaseResponse<CommentResponseDTO>> addComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                       @PathVariable Long postId,
+                                                                       @RequestParam(required = false) Long parentId,
+                                                                       @Validated @RequestBody RequestCommentDTO requestCommentDTO){
+        CommentResponseDTO commentResponseDTO = commentService.addComment(userDetails.getAccountId(), postId, parentId, requestCommentDTO);
 
-        return ResponseEntity.ok(commentId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, commentResponseDTO));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/{postId}/like")
-    public ResponseEntity<Integer> likePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                         @PathVariable Long postId){
-        return ResponseEntity.ok(postService.likePost(userDetails.getAccountId(), postId));
+    public ResponseEntity<BaseResponse<PostLikeResponseDTO>> likePost(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                      @PathVariable Long postId){
+        PostLikeResponseDTO postLikeResponseDTO = postService.handlePostLike(userDetails.getAccountId(), postId);
+        return ResponseEntity.status(HttpStatus.OK)
+                        .body(BaseResponse.ofSuccess(BaseResponseCode.OK, postLikeResponseDTO));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/{postId}/comments/{commentId}/like")
-    public ResponseEntity<Long> likeComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<BaseResponse<CommentLikeResponseDTO>> likeComment(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                             @PathVariable Long commentId){
-        return ResponseEntity.ok(commentService.likeComment(userDetails.getAccountId(), commentId));
+
+        CommentLikeResponseDTO commentLikeResponseDTO = commentService.handleCommentLike(userDetails.getAccountId(), commentId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, commentLikeResponseDTO));
     }
 }

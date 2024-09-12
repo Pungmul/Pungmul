@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS account_roles (
                                              FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 
-
 CREATE TABLE if not exists tokens (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         account_id BIGINT NOT NULL,
@@ -150,6 +149,7 @@ CREATE TABLE IF NOT EXISTS comment (
                                 parent_id BIGINT DEFAULT NULL,           -- 부모 댓글의 ID (NULL이면 최상위 댓글, 외래키로 comment 테이블의 id 참조)
                                 content TEXT NOT NULL,                   -- 댓글의 내용
                                 deleted BOOLEAN DEFAULT FALSE,
+                                likedNum INT DEFAULT 0,
                                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 댓글 작성 시간
                                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 댓글 수정 시간
                                 FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE, -- 게시글이 삭제되면 댓글도 삭제

@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import pungmul.pungmul.core.exception.custom.member.TokenNotFoundException;
 import pungmul.pungmul.domain.member.JwtToken;
 import pungmul.pungmul.repository.member.repository.JwtTokenRepository;
 import pungmul.pungmul.service.member.JwtTokenService;
@@ -26,7 +27,7 @@ public class LogoutHandlerImpl implements LogoutHandler {
         log.info("logout token: {}", token);
 
         JwtToken storedToken = jwtTokenRepository.findByToken(token)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 토큰"));
+                .orElseThrow(() -> new TokenNotFoundException("응애"));
 
         jwtTokenRepository.revokeTokenByToken(token);
     }

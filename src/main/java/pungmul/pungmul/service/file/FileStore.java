@@ -20,6 +20,9 @@ public class FileStore {
         if (originImage.isEmpty())
              throw new IllegalArgumentException("파일 없음");
 
+        if (originImage.getSize() > 5 * 1024 * 1024)
+            throw new IllegalArgumentException("파일 크기 초과");
+
         //  image.png -> 원래 파일명
         String originalFilename = originImage.getOriginalFilename();
 

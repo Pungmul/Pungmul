@@ -29,10 +29,22 @@
             ON DUPLICATE KEY UPDATE created_at = CURRENT_TIMESTAMP
     </insert>
 
+    <delete id="unlikePost" parameterType="map">
+        DELETE FROM post_likes
+        WHERE post_id = #{postId}
+          AND user_id = #{userId}
+    </delete>
+
     <!-- Update like count for a post -->
     <update id="plusPostLikeCount" parameterType="java.lang.Long">
         UPDATE post
         SET like_num = like_num + 1
+        WHERE id = #{postId}
+    </update>
+
+    <update id="minusPostLikeNum" parameterType="java.lang.Long">
+        UPDATE post
+        SET like_num = like_num - 1
         WHERE id = #{postId}
     </update>
 
@@ -41,5 +53,13 @@
         FROM post
         WHERE id = #{postId}
     </select>
+
+    <select id="isPostLikedByUser" parameterType="map" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
+        FROM post_likes
+        WHERE post_id = #{postId}
+          AND user_id = #{userId}
+    </select>
+
 
 </mapper>
