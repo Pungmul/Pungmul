@@ -55,6 +55,10 @@ dependencies {
 	// AspectJ runtime
 	implementation 'org.aspectj:aspectjweaver:1.9.19'
 
+	//WebFlux
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+
 
 }
 

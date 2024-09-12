@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,6 +38,12 @@ public class LoginService {
     private final TokenProvider tokenProvider;
     private final JwtTokenService jwtTokenService;
 
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    String kakaoClientId;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    String kakaoRedirectUri;
+
 //    private static final Key SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private static final long ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60 * 1000;
     private static final long REFRESH_TOKEN_VALIDITY_SECONDS = 7 * 24 * 60 * 60 * 1000;
@@ -63,10 +70,10 @@ public class LoginService {
     }
 
     @Transactional
-    public AuthenticationResponseDTO authenticate(LoginDTO loginDTO) {
+    public AuthenticationResponseDTO authenticate(String username) {
 
         //jwt, refresh token 발급
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginDTO.getLoginId());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         String accessToken = tokenProvider.generateToken(userDetails);
         log.info("generated access Token : {}",accessToken);
 
@@ -75,7 +82,7 @@ public class LoginService {
 
 
         //이전 토큰 무효화 및 새 토큰 저장
-        Account account = accountRepository.getAccountByLoginId(loginDTO.getLoginId())
+        Account account = accountRepository.getAccountByLoginId(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Account not found"));
 
         jwtTokenService.revokeUserAllTokens(account);

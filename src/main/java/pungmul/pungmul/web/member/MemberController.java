@@ -1,6 +1,7 @@
 package pungmul.pungmul.web.member;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -73,7 +74,7 @@ public class MemberController {
     public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
         log.info("loginDTO {}", loginDTO);
         loginService.isValidCredentials(loginDTO);
-        AuthenticationResponseDTO response = loginService.authenticate(loginDTO);
+        AuthenticationResponseDTO response = loginService.authenticate(loginDTO.getLoginId());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));

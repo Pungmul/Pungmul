@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pungmul.pungmul.core.exception.custom.member.InvalidPasswordException;
 import pungmul.pungmul.core.exception.custom.member.InvalidProfileImageException;
+import pungmul.pungmul.core.exception.custom.member.NoSuchUsernameException;
 import pungmul.pungmul.core.exception.custom.member.UsernameAlreadyExistsException;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
@@ -38,6 +39,14 @@ public class MemberExceptionHandler {
         // 에러 코드를 사용해서 BaseResponse 생성
         return new ResponseEntity<>(
                 BaseResponse.ofFail(MemberResponseCode.INVALID_PASSWORD),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(NoSuchUsernameException.class)
+    public ResponseEntity<BaseResponse<String>> handleNoSuchUsernameException(NoSuchUsernameException ex) {
+        return new ResponseEntity<>(
+                BaseResponse.ofFail(MemberResponseCode.NOTFOUND_USERNAME),
                 HttpStatus.BAD_REQUEST
         );
     }
