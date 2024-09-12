@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS account_roles (
                                              FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 
-
 CREATE TABLE if not exists tokens (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         account_id BIGINT NOT NULL,
