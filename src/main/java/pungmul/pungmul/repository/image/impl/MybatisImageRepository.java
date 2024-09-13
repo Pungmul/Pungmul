@@ -24,8 +24,8 @@ public class MybatisImageRepository implements ImageRepository {
     }
 
     @Override
-    public Image getImageByOriginImageNameAndUserId(Long userId, String originFileName) {
-        return imageMapper.getImageByOriginImageNameAndUserId(userId, originFileName);
+    public Image getImageByOriginImageNameAndUserId(String originFileName) {
+        return imageMapper.getImageByOriginImageNameAndUserId(originFileName);
     }
 
 

@@ -12,6 +12,7 @@ import pungmul.pungmul.domain.file.DomainType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestImageDTO {
+    private Long domainId;
     private Long userId;
     private DomainType domainType;
     private MultipartFile imageFile;

@@ -10,6 +10,7 @@
         <result property="domainType" column="domain_type" />
         <result property="domainId" column="domain_id" />
         <result property="imageId" column="image_id" />
+        <result property="userId" column="user_id" />
         <result property="isPrimary" column="is_primary" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
@@ -17,15 +18,8 @@
 
     <!-- Insert DomainImage -->
     <insert id="save" parameterType="pungmul.pungmul.dto.file.DomainImageDTO" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO domain_image (
-            domain_type,
-            domain_id,
-            image_id
-        ) VALUES (
-            #{domainType},
-            #{domainId},
-            #{imageId}
-        )
+        INSERT INTO domain_image (domain_type, domain_id, image_id, user_id)
+        VALUES (#{domainType}, #{domainId}, #{imageId}, #{userId})
     </insert>
 
 </mapper>

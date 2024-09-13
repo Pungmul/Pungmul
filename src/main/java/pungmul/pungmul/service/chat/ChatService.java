@@ -5,16 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.chat.ChatRoom;
+import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.domain.chat.ChatMessage;
 import pungmul.pungmul.dto.chat.ChatMessageRequestDTO;
 import pungmul.pungmul.dto.chat.CreateChatRoomRequestDTO;
 import pungmul.pungmul.dto.chat.CreateChatRoomResponseDTO;
+import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.repository.chat.repository.ChatRepository;
 import pungmul.pungmul.repository.chat.repository.ChatRoomRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.service.file.ImageService;
 
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -24,6 +29,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ImageService imageService;
 
     @Transactional
     public CreateChatRoomResponseDTO createChatRoomWithRoomCheck(String senderName, String receiverName){
@@ -58,6 +64,18 @@ public class ChatService {
         chatRoomRepository.addChatRoomMembers(roomUUID, List.of(sender.getId(), receiver.getId()));
 
         return roomUUID;
+    }
+    private void saveChatImage(Long chatId, MultipartFile image, Long userId) throws IOException {
+        imageService.saveImage(getRequestChatImageDTO(chatId, image, userId ));
+    }
+
+    private RequestImageDTO getRequestChatImageDTO(Long chatId, MultipartFile image, Long userId){
+        return RequestImageDTO.builder()
+                .domainId(chatId)
+                .imageFile(image)
+                .userId(userId)
+                .domainType(DomainType.CHAT)
+                .build();
     }
 
     private ChatMessage getChatMessage(String senderName, String chatRoomUUID, ChatMessageRequestDTO chatMessageRequestDTO) {

@@ -12,5 +12,6 @@ public class DomainImageDTO {
     private DomainType domainType;
     private Long domainId;
     private Long imageId;
+    private Long userId;
 //    private Boolean isPrimary;
 }

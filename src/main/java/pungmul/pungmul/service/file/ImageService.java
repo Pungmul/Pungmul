@@ -21,29 +21,24 @@ public class ImageService {
     private final DomainImageService domainImageService;
     private final UserRepository userRepository;
 
-    public Image addChatImage(Long accountId, MultipartFile file) {
-        try {
-            Long userId = userRepository.getUserIdByAccountId(accountId);
-            RequestImageDTO requestImageDTO = new RequestImageDTO(userId, DomainType.CHAT, file);
-            return saveImage(requestImageDTO);
-        } catch (IOException e) {
-            // 로깅 등을 여기서 수행할 수 있음
-            throw new RuntimeException("이미지 저장 중 오류가 발생했습니다.", e);
-        }
-    }
+//    public Image addChatImage(Long accountId, MultipartFile file) {
+//        try {
+//            Long userId = userRepository.getUserIdByAccountId(accountId);
+//            RequestImageDTO requestImageDTO = new RequestImageDTO(userId, DomainType.CHAT, file);
+//            return saveImage(requestImageDTO);
+//        } catch (IOException e) {
+//            // 로깅 등을 여기서 수행할 수 있음
+//            throw new RuntimeException("이미지 저장 중 오류가 발생했습니다.", e);
+//        }
+//    }
 
-    public Image saveImage(RequestImageDTO requestImageDTO) throws IOException {
-        log.info("userId : {}, Saving image {}", requestImageDTO.getUserId(), requestImageDTO.getImageFile());
+    public void saveImage(RequestImageDTO requestImageDTO) throws IOException {
         Image image = fileStore.saveImageToLocal(requestImageDTO.getUserId(), requestImageDTO.getImageFile());
-
-        return saveImageToRepo(requestImageDTO.getUserId(),
-                requestImageDTO.getDomainType(),
-                image);
+        saveImageToRepo(requestImageDTO.getDomainId(), requestImageDTO.getDomainType(), image,requestImageDTO.getUserId());
     }
 
-    private Image saveImageToRepo(Long userId, DomainType domainType, Image image) {
+    private void saveImageToRepo(Long domainId, DomainType domainType, Image image,Long userId) {
         imageRepository.save(image);
-        domainImageService.saveDomainImage(domainType, userId, image.getId());
-        return imageRepository.getImageByImageId(image.getId());
+        domainImageService.saveDomainImage(domainType, domainId, image.getId(), userId);
     }
 }

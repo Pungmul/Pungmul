@@ -43,7 +43,6 @@ public class FileStore {
                     .fullFilePath(getFullPath(convertedFileName))
                     .fileType(originImage.getContentType())
                     .fileSize(originImage.getSize())
-                    .userId(userId)
                     .build();
     }
 

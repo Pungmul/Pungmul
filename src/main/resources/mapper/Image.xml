@@ -12,7 +12,6 @@
         <result property="fullFilePath" column="full_file_path" />
         <result property="fileType" column="file_type" />
         <result property="fileSize" column="size" />
-        <result property="userId" column="user_id" />
         <result property="createdAt" column="created_at" />
     </resultMap>
 
@@ -23,16 +22,14 @@
             converted_filename,
             full_file_path,
             file_type,
-            size,
-            user_id
+            size
         ) VALUES (
-             #{originalFilename},
-             #{convertedFileName},
-             #{fullFilePath},
-             #{fileType},
-             #{fileSize},
-             #{userId}
-        )
+            #{originalFilename},
+            #{convertedFileName},
+            #{fullFilePath},
+            #{fileType},
+            #{fileSize}
+            )
     </insert>
 
     <!-- Select Image By Id -->
@@ -40,11 +37,10 @@
         SELECT * FROM image WHERE id = #{id}
     </select>
 
-    <!-- Select Image By Id -->
-    <select id="getImageByOriginalFilenameAndUserId" resultMap="ImageResultMap">
+    <!-- Select Image By Original Filename -->
+    <select id="getImageByOriginalFilename" resultMap="ImageResultMap">
         SELECT * FROM image
         WHERE original_filename = #{originalFilename}
-          AND userId = #{userId}
     </select>
 
 </mapper>

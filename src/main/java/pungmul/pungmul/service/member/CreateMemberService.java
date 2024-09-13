@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.file.DomainType;
-import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.domain.member.InstrumentStatus;
 import pungmul.pungmul.domain.member.User;
@@ -107,19 +106,17 @@ public class CreateMemberService {
     private Long createUser(CreateMemberRequestDTO createMemberRequestDTO, MultipartFile profile, Long accountId) throws IOException {
         User user = getUser(createMemberRequestDTO, accountId);
         userRepository.saveUser(user);
+        if (profile != null && !profile.isEmpty())
+            imageService.saveImage(getRequestProfileImageDTO(profile, user));
 
-
-        if (profile != null && !profile.isEmpty()) {
-            Image image = imageService.saveImage(getRequestImageDTO(profile, user));
-            domainImageService.saveDomainImage(DomainType.PROFILE,user.getId(), image.getId());
-        }
         return user.getId();
     }
 
-    private static RequestImageDTO getRequestImageDTO(MultipartFile profile, User user) {
+    private static RequestImageDTO getRequestProfileImageDTO(MultipartFile profile, User user) {
         return RequestImageDTO.builder()
-                .userId(user.getId())
+                .domainId(user.getId())
                 .imageFile(profile)
+                .userId(user.getId())
                 .domainType(DomainType.PROFILE)
                 .build();
     }
