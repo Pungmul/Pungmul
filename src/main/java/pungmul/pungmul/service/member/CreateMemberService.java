@@ -108,6 +108,7 @@ public class CreateMemberService {
         User user = getUser(createMemberRequestDTO, accountId);
         userRepository.saveUser(user);
 
+
         if (profile != null && !profile.isEmpty()) {
             Image image = imageService.saveImage(getRequestImageDTO(profile, user));
             domainImageService.saveDomainImage(DomainType.PROFILE,user.getId(), image.getId());

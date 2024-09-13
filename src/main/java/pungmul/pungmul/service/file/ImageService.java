@@ -21,15 +21,6 @@ public class ImageService {
     private final DomainImageService domainImageService;
     private final UserRepository userRepository;
 
-//    public Image saveImage(RequestImageDTO requestImageDTO) throws IOException {
-//        log.info("userId : {}, Saving image {}", requestImageDTO.getUserId(), requestImageDTO.getImageFile());
-//        Image image = fileStore.saveImageToLocal(requestImageDTO.getUserId(), requestImageDTO.getImageFile());
-//
-//        return saveImageToRepo(requestImageDTO.getUserId(),
-//                                requestImageDTO.getDomainType(),
-//                                image);
-//    }
-
     public Image addChatImage(Long accountId, MultipartFile file) {
         try {
             Long userId = userRepository.getUserIdByAccountId(accountId);
