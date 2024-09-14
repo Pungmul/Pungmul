@@ -8,6 +8,6 @@ public interface ImageRepository {
 
     public Image getImageByImageId(Long imageId);
 
-    public Image getImageByOriginImageNameAndUserId(Long userId, String originFileName);
+    public Image getImageByOriginImageNameAndUserId(String originFileName);
 
 }

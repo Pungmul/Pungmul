@@ -44,7 +44,6 @@ CREATE TABLE IF NOT EXISTS image (
                         full_file_path VARCHAR(255) NOT NULL,
                         file_type VARCHAR(50) NOT NULL,
                         size BIGINT NOT NULL,
-                        user_id BIGINT NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -53,6 +52,7 @@ CREATE TABLE IF NOT EXISTS domain_image (
                         domain_type VARCHAR(50) NOT NULL,
                         domain_id BIGINT NOT NULL,
                         image_id BIGINT NOT NULL,
+                        user_id BIGINT NOT NULL,
                         is_primary BOOLEAN DEFAULT FALSE,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

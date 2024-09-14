@@ -10,6 +10,6 @@ public interface ImageMapper {
 
     Image getImageByImageId(Long id);
 
-    Image getImageByOriginImageNameAndUserId(@Param("userId") Long userId,@Param("originFileName") String imageName);
+    Image getImageByOriginImageNameAndUserId(String imageName);
 
 }

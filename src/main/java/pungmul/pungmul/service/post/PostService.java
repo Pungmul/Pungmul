@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.file.DomainType;
-import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
 import pungmul.pungmul.dto.file.RequestImageDTO;
@@ -75,7 +74,6 @@ public class PostService {
                 .build();
     }
 
-
     private Long savePost(PostRequestDTO postRequestDTO) throws IOException {
         Post post = getPost(postRequestDTO);
         postRepository.save(post);
@@ -87,18 +85,12 @@ public class PostService {
         Content content = getContent(userId, postId, postRequestDTO);
         contentRepository.save(content);
 
-        saveImage(userId, content.getId(),files);
-//        content.setImageIdList(imageIdList);
+        saveImageList(userId, content.getId(),files);
     }
 
-    private List<Long> saveImage(Long userId, Long contentId, List<MultipartFile> images) throws IOException {
-        ArrayList<Long> imageIdList = new ArrayList<>();
-
-        for (MultipartFile image : images) {
-            Image savedImage = getImage(userId, image, imageIdList);
-            domainImageService.saveDomainImage(DomainType.CONTENT, contentId, savedImage.getId());
-        }
-        return imageIdList;
+    private void saveImageList(Long userId, Long contentId, List<MultipartFile> images) throws IOException {
+        for (MultipartFile image : images)
+            saveContentImage(contentId, image, userId);
     }
 
     private static Post getPost(PostRequestDTO postRequestDTO) {
@@ -117,16 +109,17 @@ public class PostService {
                 .build();
     }
 
-    private Image getImage(Long userId, MultipartFile image, ArrayList<Long> imageIdList) throws IOException {
-        RequestImageDTO imageDTO = RequestImageDTO.builder()
+    private void saveContentImage(Long contentId, MultipartFile image, Long userId) throws IOException {
+        imageService.saveImage(getRequestContentImageDTO(contentId, image, userId));
+    }
+
+    private RequestImageDTO getRequestContentImageDTO(Long contentId, MultipartFile image,  Long userId) {
+        return RequestImageDTO.builder()
+                .domainId(contentId)
                 .imageFile(image)
                 .userId(userId)
                 .domainType(DomainType.CONTENT)
                 .build();
-        Image savedImage = imageService.saveImage(imageDTO);
-        log.info("domainId : {}", savedImage.getId());
-        imageIdList.add(savedImage.getId());
-        return savedImage;
     }
 
 }

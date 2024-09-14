@@ -13,16 +13,18 @@ import pungmul.pungmul.repository.image.repository.DomainImageRepository;
 public class DomainImageService {
     private final DomainImageRepository domainImageRepository;
 
-    public void saveDomainImage(DomainType domainType, Long domainId, Long imageId){
-        log.info("{}",domainId);
-        DomainImageDTO domainImageDTO = DomainImageDTO.builder()
+    public void saveDomainImage(DomainType domainType, Long domainId, Long imageId, Long userId){
+        DomainImageDTO domainImageDTO = getDomainImageDTO(domainType, domainId, imageId, userId);
+        domainImageRepository.save(domainImageDTO);
+    }
+
+    private static DomainImageDTO getDomainImageDTO(DomainType domainType, Long domainId, Long imageId, Long userId) {
+        return DomainImageDTO.builder()
                 .domainType(domainType)
                 .domainId(domainId)
                 .imageId(imageId)
-//                .isPrimary(isPrimary)
+                .userId(userId)
                 .build();
-
-        domainImageRepository.save(domainImageDTO);
     }
 
 
