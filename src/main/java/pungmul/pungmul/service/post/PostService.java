@@ -74,7 +74,6 @@ public class PostService {
                 .build();
     }
 
-
     private Long savePost(PostRequestDTO postRequestDTO) throws IOException {
         Post post = getPost(postRequestDTO);
         postRepository.save(post);
