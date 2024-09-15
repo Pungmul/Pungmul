@@ -1,5 +1,6 @@
 package pungmul.pungmul.repository.member.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.domain.member.Instrument;
 import pungmul.pungmul.domain.member.InstrumentStatus;
@@ -9,13 +10,10 @@ import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 import java.util.List;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Repository
 public class MybatisInstrumentStatusRepository implements InstrumentStatusRepository {
     private final InstrumentStatusMapper instrumentStatusMapper;
-
-    public MybatisInstrumentStatusRepository(InstrumentStatusMapper instrumentStatusMapper){
-        this.instrumentStatusMapper = instrumentStatusMapper;
-    }
 
     @Override
     public void saveInstrument(InstrumentStatus instrument) {
