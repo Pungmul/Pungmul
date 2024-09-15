@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pungmul.pungmul.config.JwtConfig;
-import pungmul.pungmul.domain.member.Account;
-import pungmul.pungmul.domain.member.JwtToken;
+import pungmul.pungmul.domain.member.account.Account;
+import pungmul.pungmul.domain.member.auth.JwtToken;
 import pungmul.pungmul.repository.member.repository.JwtTokenRepository;
 
 import java.util.Date;

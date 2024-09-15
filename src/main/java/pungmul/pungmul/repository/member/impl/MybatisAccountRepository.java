@@ -1,19 +1,17 @@
 package pungmul.pungmul.repository.member.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import pungmul.pungmul.domain.member.Account;
+import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.mapper.AccountMapper;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Repository
 public class MybatisAccountRepository implements AccountRepository {
     private final AccountMapper accountMapper;
-
-    public MybatisAccountRepository(AccountMapper accountMapper){
-        this.accountMapper = accountMapper;
-    }
 
     @Override
     public void saveAccount(Account account) {

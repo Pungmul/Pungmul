@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pungmul.pungmul.domain.member.User;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Comment;
 import pungmul.pungmul.dto.post.CommentLikeResponseDTO;
 import pungmul.pungmul.dto.post.CommentResponseDTO;

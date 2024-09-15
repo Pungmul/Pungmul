@@ -1,7 +1,6 @@
 package pungmul.pungmul.service.member;
 
 import io.netty.handler.codec.http.HttpHeaderValues;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,14 +8,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pungmul.pungmul.core.exception.custom.member.NoSuchUsernameException;
-import pungmul.pungmul.domain.member.Account;
-import pungmul.pungmul.domain.member.KakaoUserInfo;
+import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.dto.member.AuthenticationResponseDTO;
 import pungmul.pungmul.dto.member.KakaoTokenResponseDTO;
 import pungmul.pungmul.dto.member.KakaoUserInfoResponseDTO;
-import pungmul.pungmul.dto.member.LoginDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
-import reactor.core.publisher.Mono;
 
 
 @Slf4j

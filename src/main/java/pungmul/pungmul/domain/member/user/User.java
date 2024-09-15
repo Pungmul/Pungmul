@@ -1,4 +1,4 @@
-package pungmul.pungmul.domain.member;
+package pungmul.pungmul.domain.member.user;
 
 import lombok.*;
 
@@ -19,10 +19,6 @@ public class User {
     private Integer clubAge;
     private Gender gender;
     private String area;
-
-//    @Setter
-//    private Long profileImageId;
-
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private Long clubId;

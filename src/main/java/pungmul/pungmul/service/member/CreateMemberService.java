@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.file.DomainType;
-import pungmul.pungmul.domain.member.Account;
-import pungmul.pungmul.domain.member.InstrumentStatus;
-import pungmul.pungmul.domain.member.User;
-import pungmul.pungmul.domain.member.UserRole;
+import pungmul.pungmul.domain.member.account.Account;
+import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
+import pungmul.pungmul.domain.member.user.User;
+import pungmul.pungmul.domain.member.account.UserRole;
 import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
@@ -41,7 +41,6 @@ public class CreateMemberService {
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final UserRoleService userRoleService;
-    private final DomainImageService domainImageService;
 
 
     /**
@@ -62,22 +61,6 @@ public class CreateMemberService {
     }
 
     /**
-     * InstrumentStatus 엔티티 생성 및 저장 메서드.
-     *
-     * @param instrumentStatusList 악기 상태 목록
-     * @return 생성된 InstrumentStatus의 ID 리스트
-     */
-    public List<Long> createInstrument(Long accountId, List<InstrumentStatus> instrumentStatusList) {
-        ArrayList<Long> arrayList = new ArrayList<>();
-        for (InstrumentStatus instrumentStatus : instrumentStatusList) {
-            InstrumentStatus status = getInstrumentStatus(userRepository.getUserIdByAccountId(accountId), instrumentStatus);
-            instrumentStatusRepository.saveInstrument(status);
-            arrayList.add(status.getId());
-        }
-        return arrayList;
-    }
-
-    /**
      * Account 엔티티 생성 및 저장 메서드.
      * @param createMemberRequestDto 회원 생성 요청 데이터
      * @return 생성된 Account의 ID
@@ -88,13 +71,6 @@ public class CreateMemberService {
         userRoleService.addRoleToAccount(getRoleRequestDTO(account));
 
         return account.getId();
-    }
-
-    private static SetRoleRequestDTO getRoleRequestDTO(Account account) {
-        return SetRoleRequestDTO.builder()
-                .username(account.getLoginId())
-                .roleName(UserRole.ROLE_USER.getAuthority())
-                .build();
     }
 
     /**
@@ -112,13 +88,20 @@ public class CreateMemberService {
         return user.getId();
     }
 
-    private static RequestImageDTO getRequestProfileImageDTO(MultipartFile profile, User user) {
-        return RequestImageDTO.builder()
-                .domainId(user.getId())
-                .imageFile(profile)
-                .userId(user.getId())
-                .domainType(DomainType.PROFILE)
-                .build();
+    /**
+     * InstrumentStatus 엔티티 생성 및 저장 메서드.
+     *
+     * @param instrumentStatusList 악기 상태 목록
+     * @return 생성된 InstrumentStatus의 ID 리스트
+     */
+    public List<Long> createInstrument(Long accountId, List<InstrumentStatus> instrumentStatusList) {
+        ArrayList<Long> arrayList = new ArrayList<>();
+        for (InstrumentStatus instrumentStatus : instrumentStatusList) {
+            InstrumentStatus status = getInstrumentStatus(userRepository.getUserIdByAccountId(accountId), instrumentStatus);
+            instrumentStatusRepository.saveInstrument(status);
+            arrayList.add(status.getId());
+        }
+        return arrayList;
     }
 
     /**
@@ -159,6 +142,13 @@ public class CreateMemberService {
                 .build();
     }
 
+    private static SetRoleRequestDTO getRoleRequestDTO(Account account) {
+        return SetRoleRequestDTO.builder()
+                .username(account.getLoginId())
+                .roleName(UserRole.ROLE_USER.getAuthority())
+                .build();
+    }
+
     /**
      * User 엔티티 생성 메서드.
      * @param createMemberRequestDto 회원 생성 요청 데이터
@@ -177,6 +167,15 @@ public class CreateMemberService {
                 .gender(createMemberRequestDto.getGender())
                 .area(createMemberRequestDto.getArea())
                 .clubId(createMemberRequestDto.getClubId())
+                .build();
+    }
+
+    private static RequestImageDTO getRequestProfileImageDTO(MultipartFile profile, User user) {
+        return RequestImageDTO.builder()
+                .domainId(user.getId())
+                .imageFile(profile)
+                .userId(user.getId())
+                .domainType(DomainType.PROFILE)
                 .build();
     }
 

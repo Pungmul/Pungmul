@@ -1,4 +1,4 @@
-package pungmul.pungmul.domain.member;
+package pungmul.pungmul.domain.member.instrument;
 
 public enum InstrumentAbility {
 

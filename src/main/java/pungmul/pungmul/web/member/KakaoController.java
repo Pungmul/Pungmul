@@ -12,11 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
-import pungmul.pungmul.domain.member.Account;
 import pungmul.pungmul.dto.member.AuthenticationResponseDTO;
 import pungmul.pungmul.service.member.JwtTokenService;
 import pungmul.pungmul.service.member.KakaoLoginService;
-import pungmul.pungmul.service.member.LoginService;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;

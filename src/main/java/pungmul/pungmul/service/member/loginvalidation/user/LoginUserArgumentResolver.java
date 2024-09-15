@@ -9,7 +9,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import pungmul.pungmul.config.member.SessionConst;
-import pungmul.pungmul.domain.member.SessionUser;
+import pungmul.pungmul.domain.member.auth.SessionUser;
 
 @Slf4j
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {

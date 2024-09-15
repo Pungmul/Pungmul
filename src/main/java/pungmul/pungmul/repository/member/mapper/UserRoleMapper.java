@@ -2,9 +2,8 @@ package pungmul.pungmul.repository.member.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import pungmul.pungmul.domain.member.UserRole;
+import pungmul.pungmul.domain.member.account.UserRole;
 
-import java.util.List;
 import java.util.Set;
 
 @Mapper

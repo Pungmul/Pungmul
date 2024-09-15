@@ -1,6 +1,6 @@
 package pungmul.pungmul.repository.member.repository;
 
-import pungmul.pungmul.domain.member.User;
+import pungmul.pungmul.domain.member.user.User;
 
 import java.util.Optional;
 

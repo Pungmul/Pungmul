@@ -31,49 +31,16 @@ import java.nio.file.AccessDeniedException;
 @EnableWebSocketMessageBroker
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CustomHandshakeInterceptor handshakeInterceptor;
-    private final TokenProvider tokenProvider;
-    private final AuthenticationManager authenticationManager;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-//        registry.addEndpoint("/ws/stomp").setAllowedOrigins("*")
-//                .addInterceptors(new CustomHandshakeInterceptor())
-//                .withSockJS();
-
         registry.addEndpoint("/ws/chat").setAllowedOrigins("*")
             .addInterceptors(handshakeInterceptor);
-//                .withSockJS();
     }
 
-        @Override
+    @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/sub");
         registry.setApplicationDestinationPrefixes("/pub");
     }
-
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(new ChannelInterceptor() {
-//            @Override
-//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-//                StompHeaderAccessor accessor =
-//                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-//
-//                if (StompHeaderAccessor.StompCommand.CONNECT.equals(accessor.getCommand())) {
-//                    String token = accessor.getFirstNativeHeader("Authorization");
-//                    if (token != null && token.startsWith("Bearer ")) {
-//                        token = token.substring(7);
-//                        try {
-//                            Authentication auth = jwtAuthenticationFilter.attemptAuthentication(
-//                                    accessor.getMessageHeaders(), token);
-//                            SecurityContextHolder.getContext().setAuthentication(auth);
-//                        } catch (Exception e) {
-//                            throw new RuntimeException("Invalid token", e);
-//                        }
-//                    }
-//                }
-//                return message;
-//            }
-//        });
-//    }
 }

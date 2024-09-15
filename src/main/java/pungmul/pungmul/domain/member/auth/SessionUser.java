@@ -1,11 +1,9 @@
-package pungmul.pungmul.domain.member;
+package pungmul.pungmul.domain.member.auth;
 
 import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @Getter
 @Builder

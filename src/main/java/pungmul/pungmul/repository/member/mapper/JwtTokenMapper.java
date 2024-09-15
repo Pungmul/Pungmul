@@ -2,7 +2,7 @@ package pungmul.pungmul.repository.member.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import pungmul.pungmul.domain.member.JwtToken;
+import pungmul.pungmul.domain.member.auth.JwtToken;
 
 import java.util.List;
 import java.util.Optional;

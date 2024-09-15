@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.config.security.TokenProvider;
-import pungmul.pungmul.domain.member.Account;
-import pungmul.pungmul.domain.member.SessionUser;
-import pungmul.pungmul.domain.member.User;
+import pungmul.pungmul.domain.member.account.Account;
+import pungmul.pungmul.domain.member.auth.SessionUser;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.member.AuthenticationResponseDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
@@ -25,7 +25,6 @@ import pungmul.pungmul.config.member.SessionConst;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Service

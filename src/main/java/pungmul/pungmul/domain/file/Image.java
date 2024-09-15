@@ -15,6 +15,5 @@ public class Image {
     private String fullFilePath;
     private String fileType;
     private Long fileSize;
-//    private Long userId;
     private LocalDateTime createdAt;
 }

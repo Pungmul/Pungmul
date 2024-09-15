@@ -1,20 +1,18 @@
 package pungmul.pungmul.repository.member.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import pungmul.pungmul.domain.member.User;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.member.mapper.UserMapper;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Repository
 public class MybatisUserRepository implements UserRepository {
     private final UserMapper userMapper;
-
-    public MybatisUserRepository(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
 
     @Override
     public void saveUser(User user) {

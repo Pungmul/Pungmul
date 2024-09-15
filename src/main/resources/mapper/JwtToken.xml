@@ -4,7 +4,7 @@
 <mapper namespace="pungmul.pungmul.repository.member.mapper.JwtTokenMapper">
 
     <!-- 특정 사용자의 모든 유효한 토큰 조회 -->
-    <select id="findAllValidTokensByUser" parameterType="long" resultType="pungmul.pungmul.domain.member.JwtToken">
+    <select id="findAllValidTokensByUser" parameterType="long" resultType="pungmul.pungmul.domain.member.auth.JwtToken">
         SELECT * FROM tokens
         WHERE account_id = #{accountId} AND expired = false AND revoked = false
     </select>
@@ -22,7 +22,7 @@
     </update>
 
     <!-- 토큰 저장 -->
-    <insert id="save" parameterType="pungmul.pungmul.domain.member.JwtToken" useGeneratedKeys="true" keyProperty="id">
+    <insert id="save" parameterType="pungmul.pungmul.domain.member.auth.JwtToken" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO tokens (account_id, token, token_type, expired, revoked)
         VALUES (#{accountId}, #{token}, #{tokenType}, #{expired}, #{revoked})
     </insert>

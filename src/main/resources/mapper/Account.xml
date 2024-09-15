@@ -5,7 +5,7 @@
 <mapper namespace="pungmul.pungmul.repository.member.mapper.AccountMapper">
 
     <!-- Account ResultMap -->
-    <resultMap id="AccountResultMap" type="pungmul.pungmul.domain.member.Account">
+    <resultMap id="AccountResultMap" type="pungmul.pungmul.domain.member.account.Account">
         <id property="id" column="id" />
         <result property="loginId" column="login_id" />
         <result property="password" column="password" />
@@ -35,14 +35,14 @@
     </select>
 
     <!-- Email로 Account 조회 -->
-    <select id="getAccountByEmail" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.Account">
+    <select id="getAccountByEmail" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.account.Account">
         SELECT *
         FROM account
         WHERE login_id = #{email};
     </select>
 
     <!-- Login ID로 Account 조회 -->
-    <select id="getAccountByLoginId" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.Account">
+    <select id="getAccountByLoginId" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.account.Account">
         SELECT *
         FROM account
         WHERE login_id = #{loginId};

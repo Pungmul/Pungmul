@@ -1,6 +1,5 @@
-package pungmul.pungmul.domain.member;
+package pungmul.pungmul.domain.member.account;
 
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 
 public enum UserRole implements GrantedAuthority {

@@ -1,8 +1,7 @@
 package pungmul.pungmul.repository.member.repository;
 
-import pungmul.pungmul.domain.member.UserRole;
+import pungmul.pungmul.domain.member.account.UserRole;
 
-import java.util.List;
 import java.util.Set;
 
 public interface UserRoleRepository {

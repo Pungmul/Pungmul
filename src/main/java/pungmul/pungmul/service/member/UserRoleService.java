@@ -2,8 +2,8 @@ package pungmul.pungmul.service.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import pungmul.pungmul.domain.member.Account;
-import pungmul.pungmul.domain.member.UserRole;
+import pungmul.pungmul.domain.member.account.Account;
+import pungmul.pungmul.domain.member.account.UserRole;
 import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
 import pungmul.pungmul.dto.admin.SetRoleResponseDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;

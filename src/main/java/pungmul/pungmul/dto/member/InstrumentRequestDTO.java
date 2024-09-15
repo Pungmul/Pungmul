@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pungmul.pungmul.domain.member.InstrumentStatus;
+import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 
 import java.util.List;
 

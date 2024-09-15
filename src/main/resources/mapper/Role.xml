@@ -4,7 +4,7 @@
 <mapper namespace="pungmul.pungmul.repository.member.mapper.UserRoleMapper">
 
     <!-- 새로운 역할(Role) 추가 -->
-    <insert id="insertRole" parameterType="pungmul.pungmul.domain.member.UserRole" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertRole" parameterType="pungmul.pungmul.domain.member.account.UserRole" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO roles (role_name)
         VALUES (#{role})
     </insert>
@@ -17,7 +17,7 @@
     </insert>
 
     <!-- 특정 계정의 모든 역할 조회 -->
-    <select id="getRolesByAccountId" resultType="pungmul.pungmul.domain.member.UserRole">
+    <select id="getRolesByAccountId" resultType="pungmul.pungmul.domain.member.account.UserRole">
         SELECT r.role_name
         FROM roles r
                  INNER JOIN account_roles ar ON r.id = ar.role_id

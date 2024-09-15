@@ -2,11 +2,9 @@ package pungmul.pungmul.dto.member;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import pungmul.pungmul.domain.member.Gender;
-import pungmul.pungmul.domain.member.InstrumentStatus;
+import pungmul.pungmul.domain.member.user.Gender;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 public class CreateMemberRequestDTO {

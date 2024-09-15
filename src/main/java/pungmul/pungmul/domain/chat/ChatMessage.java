@@ -1,7 +1,6 @@
 package pungmul.pungmul.domain.chat;
 
 import lombok.*;
-import pungmul.pungmul.domain.MessageType;
 
 import java.time.LocalDateTime;
 
