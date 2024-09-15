@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pungmul.pungmul.config.security.UserDetailsImpl;
-import pungmul.pungmul.domain.member.Account;
+import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 
 @Service

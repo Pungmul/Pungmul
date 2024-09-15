@@ -3,8 +3,7 @@ package pungmul.pungmul.dto.chat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pungmul.pungmul.domain.MessageType;
-import java.time.LocalDateTime;
+import pungmul.pungmul.domain.chat.MessageType;
 
 @Data
 @AllArgsConstructor

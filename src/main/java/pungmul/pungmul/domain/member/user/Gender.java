@@ -1,8 +1,7 @@
-package pungmul.pungmul.domain.member;
+package pungmul.pungmul.domain.member.user;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
 
 public enum Gender {
     @JsonProperty("M")

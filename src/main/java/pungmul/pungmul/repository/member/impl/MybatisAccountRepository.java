@@ -2,7 +2,7 @@ package pungmul.pungmul.repository.member.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import pungmul.pungmul.domain.member.Account;
+import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.mapper.AccountMapper;
 

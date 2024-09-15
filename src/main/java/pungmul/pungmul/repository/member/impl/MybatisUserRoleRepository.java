@@ -2,11 +2,10 @@ package pungmul.pungmul.repository.member.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import pungmul.pungmul.domain.member.UserRole;
+import pungmul.pungmul.domain.member.account.UserRole;
 import pungmul.pungmul.repository.member.mapper.UserRoleMapper;
 import pungmul.pungmul.repository.member.repository.UserRoleRepository;
 
-import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor

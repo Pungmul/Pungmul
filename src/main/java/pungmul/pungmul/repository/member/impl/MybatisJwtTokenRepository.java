@@ -2,7 +2,7 @@ package pungmul.pungmul.repository.member.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import pungmul.pungmul.domain.member.JwtToken;
+import pungmul.pungmul.domain.member.auth.JwtToken;
 import pungmul.pungmul.repository.member.mapper.JwtTokenMapper;
 import pungmul.pungmul.repository.member.repository.JwtTokenRepository;
 

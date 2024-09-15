@@ -14,10 +14,13 @@ import java.util.Date;
 @RequiredArgsConstructor
 @Component
 public class TokenProvider {
+
     @Value("${jwt.secret}")
     private String secretKey;
+
     @Value("${jwt.expiration}")
     private long expirationTime;
+
     @Value("${jwt.refreshExpiration}")
     private long refreshExpirationTime;
 

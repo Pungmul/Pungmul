@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.domain.chat.ChatRoom;
-import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.repository.chat.mapper.ChatRoomMapper;
 import pungmul.pungmul.repository.chat.repository.ChatRoomRepository;
 

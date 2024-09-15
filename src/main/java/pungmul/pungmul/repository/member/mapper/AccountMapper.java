@@ -1,9 +1,7 @@
 package pungmul.pungmul.repository.member.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import pungmul.pungmul.domain.member.Account;
-import pungmul.pungmul.domain.member.LoginForm;
+import pungmul.pungmul.domain.member.account.Account;
 
 @Mapper
 public interface AccountMapper {

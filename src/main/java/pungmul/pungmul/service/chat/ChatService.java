@@ -2,16 +2,14 @@ package pungmul.pungmul.service.chat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.chat.ChatRoom;
 import pungmul.pungmul.domain.file.DomainType;
-import pungmul.pungmul.domain.member.User;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.chat.ChatMessage;
 import pungmul.pungmul.dto.chat.ChatMessageRequestDTO;
-import pungmul.pungmul.dto.chat.CreateChatRoomRequestDTO;
 import pungmul.pungmul.dto.chat.CreateChatRoomResponseDTO;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.repository.chat.repository.ChatRepository;

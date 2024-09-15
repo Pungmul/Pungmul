@@ -2,7 +2,6 @@ package pungmul.pungmul.repository.post.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import pungmul.pungmul.domain.member.User;
 import pungmul.pungmul.domain.post.Comment;
 import pungmul.pungmul.repository.post.mapper.CommentMapper;
 import pungmul.pungmul.repository.post.repository.CommentRepository;

@@ -1,4 +1,4 @@
-package pungmul.pungmul.domain.member;
+package pungmul.pungmul.domain.member.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

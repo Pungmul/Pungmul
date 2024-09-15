@@ -2,8 +2,8 @@ package pungmul.pungmul.repository.member.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import pungmul.pungmul.domain.member.Instrument;
-import pungmul.pungmul.domain.member.InstrumentStatus;
+import pungmul.pungmul.domain.member.instrument.Instrument;
+import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.repository.member.mapper.InstrumentStatusMapper;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 
