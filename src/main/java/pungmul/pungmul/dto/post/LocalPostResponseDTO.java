@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PostResponseDTO {
+public class LocalPostResponseDTO {
     private Long postId;
 }

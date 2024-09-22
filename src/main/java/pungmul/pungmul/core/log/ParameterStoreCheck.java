@@ -17,8 +17,8 @@ public class ParameterStoreCheck implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("AWS Access Key ID: {}", awsAccessKeyId);
-        log.info("JWT Secret: {}", jwtSecret);
+//        log.info("AWS Access Key ID: {}", awsAccessKeyId);
+//        log.info("JWT Secret: {}", jwtSecret);
 
     }
 }

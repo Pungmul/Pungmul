@@ -15,6 +15,25 @@
         <result property="updatedAt" column="updated_at" />
     </resultMap>
 
+    <select id="getPostListByCategory" resultType="pungmul.pungmul.domain.post.Post">
+        SELECT * FROM post p
+            INNER JOIN category c
+                ON p.category_id = c.id
+        WHERE c.name = #{categoryName}
+    </select>
+
+    <!-- Select the Hot Post (Most liked post within the last 24 hours) -->
+    <select id="getHotPost" resultMap="PostResultMap">
+        SELECT *
+        FROM post p
+        WHERE p.category_id = (
+            SELECT id FROM category WHERE name = #{categoryName}
+        )
+          AND p.created_at >= NOW() - INTERVAL 1 DAY
+        ORDER BY p.like_num DESC
+            LIMIT 1
+    </select>
+
     <!-- Insert Post -->
     <insert id="save" parameterType="pungmul.pungmul.domain.post.Post" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO post (category_id)
@@ -48,6 +67,11 @@
         WHERE id = #{postId}
     </update>
 
+    <select id="getPostById" parameterType="java.lang.Long">
+        SELECT * FROM post
+        WHERE id = #{postId}
+    </select>
+
     <select id="postLikedNum" parameterType="java.lang.Long">
         SELECT like_num
         FROM post
@@ -60,6 +84,5 @@
         WHERE post_id = #{postId}
           AND user_id = #{userId}
     </select>
-
 
 </mapper>

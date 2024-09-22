@@ -1,26 +1,35 @@
 package pungmul.pungmul.service.post;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.file.DomainType;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
-import pungmul.pungmul.dto.post.PostResponseDTO;
+import pungmul.pungmul.dto.post.LocalPostResponseDTO;
+import pungmul.pungmul.dto.post.post.SimplePostDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.repository.post.repository.CategoryRepository;
 import pungmul.pungmul.repository.post.repository.ContentRepository;
 import pungmul.pungmul.repository.post.repository.PostRepository;
 import pungmul.pungmul.service.file.DomainImageService;
 import pungmul.pungmul.service.file.ImageService;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,13 +40,35 @@ public class PostService {
     private final ContentRepository contentRepository;
     private final DomainImageService domainImageService;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
+    private final TimeSincePosted timeSincePosted;
+
+    @Value("${post.hot.minLikes}")
+    private Integer hotPostMinLikeNum;
+
+//    public PageInfo<SimplePostDTO> getPostListByCategory(String categoryName, Integer pageNum, Integer pageSize) {
+//        //  category 있는지 확인
+//        if (!categoryRepository.isCategoryExist(categoryName))
+//            throw new NoSuchElementException();
+//
+//        try (Page<Object> ignored = PageHelper.startPage(pageNum, pageSize)) {
+//            List<Post> posts = postRepository.getPostListByCategory(categoryName);
+//            for (Post post : posts) {
+//
+//            }
+//            return new PageInfo<>(posts);
+//        }
+////        PageHelper.startPage(pageNum, pageSize);
+////        List<PostDTO> posts = postRepository.getPostListByCategory(categoryName);
+////        return new PageInfo<>(posts);
+//    }
 
     @Transactional
-    public PostResponseDTO addPost(Long accountId, PostRequestDTO postRequestDTO, List<MultipartFile> files) throws IOException {
+    public LocalPostResponseDTO addPost(Long accountId, PostRequestDTO postRequestDTO, List<MultipartFile> files) throws IOException {
         Long postId = savePost(postRequestDTO);
         saveContent(userRepository.getUserIdByAccountId(accountId), postId, postRequestDTO, files);
 
-        return PostResponseDTO.builder()
+        return LocalPostResponseDTO.builder()
                 .postId(postId)
                 .build();
     }
@@ -122,4 +153,57 @@ public class PostService {
                 .build();
     }
 
+    public SimplePostDTO getHotPost(String categoryName) {
+        return postRepository.getHotPost(categoryName)
+                .filter(post -> post.getLikeNum() >= hotPostMinLikeNum)
+                .map(this::getSimplePostDTO)
+                .orElse(null);
+    }
+
+    public SimplePostDTO getSimplePostDTO(Post post) {
+        Content contentByPostId = contentRepository.getContentByPostId(post.getId());
+        return SimplePostDTO.builder()
+                .postId(post.getId())
+                .title(contentByPostId.getTitle())
+                .content(contentByPostId.getText())
+                .author(getAuthorNameOrAnonymous(contentByPostId))
+                .timeSincePosted(getTimeSincePosted(post.getCreatedAt()))
+                .timeSincePostedText(timeSincePosted.getTimeSincePostedText(post.getCreatedAt()))
+                .viewCount(post.getViewCount())
+                .likedNum(post.getLikeNum())
+                .build();
+    }
+
+    private Integer getTimeSincePosted(LocalDateTime postedTime) {
+        LocalDateTime now = LocalDateTime.now();
+        Duration duration = Duration.between(postedTime, now);
+
+        return (int) duration.toMinutes();
+    }
+
+    private String getAuthorNameOrAnonymous(Content content) {
+        if (content.getAnonymity())
+            return "Anonymous";
+        Optional<User> userByUserId = userRepository.getUserByUserId(content.getWriterId());
+        return userByUserId.map(User::getName)
+                    .orElse("Unknown User");
+    }
+
+    public PageInfo<SimplePostDTO> getPostsByCategory(String categoryName, Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+
+        List<Post> postListByCategory = postRepository.getPostListByCategory(categoryName);
+        List<SimplePostDTO> postDTOList = new ArrayList<>();
+        for (Post post : postListByCategory) {
+            postDTOList.add(getSimplePostDTO(post));
+        }
+        return new PageInfo<>(postDTOList);
+    }
+
+    public LocalPostResponseDTO getPostById(Long postId) {
+        Post postById = postRepository.getPostById(postId);
+        return LocalPostResponseDTO.builder()
+                    .postId(postById.getId())
+                    .build();
+    }
 }

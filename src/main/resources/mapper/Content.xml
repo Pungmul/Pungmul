@@ -28,7 +28,7 @@
     </select>
 
     <!-- Select Contents By PostId -->
-    <select id="getContentsByPostId" resultMap="ContentResultMap" parameterType="java.lang.Long">
+    <select id="getContentByPostId" resultMap="ContentResultMap" parameterType="java.lang.Long">
         SELECT * FROM content WHERE post_id = #{postId}
     </select>
 
