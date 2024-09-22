@@ -2,6 +2,7 @@ package pungmul.pungmul.core.exception.handler;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +17,7 @@ import pungmul.pungmul.core.response.code.MemberResponseCode;
 
 @Slf4j
 @RestControllerAdvice
+@Order(1)
 public class MemberExceptionHandler {
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<BaseResponse<String>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {

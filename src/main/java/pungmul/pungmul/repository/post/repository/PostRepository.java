@@ -2,6 +2,9 @@ package pungmul.pungmul.repository.post.repository;
 
 import pungmul.pungmul.domain.post.Post;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface PostRepository {
     void save(Post post);
 
@@ -17,4 +20,10 @@ public interface PostRepository {
     void unlikePost(Long userId, Long postId);
 
     void minusPostLikeNum(Long postId);
+
+    List<Post> getPostListByCategory(String category);
+
+    Optional<Post> getHotPost(String categoryName);
+
+    Post getPostById(Long postId);
 }

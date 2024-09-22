@@ -4,4 +4,6 @@ import pungmul.pungmul.domain.post.Content;
 
 public interface ContentRepository {
     void save(Content content);
+
+    Content getContentByPostId(Long postId);
 }

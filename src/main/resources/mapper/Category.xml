@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.post.mapper.CategoryMapper">
+    <!-- Category ResultMap -->
+    <resultMap id="CategoryResultMap" type="pungmul.pungmul.domain.post.board.Category">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- Insert Category -->
+    <insert id="saveCategory" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO category (name, parent_id)
+        VALUES (#{name}, #{parentId})
+    </insert>
+
+    <!-- Select Category By Id -->
+    <select id="getCategoryById" resultMap="CategoryResultMap">
+        SELECT * FROM category WHERE id = #{id}
+    </select>
+
+    <!-- Select Category By Name -->
+    <select id="getCategoryByName" resultMap="CategoryResultMap">
+        SELECT * FROM category WHERE name = #{categoryName}
+    </select>
+
+    <!-- Select All Categories -->
+    <select id="getCategoryList" resultMap="CategoryResultMap">
+        SELECT * FROM category
+    </select>
+
+    <!-- Select Root Categories -->
+    <select id="getRootCategoryList" resultMap="CategoryResultMap">
+        SELECT * FROM category
+        WHERE parent_id IS NULL ;
+    </select>
+
+    <!-- Update Category -->
+    <update id="updateCategory">
+        UPDATE category
+        SET name = #{name},
+            parent_id = #{parentId},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- Check Category Exist -->
+    <select id="isCategoryExist" resultType="java.lang.Boolean" parameterType="java.lang.String">
+        SELECT EXISTS (
+            SELECT 1
+            FROM category
+            WHERE name = #{category}
+        )
+    </select>
+
+    <!-- Delete Category By Id -->
+    <delete id="deleteCategoryById">
+        DELETE FROM category WHERE id = #{id}
+    </delete>
+
+</mapper>
