@@ -13,8 +13,9 @@ public class MybatisCommentRepository implements CommentRepository {
     private final CommentMapper commentMapper;
 
     @Override
-    public void save(Comment comment) {
-        commentMapper.save(comment);
+    public Comment save(Comment comment) {
+        Long saved = commentMapper.save(comment);
+        return commentMapper.getCommentById(saved);
     }
 
     @Override

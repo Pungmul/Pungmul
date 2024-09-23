@@ -12,5 +12,4 @@ public class PostRequestDTO {
     private String title;
     private String text;
     private boolean anonymity;
-    private Long categoryId;
 }

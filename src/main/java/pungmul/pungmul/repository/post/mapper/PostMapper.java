@@ -22,9 +22,9 @@ public interface PostMapper {
 
     void minusPostLikeNum(Long postId);
 
-    List<Post> getPostListByCategory(String categoryName);
+    List<Post> getPostListByCategory(Long categoryId);
 
-    Optional<Post> getHotPost(String categoryName);
+    Optional<Post> getHotPost(Long categoryId);
 
     Post getPostById(Long postId);
 }

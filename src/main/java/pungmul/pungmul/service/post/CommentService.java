@@ -20,12 +20,15 @@ import java.util.NoSuchElementException;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final TimeSincePosted timeSincePosted;
+
     public CommentResponseDTO addComment(Long accountId, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
 
         Comment comment = getComment(getUserIdByAccountId(accountId), postId, parentId, requestCommentDTO);
-        commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
+        log.info("comment UserId : {}, comment createdAt : {}", comment.getUserId(), comment.getCreatedAt());
 
-        return getCommentResponseDTO(comment);
+        return getCommentResponseDTO(savedComment);
     }
 
     @Transactional
@@ -64,13 +67,14 @@ public class CommentService {
                 .build();
     }
 
-    private static CommentResponseDTO getCommentResponseDTO(Comment comment) {
+    public CommentResponseDTO getCommentResponseDTO(Comment comment) {
         return CommentResponseDTO.builder()
                 .commentId(comment.getId())
                 .postId(comment.getPostId())
                 .parentId(comment.getParentId())
+                .userId(comment.getUserId())
                 .content(comment.getContent())
-                .createdAt(comment.getCreatedAt())
+                .createdAt(timeSincePosted.getTimePostedText(comment.getCreatedAt()))
                 .build();
     }
 

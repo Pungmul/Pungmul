@@ -49,11 +49,11 @@
     </update>
 
     <!-- Check Category Exist -->
-    <select id="isCategoryExist" resultType="java.lang.Boolean" parameterType="java.lang.String">
+    <select id="isCategoryExistById" resultType="java.lang.Boolean" parameterType="java.lang.Long">
         SELECT EXISTS (
             SELECT 1
             FROM category
-            WHERE name = #{category}
+            WHERE id = #{categoryId}
         )
     </select>
 

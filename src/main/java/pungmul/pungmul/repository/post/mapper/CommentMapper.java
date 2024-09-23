@@ -5,7 +5,7 @@ import pungmul.pungmul.domain.post.Comment;
 
 @Mapper
 public interface CommentMapper {
-    void save(Comment comment);
+    Long save(Comment comment);
 
     void likeComment(Long userId, Long commentId);
 
@@ -18,4 +18,6 @@ public interface CommentMapper {
     void plusCommentLikeNum(Long commentId);
 
     void minusCommentLikeNum(Long commentId);
+
+    Comment getCommentById(Long commentId);
 }
