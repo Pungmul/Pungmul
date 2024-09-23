@@ -11,7 +11,7 @@ public interface CategoryMapper {
 
     List<Category> getRootCategoryList();
 
-    Boolean isCategoryExist(String category);
+    Boolean isCategoryExistById(Long categoryId);
 
     Category getCategoryByName(String categoryName);
 

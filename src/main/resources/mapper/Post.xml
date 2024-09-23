@@ -19,7 +19,7 @@
         SELECT * FROM post p
             INNER JOIN category c
                 ON p.category_id = c.id
-        WHERE c.name = #{categoryName}
+        WHERE c.id = #{categoryId}
     </select>
 
     <!-- Select the Hot Post (Most liked post within the last 24 hours) -->
@@ -27,7 +27,7 @@
         SELECT *
         FROM post p
         WHERE p.category_id = (
-            SELECT id FROM category WHERE name = #{categoryName}
+            SELECT id FROM category WHERE id = #{categoryId}
         )
           AND p.created_at >= NOW() - INTERVAL 1 DAY
         ORDER BY p.like_num DESC

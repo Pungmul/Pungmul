@@ -25,8 +25,8 @@ public class MybatisCategoryRepository implements CategoryRepository {
     }
 
     @Override
-    public boolean isCategoryExist(String categoryName) {
-        return categoryMapper.isCategoryExist(categoryName);
+    public boolean isCategoryExistById(Long categoryId) {
+        return categoryMapper.isCategoryExistById(categoryId);
     }
 
     @Override

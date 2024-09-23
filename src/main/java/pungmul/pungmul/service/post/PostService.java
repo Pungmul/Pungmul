@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.file.DomainType;
+import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
@@ -16,6 +17,8 @@ import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
 import pungmul.pungmul.dto.post.LocalPostResponseDTO;
+import pungmul.pungmul.dto.post.post.CreatePostResponseDTO;
+import pungmul.pungmul.dto.post.post.PostResponseDTO;
 import pungmul.pungmul.dto.post.post.SimplePostDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.CategoryRepository;
@@ -38,37 +41,34 @@ public class PostService {
     private final ImageService imageService;
     private final PostRepository postRepository;
     private final ContentRepository contentRepository;
-    private final DomainImageService domainImageService;
     private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
     private final TimeSincePosted timeSincePosted;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
 
-//    public PageInfo<SimplePostDTO> getPostListByCategory(String categoryName, Integer pageNum, Integer pageSize) {
-//        //  category 있는지 확인
-//        if (!categoryRepository.isCategoryExist(categoryName))
-//            throw new NoSuchElementException();
-//
-//        try (Page<Object> ignored = PageHelper.startPage(pageNum, pageSize)) {
-//            List<Post> posts = postRepository.getPostListByCategory(categoryName);
-//            for (Post post : posts) {
-//
-//            }
-//            return new PageInfo<>(posts);
-//        }
-////        PageHelper.startPage(pageNum, pageSize);
-////        List<PostDTO> posts = postRepository.getPostListByCategory(categoryName);
-////        return new PageInfo<>(posts);
-//    }
+    public PostResponseDTO getPostById(Long postId) {
+        Post post = postRepository.getPostById(postId);
+        Content content = getContentByPostId(postId);
+
+        return getPostResponseDTO(post, content);
+    }
+
+    public Content getContentByPostId(Long postId) {
+        Content contentByPostId = contentRepository.getContentByPostId(postId);
+        List<Image> imagesByDomainId = imageService.getImagesByDomainId(DomainType.CONTENT, contentByPostId.getId());
+        log.info("images by domainId: {}", imagesByDomainId);
+        contentByPostId.setImageList(imagesByDomainId);
+
+        return contentByPostId;
+    }
 
     @Transactional
-    public LocalPostResponseDTO addPost(Long accountId, PostRequestDTO postRequestDTO, List<MultipartFile> files) throws IOException {
-        Long postId = savePost(postRequestDTO);
+    public CreatePostResponseDTO addPost(Long accountId, Long categoryId, PostRequestDTO postRequestDTO, List<MultipartFile> files) throws IOException {
+        Long postId = savePost(categoryId);
         saveContent(userRepository.getUserIdByAccountId(accountId), postId, postRequestDTO, files);
 
-        return LocalPostResponseDTO.builder()
+        return CreatePostResponseDTO.builder()
                 .postId(postId)
                 .build();
     }
@@ -105,8 +105,8 @@ public class PostService {
                 .build();
     }
 
-    private Long savePost(PostRequestDTO postRequestDTO) throws IOException {
-        Post post = getPost(postRequestDTO);
+    private Long savePost(Long categoryId) throws IOException {
+        Post post = getPost(categoryId);
         postRepository.save(post);
 
         return post.getId();
@@ -124,9 +124,9 @@ public class PostService {
             saveContentImage(contentId, image, userId);
     }
 
-    private static Post getPost(PostRequestDTO postRequestDTO) {
+    private static Post getPost(Long categoryId) {
         return Post.builder()
-                .categoryId(postRequestDTO.getCategoryId())
+                .categoryId(categoryId)
                 .build();
     }
 
@@ -153,8 +153,8 @@ public class PostService {
                 .build();
     }
 
-    public SimplePostDTO getHotPost(String categoryName) {
-        return postRepository.getHotPost(categoryName)
+    public SimplePostDTO getHotPost(Long categoryId) {
+        return postRepository.getHotPost(categoryId)
                 .filter(post -> post.getLikeNum() >= hotPostMinLikeNum)
                 .map(this::getSimplePostDTO)
                 .orElse(null);
@@ -189,10 +189,10 @@ public class PostService {
                     .orElse("Unknown User");
     }
 
-    public PageInfo<SimplePostDTO> getPostsByCategory(String categoryName, Integer page, Integer size) {
+    public PageInfo<SimplePostDTO> getPostsByCategory(Long categoryId, Integer page, Integer size) {
         PageHelper.startPage(page, size);
 
-        List<Post> postListByCategory = postRepository.getPostListByCategory(categoryName);
+        List<Post> postListByCategory = postRepository.getPostListByCategory(categoryId);
         List<SimplePostDTO> postDTOList = new ArrayList<>();
         for (Post post : postListByCategory) {
             postDTOList.add(getSimplePostDTO(post));
@@ -200,10 +200,18 @@ public class PostService {
         return new PageInfo<>(postDTOList);
     }
 
-    public LocalPostResponseDTO getPostById(Long postId) {
-        Post postById = postRepository.getPostById(postId);
-        return LocalPostResponseDTO.builder()
-                    .postId(postById.getId())
-                    .build();
+    private PostResponseDTO getPostResponseDTO(Post postById, Content contentByPostId) {
+        log.info("{}",contentByPostId.getImageList());
+        return PostResponseDTO.builder()
+                .postId(postById.getId())
+                .title(contentByPostId.getTitle())
+                .content(contentByPostId.getText())
+                .author(getAuthorNameOrAnonymous(contentByPostId))
+                .imageList(contentByPostId.getImageList())
+                .timeSincePosted(getTimeSincePosted(postById.getCreatedAt()))
+                .timeSincePostedText(timeSincePosted.getTimeSincePostedText(postById.getCreatedAt()))
+                .likedNum(postById.getLikeNum())
+                .viewCount(postById.getViewCount())
+                .build();
     }
 }

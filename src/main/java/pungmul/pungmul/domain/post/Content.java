@@ -1,6 +1,7 @@
 package pungmul.pungmul.domain.post;
 
 import lombok.*;
+import pungmul.pungmul.domain.file.Image;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,7 +18,7 @@ public class Content {
     private Boolean anonymity;
     private String title;
     private String text;
-    private List<Long> imageIdList;
+    private List<Image> imageList;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

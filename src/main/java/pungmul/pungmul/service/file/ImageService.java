@@ -9,6 +9,8 @@ import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.repository.image.repository.ImageRepository;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -29,5 +31,21 @@ public class ImageService {
     private void saveImageToRepo(Long domainId, DomainType domainType, Image image, Long userId) {
         imageRepository.save(image);
         domainImageService.saveDomainImage(domainType, domainId, image.getId(), userId);
+    }
+
+    public List<Image> getImagesByIdList(List<Long> imageIdList) {
+        if (imageIdList == null || imageIdList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return imageRepository.getImagesByImageIds(imageIdList);
+    }
+
+    public Image getImageById(Long imageId) {
+        return imageRepository.getImageByImageId(imageId);
+    }
+
+
+    public List<Image> getImagesByDomainId(DomainType domainType, Long domainId) {
+        return imageRepository.getImagesByDomainIdAndType(domainType, domainId);
     }
 }

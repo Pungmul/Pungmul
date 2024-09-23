@@ -16,6 +16,14 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
+    <!-- SELECT Comment -->
+    <select id="getCommentById" parameterType="java.lang.Long" resultMap="CommentResultMap">
+        SELECT *
+        FROM comment
+        WHERE id = #{commentId}
+    </select>
+
+
     <!-- Insert Comment -->
     <insert id="save" parameterType="pungmul.pungmul.domain.post.Comment" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO comment (post_id, user_id, parent_id, content)

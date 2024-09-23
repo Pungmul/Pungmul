@@ -41,29 +41,29 @@ public class BoardService {
         return categoryDTOList;
     }
 
-    public BoardDetailsResponseDTO getInitialBoardData(String categoryName) {
-        if (!categoryRepository.isCategoryExist(categoryName))
+    public BoardDetailsResponseDTO getInitialBoardData(Long categoryId) {
+        if (!categoryRepository.isCategoryExistById(categoryId))
             throw new NoSuchElementException();
-        BoardInfoDTO boardInfo = getBoardInfo(categoryName);
-        SimplePostDTO hotPost = postService.getHotPost(categoryName);
-        PageInfo<SimplePostDTO> recentPosts = postService.getPostsByCategory(categoryName, 1, 20);
+        BoardInfoDTO boardInfo = getBoardInfo(categoryId);
+        SimplePostDTO hotPost = postService.getHotPost(categoryId);
+        PageInfo<SimplePostDTO> recentPosts = postService.getPostsByCategory(categoryId, 1, 20);
 //        if (recentPosts.getList().isEmpty() || recentPosts.isIsLastPage())
 //            throw new NoMoreDataException("초기 호출에서 모든 게시물이 호출되었습니다.");
 
         return getBoardDetailsResponseDTO(boardInfo, hotPost, recentPosts);
     }
 
-    public PageInfo<SimplePostDTO> getAdditionalPosts(String categoryName, Integer page, Integer size) {
-        if (!categoryRepository.isCategoryExist(categoryName))
+    public PageInfo<SimplePostDTO> getAdditionalPosts(Long categoryId, Integer page, Integer size) {
+        if (!categoryRepository.isCategoryExistById(categoryId))
             throw new NoSuchElementException("해당 카테고리 없음");
 
-        PageInfo<SimplePostDTO> pageInfo = postService.getPostsByCategory(categoryName, page, size);
+        PageInfo<SimplePostDTO> pageInfo = postService.getPostsByCategory(categoryId, page, size);
 
         // 더 이상 호출할 데이터가 없는 경우 예외 처리
         if (page > 1 && (pageInfo.getList().isEmpty() || pageInfo.isIsLastPage())) {
             throw new NoMoreDataException("더 이상 호출할 데이터가 없습니다.");
         }
-        return postService.getPostsByCategory(categoryName, page, size);
+        return postService.getPostsByCategory(categoryId, page, size);
     }
 
     private BoardDetailsResponseDTO getBoardDetailsResponseDTO(
@@ -77,8 +77,8 @@ public class BoardService {
                 .build();
     }
 
-    private BoardInfoDTO getBoardInfo(String categoryName) {
-        Category categoryByName = categoryRepository.getCategoryByName(categoryName);
+    private BoardInfoDTO getBoardInfo(Long categoryId) {
+        Category categoryByName = categoryRepository.getCategoryById(categoryId);
         if (!categoryByName.isRootCategory()) {
             Category parentCategory = categoryRepository.getCategoryById(categoryByName.getParentId());
             return getBoardInfoDTO(parentCategory, categoryByName);

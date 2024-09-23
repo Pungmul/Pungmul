@@ -3,9 +3,12 @@ package pungmul.pungmul.repository.image.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.repository.image.mapper.ImageMapper;
 import pungmul.pungmul.repository.image.repository.ImageRepository;
+
+import java.util.List;
 
 @Slf4j
 @Repository
@@ -26,6 +29,16 @@ public class MybatisImageRepository implements ImageRepository {
     @Override
     public Image getImageByOriginImageNameAndUserId(String originFileName) {
         return imageMapper.getImageByOriginImageNameAndUserId(originFileName);
+    }
+
+    @Override
+    public List<Image> getImagesByImageIds(List<Long> imageIdList) {
+        return imageMapper.getImagesByImageIds(imageIdList);
+    }
+
+    @Override
+    public List<Image> getImagesByDomainIdAndType(DomainType domainType, Long domainId) {
+        return imageMapper.getImagesByDomainIdAndType(domainType, domainId);
     }
 
 

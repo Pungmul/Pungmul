@@ -11,6 +11,13 @@ import java.time.temporal.ChronoField;
 @Component
 public class TimeSincePosted {
 
+    public String getTimePostedText(LocalDateTime postedTime){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm");
+
+        // LocalDateTime을 문자열로 변환
+        return postedTime.format(formatter);
+    }
+
     public String getTimeSincePostedText(LocalDateTime postedTime) {
         LocalDateTime now = LocalDateTime.now();
         Duration duration = Duration.between(postedTime, now);
@@ -28,9 +35,9 @@ public class TimeSincePosted {
             // 7일 이상이면 'M:d' 형식으로 날짜만 표시 (앞에 0 제거)
             DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                     .appendValue(ChronoField.MONTH_OF_YEAR)   // 월에서 앞의 0 제거
-                    .appendLiteral("월 ")                       // ':' 구분자
+                    .appendLiteral("/")                       // ':' 구분자
                     .appendValue(ChronoField.DAY_OF_MONTH)    // 일에서 앞의 0 제거
-                    .appendLiteral("일")                       // ':' 구분자
+//                    .appendLiteral("일")                       // ':' 구분자
                     .toFormatter();
             return postedTime.format(formatter);
         }

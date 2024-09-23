@@ -9,7 +9,7 @@ public interface CategoryRepository {
 
     List<Category> getRootCategory();
 
-    boolean isCategoryExist(String category);
+    boolean isCategoryExistById(Long categoryId);
 
     Category getCategoryByName(String categoryName);
 

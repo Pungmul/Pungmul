@@ -21,9 +21,9 @@ public interface PostRepository {
 
     void minusPostLikeNum(Long postId);
 
-    List<Post> getPostListByCategory(String category);
+    List<Post> getPostListByCategory(Long categoryId);
 
-    Optional<Post> getHotPost(String categoryName);
+    Optional<Post> getHotPost(Long categoryId);
 
     Post getPostById(Long postId);
 }

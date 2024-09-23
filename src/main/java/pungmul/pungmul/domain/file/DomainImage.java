@@ -10,9 +10,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DomainImage {
     private Long id;
-    private String domainType;
+    private DomainType domainType;
     private Long domainId;
     private Long imageId;
+    private Long userId;
     private Boolean isPrimary;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

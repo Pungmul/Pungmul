@@ -45,23 +45,31 @@ public class BoardController {
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardList));
     }
 
+//    @PreAuthorize("hasRole('USER')")
+//    @GetMapping("/{categoryName}")
+//    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(@PathVariable Long categoryId){
+//        BoardDetailsResponseDTO boardDetailsResponseDTO = boardService.getInitialBoardData(categoryId);
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardDetailsResponseDTO));
+//    }
+
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/{categoryName}")
-    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(@PathVariable String categoryName){
-        BoardDetailsResponseDTO boardDetailsResponseDTO = boardService.getInitialBoardData(categoryName);
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(@PathVariable Long categoryId){
+        BoardDetailsResponseDTO boardDetailsResponseDTO = boardService.getInitialBoardData(categoryId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardDetailsResponseDTO));
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/{categoryName}/add")
+    @GetMapping("/{categoryId}/add")
     public ResponseEntity<BaseResponse<PageInfo<SimplePostDTO>>> getAdditionalPosts(
-            @PathVariable String categoryName,
+            @PathVariable Long categoryId,
             @RequestParam(defaultValue = "2") Integer page,
             @RequestParam(defaultValue = "10") Integer size
     )
     {
-        PageInfo<SimplePostDTO> additionalPosts = boardService.getAdditionalPosts(categoryName, page, size);
+        PageInfo<SimplePostDTO> additionalPosts = boardService.getAdditionalPosts(categoryId, page, size);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, additionalPosts));
     }

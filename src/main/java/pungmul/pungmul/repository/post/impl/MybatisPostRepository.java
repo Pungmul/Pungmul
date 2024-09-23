@@ -17,14 +17,14 @@ public class MybatisPostRepository implements PostRepository {
     private final PostMapper postMapper;
 
     @Override
-    public List<Post> getPostListByCategory(String categoryName) {
-        return postMapper.getPostListByCategory(categoryName);
+    public List<Post> getPostListByCategory(Long categoryId) {
+        return postMapper.getPostListByCategory(categoryId);
     }
 
     @Override
-    public Optional<Post> getHotPost(String categoryName) {
-        log.info("repository categoryName: {}", categoryName);
-        Optional<Post> hotPost = postMapper.getHotPost(categoryName);
+    public Optional<Post> getHotPost(Long categoryId) {
+        log.info("repository categoryName: {}", categoryId);
+        Optional<Post> hotPost = postMapper.getHotPost(categoryId);
         log.info("repository hotPost: {}", hotPost);
         return hotPost;
     }

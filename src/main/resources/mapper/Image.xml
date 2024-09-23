@@ -43,4 +43,20 @@
         WHERE original_filename = #{originalFilename}
     </select>
 
+    <select id="getImagesByImageIds" resultType="Image">
+        SELECT * FROM images WHERE id IN
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getImagesByDomainIdAndType" resultMap="ImageResultMap">
+        SELECT img.*
+        FROM domain_image di
+                 INNER JOIN image img ON di.image_id = img.id
+        WHERE di.domain_id = #{domainId}
+          AND di.domain_type = #{domainType}
+    </select>
+
+
 </mapper>

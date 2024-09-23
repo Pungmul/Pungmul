@@ -16,6 +16,8 @@ import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.LocalPostResponseDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
+import pungmul.pungmul.dto.post.post.CreatePostResponseDTO;
+import pungmul.pungmul.dto.post.post.PostResponseDTO;
 import pungmul.pungmul.dto.post.post.SimplePostDTO;
 import pungmul.pungmul.service.post.PostService;
 
@@ -31,34 +33,30 @@ public class PostController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("")
-    public ResponseEntity<BaseResponse<LocalPostResponseDTO>> createPost(
+    public ResponseEntity<BaseResponse<CreatePostResponseDTO>> createPost(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam String category,
+            @RequestParam Long categoryId,
             @Validated @RequestPart("postData") PostRequestDTO postRequestDTO,
             @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
-        LocalPostResponseDTO localPostResponseDTO = postService.addPost(userDetails.getAccountId(), postRequestDTO, files);
+        CreatePostResponseDTO createPostResponseDTO = postService.addPost(userDetails.getAccountId(), categoryId, postRequestDTO, files);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, localPostResponseDTO));
+                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createPostResponseDTO));
     }
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{postId}")
-    public ResponseEntity<BaseResponse<LocalPostResponseDTO>> getPostByPostId(
-            @PathVariable Long postId,
-            @RequestParam String category
-            ) {
-        LocalPostResponseDTO postById = postService.getPostById(postId);
+    public ResponseEntity<BaseResponse<PostResponseDTO>> getPostByPostId(@PathVariable Long postId) {
+        PostResponseDTO post = postService.getPostById(postId);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, postById));
+                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, post));
     }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/{postId}/like")
     public ResponseEntity<BaseResponse<PostLikeResponseDTO>> likePostByPostId(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long postId,
-            @RequestParam String category
+            @PathVariable Long postId
     ) {
         PostLikeResponseDTO postLikeResponseDTO = postService.handlePostLike(userDetails.getAccountId(), postId);
         return ResponseEntity.status(HttpStatus.OK)
