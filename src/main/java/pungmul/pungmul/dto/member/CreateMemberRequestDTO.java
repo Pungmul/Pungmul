@@ -13,7 +13,7 @@ public class CreateMemberRequestDTO {
     private String loginId;
 
     @NotEmpty   @Size(min = 8, max = 20)
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,}$", message = "8자 이상의 영문자와 숫자 조합")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z]).{8,16}$", message = "8자 이상의 영문자와 숫자 조합")
     private String password;
 
     @NotEmpty   @Size(min = 2, max = 20)
