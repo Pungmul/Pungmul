@@ -39,6 +39,12 @@
         WHERE parent_id IS NULL ;
     </select>
 
+    <!-- Select Child Categories -->
+    <select id="getChildCategoryList" resultMap="CategoryResultMap" parameterType="java.lang.Long">
+        SELECT * FROM category
+        WHERE parent_id = #{categoryId} ;
+    </select>
+
     <!-- Update Category -->
     <update id="updateCategory">
         UPDATE category

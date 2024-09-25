@@ -39,8 +39,10 @@ public class BoardController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
-    public ResponseEntity<BaseResponse<List<CategoryDTO>>> getRootBoards(){
-        List<CategoryDTO> boardList = boardService.getRootBoardList();
+    public ResponseEntity<BaseResponse<List<CategoryDTO>>> getRootBoards(
+            @RequestParam(required = false) Long categoryId
+    ){
+        List<CategoryDTO> boardList = boardService.getBoardList(categoryId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardList));
     }
@@ -73,6 +75,4 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, additionalPosts));
     }
-
-
 }
