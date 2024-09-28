@@ -29,6 +29,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -60,15 +61,14 @@ dependencies {
 
 	// AWS
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-    implementation 'software.amazon.awssdk:s3:2.20.22'  // AWS SDK for S3
-    implementation 'software.amazon.awssdk:core:2.20.22'  // AWS SDK Core
+	implementation 'software.amazon.awssdk:s3:2.20.22'  // AWS SDK for S3
+	implementation 'software.amazon.awssdk:core:2.20.22'  // AWS SDK Core
 
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.0")
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
 
+
 	implementation 'com.github.pagehelper:pagehelper-spring-boot-starter:1.4.5'
-
-
 }
 
 tasks.named('test') {

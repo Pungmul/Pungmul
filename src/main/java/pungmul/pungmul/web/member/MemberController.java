@@ -62,6 +62,13 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('USER')")
+    @GetMapping("")
+    public ResponseEntity<BaseResponse<GetMemberResponseDTO>> getMemberInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        GetMemberResponseDTO memberInfo = createMemberService.getMemberInfo(userDetails.getAccountId());
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, memberInfo));
+    }
+
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/inst")
     public ResponseEntity<BaseResponse<List<Long>>> regInstrument(@AuthenticationPrincipal UserDetailsImpl userDetails, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
 
