@@ -79,6 +79,17 @@ CREATE TABLE IF NOT EXISTS user (
                         FOREIGN KEY (profile_image) REFERENCES domain_image(id)
 );
 
+CREATE TABLE IF NOT EXISTS verification_tokens (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        user_id BIGINT NOT NULL,
+                        token VARCHAR(255) NOT NULL,
+                        expiry_date TIMESTAMP NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+
 CREATE TABLE IF NOT EXISTS club (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         name VARCHAR(50) UNIQUE NOT NULL,

@@ -13,19 +13,18 @@ import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.member.account.UserRole;
 import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
 import pungmul.pungmul.dto.file.RequestImageDTO;
+import pungmul.pungmul.dto.member.GetMemberResponseDTO;
+import pungmul.pungmul.dto.member.InstrumentStatusResponseDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.dto.member.CreateMemberRequestDTO;
 import pungmul.pungmul.dto.member.CreateAccountResponseDTO;
-import pungmul.pungmul.service.file.DomainImageService;
 import pungmul.pungmul.service.file.ImageService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * CreateMemberService 클래스는 회원 가입 로직을 처리하는 서비스입니다.
@@ -41,6 +40,7 @@ public class CreateMemberService {
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final UserRoleService userRoleService;
+    private final EmailService emailService;
 
 
     /**
@@ -54,8 +54,9 @@ public class CreateMemberService {
         Long accountId = createAccount(createMemberRequestDto);
         //  2. user 생성
         Long userId = createUser(createMemberRequestDto, profile, accountId);
-        //  3. instrumentStatus 생성
-//        createInstrument(createMemberRequestDto.getInstrumentStatusList(), userId);
+
+        //  3. 이메일 인증 요청
+        emailService.verificationEmail(userId);
 
         return getCreateMemberResponse(accountId, userId);
     }
@@ -188,4 +189,38 @@ public class CreateMemberService {
                 .build();
     }
 
+    public GetMemberResponseDTO getMemberInfo(Long accountId) {
+        Account account = accountRepository.getAccountByAccountId(accountId)
+                .orElseThrow(NoSuchElementException::new);
+        User user = userRepository.getUserByAccountId(accountId)
+                .orElseThrow(NoSuchElementException::new);
+        List<InstrumentStatus> instrumentStatusList = instrumentStatusRepository.getAllInstrumentStatusByUserId(userRepository.getUserIdByAccountId(accountId))
+                .orElse(Collections.emptyList() );
+
+        return getGetMemberResponseDTO(account, user, instrumentStatusList);
+    }
+
+    private static GetMemberResponseDTO getGetMemberResponseDTO(Account account, User user, List<InstrumentStatus> instrumentStatusList) {
+        return GetMemberResponseDTO.builder()
+                .loginId(account.getLoginId())
+                .name(user.getName())
+                .clubName(user.getClubName())
+                .birth(user.getBirth())
+                .clubAge(user.getClubAge())
+                .gender(user.getGender())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .area(user.getArea())
+                .instrumentStatusDTOList(
+                        instrumentStatusList.stream()
+                                .map(instrumentStatus -> InstrumentStatusResponseDTO.builder()
+                                        .instrument(instrumentStatus.getInstrument())
+                                        .instrumentAbility(instrumentStatus.getInstrumentAbility())
+                                        .major(instrumentStatus.isMajor())
+                                        .build()
+                                )
+                                .collect(Collectors.toList())
+                )
+                .build();
+    }
 }

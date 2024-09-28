@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pungmul.pungmul.repository.member.mapper.VerificationTokenMapper">
+
+    <!-- VerificationToken ResultMap -->
+    <resultMap id="VerificationTokenResultMap" type="pungmul.pungmul.domain.member.auth.VerificationToken">
+        <id property="id" column="id"/>
+        <result property="token" column="token"/>
+        <result property="userId" column="user_id"/>
+        <result property="expiryDate" column="expiry_date"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- Token 저장 -->
+    <insert id="saveVerificationToken" parameterType="pungmul.pungmul.domain.member.auth.VerificationToken" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO verification_tokens (user_id, token, expiry_date)
+        VALUES (#{userId}, #{token}, #{expiryDate})
+    </insert>
+
+    <!-- Token 찾기 -->
+    <select id="findByToken" parameterType="java.lang.String" resultMap="VerificationTokenResultMap">
+        SELECT * FROM verification_tokens WHERE token = #{token}
+    </select>
+
+    <!-- Token 삭제 -->
+    <delete id="deleteVerificationToken" parameterType="java.lang.Long">
+        DELETE FROM verification_tokens WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

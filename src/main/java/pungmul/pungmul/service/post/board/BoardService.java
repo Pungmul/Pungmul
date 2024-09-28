@@ -2,6 +2,7 @@ package pungmul.pungmul.service.post.board;
 
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pungmul.pungmul.core.exception.custom.post.NoMoreDataException;
 import pungmul.pungmul.domain.post.board.Category;
@@ -16,14 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BoardService {
     private final CategoryRepository categoryRepository;
     private final PostService postService;
 
-    public List<CategoryDTO> getRootBoardList() {
-        List<Category> categoryList = categoryRepository.getRootCategory();
+    public List<CategoryDTO> getBoardList(Long categoryId) {
+        List<Category> categoryList;
+        if (categoryId == null)
+            categoryList = categoryRepository.getRootCategory();
+        else
+            categoryList = categoryRepository.getChildCategory(categoryId);
+
         return getCategoryResponseDTOList(categoryList);
     }
 
@@ -38,6 +45,7 @@ public class BoardService {
                             .build()
                     );
         }
+        log.info("getCategoryResponseDTOList: {}", categoryDTOList);
         return categoryDTOList;
     }
 
