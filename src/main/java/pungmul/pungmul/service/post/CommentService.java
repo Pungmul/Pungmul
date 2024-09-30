@@ -29,11 +29,11 @@ public class CommentService {
 
     public CommentResponseDTO addComment(Long accountId, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
 
+        log.info(requestCommentDTO.toString());
         Comment comment = getComment(getUserIdByAccountId(accountId), postId, parentId, requestCommentDTO);
-        Comment savedComment = commentRepository.save(comment);
-//        log.info("comment UserId : {}, comment createdAt : {}", comment.getUserId(), comment.getCreatedAt());
+        commentRepository.save(comment);
 
-        return getCommentResponseDTO(savedComment);
+        return getCommentResponseDTO(commentRepository.getCommentByCommentId(comment.getId()));
     }
 
     @Transactional
@@ -80,6 +80,8 @@ public class CommentService {
     }
 
     public CommentResponseDTO getCommentResponseDTO(Comment comment) {
+        log.info("comment content : {}", comment.getContent());
+
         return CommentResponseDTO.builder()
                 .commentId(comment.getId())
                 .postId(comment.getPostId())

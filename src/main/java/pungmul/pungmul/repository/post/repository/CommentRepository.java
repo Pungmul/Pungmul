@@ -6,7 +6,7 @@ import pungmul.pungmul.dto.post.CommentResponseDTO;
 import java.util.List;
 
 public interface CommentRepository {
-    Comment save(Comment comment);
+    void save(Comment comment);
 
     void likeComment(Long userId, Long commentId);
 
@@ -22,4 +22,5 @@ public interface CommentRepository {
 
     List<Comment> getCommentsByPostId(Long postId);
 
+    Comment getCommentByCommentId(Long id);
 }

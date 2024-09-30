@@ -32,6 +32,7 @@ public class CommentController {
                                                                        @Validated @RequestBody RequestCommentDTO requestCommentDTO){
         CommentResponseDTO commentResponseDTO = commentService.addComment(userDetails.getAccountId(), postId, parentId, requestCommentDTO);
 
+        log.info("Comment added: {}", commentResponseDTO.getContent());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, commentResponseDTO));
     }

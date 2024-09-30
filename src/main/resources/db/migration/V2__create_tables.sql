@@ -206,4 +206,15 @@ CREATE TABLE IF NOT EXISTS chat_messages (
                                 message_type VARCHAR(50),
                                 image_url VARCHAR(255)
 );
+CREATE TABLE IF NOT EXISTS Friends (
+                                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                       user_id BIGINT NOT NULL,
+                                       friend_id BIGINT NOT NULL,
+                                       status ENUM('PENDING', 'ACCEPTED', 'DECLINED') NOT NULL DEFAULT 'PENDING',
+                                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                       UNIQUE (user_id, friend_id),
+                                       FOREIGN KEY (user_id) REFERENCES user(id),
+                                       FOREIGN KEY (friend_id) REFERENCES user(id)
+);
 

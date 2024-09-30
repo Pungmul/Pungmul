@@ -1,6 +1,7 @@
 package pungmul.pungmul.repository.post.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.domain.post.Comment;
 import pungmul.pungmul.dto.post.CommentResponseDTO;
@@ -10,15 +11,21 @@ import pungmul.pungmul.repository.post.repository.CommentRepository;
 import java.util.List;
 
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class MybatisCommentRepository implements CommentRepository {
     private final CommentMapper commentMapper;
 
+//    @Override
+//    public Comment save(Comment comment) {
+//        Long saved = commentMapper.save(comment);
+//        return commentMapper.getCommentById(saved);
+//    }
+
     @Override
-    public Comment save(Comment comment) {
-        Long saved = commentMapper.save(comment);
-        return commentMapper.getCommentById(saved);
+    public void save(Comment comment) {
+        commentMapper.save(comment);
     }
 
     @Override
@@ -44,6 +51,11 @@ public class MybatisCommentRepository implements CommentRepository {
     @Override
     public List<Comment> getCommentsByPostId(Long postId) {
         return commentMapper.getCommentsByPostId(postId);
+    }
+
+    @Override
+    public Comment getCommentByCommentId(Long id) {
+        return commentMapper.getCommentById(id);
     }
 
     @Override
