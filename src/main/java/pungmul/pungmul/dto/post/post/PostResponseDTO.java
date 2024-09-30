@@ -21,6 +21,7 @@ public class PostResponseDTO {
     private List<Image> imageList;
     private List<CommentResponseDTO> commentList;
     private Integer viewCount;
+    private Boolean isLiked;
     private Integer likedNum;
     private Integer timeSincePosted;
     private String timeSincePostedText;

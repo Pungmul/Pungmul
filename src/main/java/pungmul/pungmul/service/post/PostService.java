@@ -5,11 +5,13 @@ import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
+import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
@@ -20,6 +22,7 @@ import pungmul.pungmul.dto.post.LocalPostResponseDTO;
 import pungmul.pungmul.dto.post.post.CreatePostResponseDTO;
 import pungmul.pungmul.dto.post.post.PostResponseDTO;
 import pungmul.pungmul.dto.post.post.SimplePostDTO;
+import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.CategoryRepository;
 import pungmul.pungmul.repository.post.repository.ContentRepository;
@@ -32,6 +35,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -44,15 +48,18 @@ public class PostService {
     private final UserRepository userRepository;
     private final TimeSincePosted timeSincePosted;
     private final CommentService commentService;
+    private final AccountRepository accountRepository;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
 
-    public PostResponseDTO getPostById(Long postId) {
+    public PostResponseDTO getPostById(UserDetails userDetails, Long postId) {
         Post post = postRepository.getPostById(postId);
         Content content = getContentByPostId(postId);
+        boolean postLikedByUser = isPostLikedByUser(userDetails, postId);
 
-        return getPostResponseDTO(post, content);
+
+        return getPostResponseDTO(post, content, postLikedByUser);
     }
 
     public Content getContentByPostId(Long postId) {
@@ -141,6 +148,13 @@ public class PostService {
                 .build();
     }
 
+    private boolean isPostLikedByUser(UserDetails userDetails, Long postId) {
+        Account account = accountRepository.getAccountByLoginId(userDetails.getUsername())
+                .orElseThrow(NoSuchElementException::new);
+        Long userId = userRepository.getUserIdByAccountId(account.getId());
+        return postRepository.isPostLikedByUser(userId, postId);
+    }
+
     private void saveContentImage(Long contentId, MultipartFile image, Long userId) throws IOException {
         imageService.saveImage(getRequestContentImageDTO(contentId, image, userId));
     }
@@ -201,8 +215,7 @@ public class PostService {
         return new PageInfo<>(postDTOList);
     }
 
-    private PostResponseDTO getPostResponseDTO(Post postById, Content contentByPostId) {
-        log.info("{}",contentByPostId.getImageList());
+    private PostResponseDTO getPostResponseDTO(Post postById, Content contentByPostId, Boolean postLikedByUser) {
         return PostResponseDTO.builder()
                 .postId(postById.getId())
                 .title(contentByPostId.getTitle())
@@ -212,6 +225,7 @@ public class PostService {
                 .commentList(commentService.getCommentsByPostId(postById.getId()))
                 .timeSincePosted(getTimeSincePosted(postById.getCreatedAt()))
                 .timeSincePostedText(timeSincePosted.getTimeSincePostedText(postById.getCreatedAt()))
+                .isLiked(postLikedByUser)
                 .likedNum(postById.getLikeNum())
                 .viewCount(postById.getViewCount())
                 .build();

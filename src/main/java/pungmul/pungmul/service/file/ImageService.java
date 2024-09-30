@@ -52,7 +52,7 @@ public class ImageService {
 
     public List<Image> getImagesByDomainId(DomainType domainType, Long domainId) {
         List<Image> images = imageRepository.getImagesByDomainIdAndType(domainType, domainId);
-        log.info(images.size() + " images found");
+//        log.info(images.size() + " images found");
 
         // 기본 이미지 설정
         if (images.isEmpty()) {
