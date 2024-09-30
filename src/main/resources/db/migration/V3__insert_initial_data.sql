@@ -7,5 +7,6 @@ INSERT INTO roles (role_name) SELECT 'GUEST' WHERE NOT EXISTS (SELECT 1 FROM rol
 -- 기본 이미지
 INSERT INTO image (converted_filename, original_filename, full_file_path, file_type, size, created_at)
 VALUES ('admin/ce6cfc73ef62f44510a64bc62937328f.jpg', 'anonymous_image.jpg', 'https://pungmul-s3-bucket.s3.ap-northeast-2.amazonaws.com/admin/ce6cfc73ef62f44510a64bc62937328f.jpg', 'image/jpeg', 2966, NOW())
-ON DUPLICATE KEY UPDATE id=id;
+ON DUPLICATE KEY UPDATE full_file_path = VALUES(full_file_path);
+
 
