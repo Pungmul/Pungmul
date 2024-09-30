@@ -8,7 +8,7 @@ import java.util.List;
 
 @Mapper
 public interface CommentMapper {
-    Long save(Comment comment);
+    void save(Comment comment);
 
     void likeComment(Long userId, Long commentId);
 

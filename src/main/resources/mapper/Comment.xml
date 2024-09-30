@@ -33,7 +33,7 @@
 
 
     <!-- Insert Comment -->
-    <insert id="save" parameterType="pungmul.pungmul.domain.post.Comment" useGeneratedKeys="true" keyProperty="id">
+    <insert id="save" parameterType="pungmul.pungmul.domain.post.Comment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO comment (post_id, user_id, parent_id, content)
         VALUES (#{postId}, #{userId}, #{parentId}, #{content})
     </insert>
