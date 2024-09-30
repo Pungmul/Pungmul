@@ -26,6 +26,7 @@ public class Account {
 
     private boolean withdraw;
 
+    @Setter //  이메일 인증 구현 전 임시
     private boolean enabled;
 
     private boolean accountExpired;

@@ -43,6 +43,7 @@ public class PostService {
     private final ContentRepository contentRepository;
     private final UserRepository userRepository;
     private final TimeSincePosted timeSincePosted;
+    private final CommentService commentService;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
@@ -208,6 +209,7 @@ public class PostService {
                 .content(contentByPostId.getText())
                 .author(getAuthorNameOrAnonymous(contentByPostId))
                 .imageList(contentByPostId.getImageList())
+                .commentList(commentService.getCommentsByPostId(postById.getId()))
                 .timeSincePosted(getTimeSincePosted(postById.getCreatedAt()))
                 .timeSincePostedText(timeSincePosted.getTimeSincePostedText(postById.getCreatedAt()))
                 .likedNum(postById.getLikeNum())

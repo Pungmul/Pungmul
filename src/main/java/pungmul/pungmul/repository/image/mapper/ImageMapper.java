@@ -17,4 +17,6 @@ public interface ImageMapper {
     List<Image> getImagesByImageIds(List<Long> imageIdList);
 
     List<Image> getImagesByDomainIdAndType(DomainType domainType, Long domainId);
+
+    Image getImageByConvertedName(String convertedName);
 }

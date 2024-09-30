@@ -56,7 +56,10 @@ public class CreateMemberService {
         Long userId = createUser(createMemberRequestDto, profile, accountId);
 
         //  3. 이메일 인증 요청
-        emailService.verificationEmail(userId);
+//        emailService.verificationEmail(userId);
+
+        //  email 인증 전 임시 account Enable. 이메일 인증 로직 추가 필요
+        accountRepository.setEnabledAccount(accountId);
 
         return getCreateMemberResponse(accountId, userId);
     }

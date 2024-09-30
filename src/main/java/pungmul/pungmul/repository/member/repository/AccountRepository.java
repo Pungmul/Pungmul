@@ -13,4 +13,5 @@ public interface AccountRepository {
 
     public Optional<Account> getAccountByEmail(String email);
 
+    public void setEnabledAccount(Long accountId);
     }

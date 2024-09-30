@@ -41,5 +41,10 @@ public class MybatisImageRepository implements ImageRepository {
         return imageMapper.getImagesByDomainIdAndType(domainType, domainId);
     }
 
+    @Override
+    public Image getImageByConvertedName(String convertedName) {
+        return imageMapper.getImageByConvertedName(convertedName);
+    }
+
 
 }

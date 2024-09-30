@@ -12,7 +12,11 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import pungmul.pungmul.domain.file.DomainType;
+import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.member.CreateMemberRequestDTO;
+import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.service.file.ImageService;
 import pungmul.pungmul.service.member.CreateMemberService;
 
 import java.io.IOException;
@@ -30,7 +34,8 @@ public class TestDataInitializer {
     private final DataSource dataSource;
     private final CreateMemberService createMemberService;
     private final ObjectMapper objectMapper;  // JSON 데이터를 읽어오기 위한 ObjectMapper
-
+    private final ImageService imageService;
+    private final UserRepository userRepository;
 
     @Bean
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
@@ -51,7 +56,6 @@ public class TestDataInitializer {
             } else {
                 System.out.println("Post and Content data already sufficient, no need to insert post test data.");
             }
-
         };
     }
 

@@ -14,5 +14,7 @@ public interface AccountMapper {
 
     Account getAccountByEmail(String email);
 
+    void setEnabledAccount(Long accountId);
+
 //    Long selectLastInsertAccountId();
 }

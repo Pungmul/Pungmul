@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Comment;
 import pungmul.pungmul.dto.post.CommentLikeResponseDTO;
@@ -11,8 +12,11 @@ import pungmul.pungmul.dto.post.CommentResponseDTO;
 import pungmul.pungmul.dto.post.RequestCommentDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.CommentRepository;
+import pungmul.pungmul.service.file.ImageService;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,12 +25,13 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final TimeSincePosted timeSincePosted;
+    private final ImageService imageService;
 
     public CommentResponseDTO addComment(Long accountId, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
 
         Comment comment = getComment(getUserIdByAccountId(accountId), postId, parentId, requestCommentDTO);
         Comment savedComment = commentRepository.save(comment);
-        log.info("comment UserId : {}, comment createdAt : {}", comment.getUserId(), comment.getCreatedAt());
+//        log.info("comment UserId : {}, comment createdAt : {}", comment.getUserId(), comment.getCreatedAt());
 
         return getCommentResponseDTO(savedComment);
     }
@@ -51,6 +56,13 @@ public class CommentService {
         return getCommentLikeResponseDTO(commentId, commentLikesNum, !isLiked);
     }
 
+    public List<CommentResponseDTO> getCommentsByPostId(Long postId) {
+        List<Comment> commentsByPostId = commentRepository.getCommentsByPostId(postId);
+        return commentsByPostId.stream()
+                .map(this::getCommentResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     private Long getUserIdByAccountId(Long accountId) {
         User user = userRepository.getUserByAccountId(accountId)
                 .orElseThrow(NoSuchElementException::new);
@@ -72,8 +84,9 @@ public class CommentService {
                 .commentId(comment.getId())
                 .postId(comment.getPostId())
                 .parentId(comment.getParentId())
-                .userId(comment.getUserId())
                 .content(comment.getContent())
+                .userName(userRepository.getUserByUserId(comment.getUserId()).map(User::getName).orElseThrow(NoSuchElementException::new))
+                .profile(imageService.getImagesByDomainId(DomainType.PROFILE, comment.getUserId()).get(0))
                 .createdAt(timeSincePosted.getTimePostedText(comment.getCreatedAt()))
                 .build();
     }

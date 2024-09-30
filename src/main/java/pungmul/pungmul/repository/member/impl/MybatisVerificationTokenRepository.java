@@ -6,6 +6,7 @@ import pungmul.pungmul.domain.member.auth.VerificationToken;
 import pungmul.pungmul.repository.member.mapper.VerificationTokenMapper;
 import pungmul.pungmul.repository.member.repository.VerificationTokenRepository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -25,5 +26,10 @@ public class MybatisVerificationTokenRepository implements VerificationTokenRepo
     @Override
     public void deleteByUserId(Long userId) {
         verificationTokenMapper.deleteByUserId(userId);
+    }
+
+    @Override
+    public void deleteExpiredTokens(LocalDateTime now) {
+        verificationTokenMapper.deleteExpiredTokens(now);
     }
 }

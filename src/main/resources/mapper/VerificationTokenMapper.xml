@@ -8,17 +8,16 @@
         <id property="id" column="id"/>
         <result property="token" column="token"/>
         <result property="userId" column="user_id"/>
-        <result property="expiryDate" column="expiry_date"/>
+        <result property="expiredAt" column="expired_at"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
     <!-- Token 저장 -->
     <insert id="saveVerificationToken" parameterType="pungmul.pungmul.domain.member.auth.VerificationToken" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO verification_tokens (user_id, token, expiry_date)
-        VALUES (#{userId}, #{token}, #{expiryDate})
+        INSERT INTO verification_tokens (user_id, token, expired_at)
+        VALUES (#{userId}, #{token}, #{expiredAt})
     </insert>
-
     <!-- Token 찾기 -->
     <select id="findByToken" parameterType="java.lang.String" resultMap="VerificationTokenResultMap">
         SELECT * FROM verification_tokens WHERE token = #{token}
@@ -27,6 +26,12 @@
     <!-- Token 삭제 -->
     <delete id="deleteVerificationToken" parameterType="java.lang.Long">
         DELETE FROM verification_tokens WHERE user_id = #{userId}
+    </delete>
+
+    <!-- 만료 Token 삭제 -->
+    <delete id="deleteExpiredTokens" parameterType="java.time.LocalDateTime">
+        DELETE FROM verification_tokens
+               WHERE expired_at &lt; #{currentTime}
     </delete>
 
 </mapper>
