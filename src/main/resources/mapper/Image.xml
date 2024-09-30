@@ -58,5 +58,11 @@
           AND di.domain_type = #{domainType}
     </select>
 
+    <select id="getImageByConvertedName" resultMap="ImageResultMap" parameterType="java.lang.String">
+        SELECT * FROM image
+        WHERE converted_filename = #{convertedName};
+    </select>
+
+
 
 </mapper>

@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.messaging.MessagingException;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pungmul.pungmul.domain.member.auth.VerificationToken;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.member.repository.VerificationTokenRepository;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -35,19 +37,28 @@ public class EmailService {
         User user = userRepository.getUserByUserId(userByUserId)
                 .orElseThrow(NoSuchElementException::new);
         String token = createVerificationToken(user);
+        log.info("token : {}", token);
         sendVerificationEmail(user.getEmail(), token);
     }
 
     private String createVerificationToken(User user) {
         String token = UUID.randomUUID().toString();
+        LocalDateTime expiryDate = LocalDateTime.now().plusHours(24);  // 24시간 후 만료
         VerificationToken verificationToken = VerificationToken.builder()
                 .token(token)
                 .userId(user.getId())
+                .expiredAt(expiryDate)
                 .build();
         verificationTokenRepository.saveVerificationToken(verificationToken);
 
         return token;
     }
+
+    @Scheduled(cron = "0 0 0 * * ?")  // 매일 자정에 실행
+    public void removeExpiredTokens() {
+        verificationTokenRepository.deleteExpiredTokens(LocalDateTime.now());
+    }
+
 
     public void sendVerificationEmail(String toEmail, String token) {
         String subject = "이메일 인증";

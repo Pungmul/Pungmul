@@ -2,6 +2,9 @@ package pungmul.pungmul.repository.post.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import pungmul.pungmul.domain.post.Comment;
+import pungmul.pungmul.dto.post.CommentResponseDTO;
+
+import java.util.List;
 
 @Mapper
 public interface CommentMapper {
@@ -20,4 +23,6 @@ public interface CommentMapper {
     void minusCommentLikeNum(Long commentId);
 
     Comment getCommentById(Long commentId);
+
+    List<Comment> getCommentsByPostId(Long postId);
 }

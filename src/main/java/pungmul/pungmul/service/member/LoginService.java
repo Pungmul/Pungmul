@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.config.security.TokenProvider;
+import pungmul.pungmul.core.exception.custom.member.AccountEmailNotVerifiedException;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.auth.SessionUser;
 import pungmul.pungmul.domain.member.user.User;
@@ -25,6 +26,7 @@ import pungmul.pungmul.config.member.SessionConst;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -70,6 +72,12 @@ public class LoginService {
 
     @Transactional
     public AuthenticationResponseDTO authenticate(String username) {
+
+        Account enabledAccount = accountRepository.getAccountByLoginId(username)
+                .orElseThrow(NoSuchElementException::new);
+
+        if (!enabledAccount.isEnabled())
+            throw new AccountEmailNotVerifiedException();
 
         //jwt, refresh token 발급
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);

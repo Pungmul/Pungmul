@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pungmul.pungmul.domain.file.Image;
 
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public class CommentResponseDTO {
     private Long postId;
     private Long parentId;
     private String content;
-    private Long userId;
+    private String userName;
+    private Image profile;
     private String createdAt;
 }

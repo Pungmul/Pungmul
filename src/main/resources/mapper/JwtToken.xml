@@ -9,11 +9,7 @@
         WHERE account_id = #{accountId} AND expired = false AND revoked = false
     </select>
 
-    <update id="revokeTokensByAccountId">
-        UPDATE tokens
-        SET expired = true, revoked = true
-        WHERE account_id = #{accountId} AND expired = false AND revoked = false
-    </update>
+
 
     <update id="revokeTokenByToken">
         UPDATE tokens
@@ -40,4 +36,9 @@
         SELECT * FROM tokens WHERE token = #{token}
     </select>
 
+    <update id="revokeTokensByAccountId" parameterType="java.lang.Long">
+        UPDATE tokens
+        SET expired = true, revoked = true
+        WHERE account_id = #{accountId} AND expired = false AND revoked = false;
+    </update>
 </mapper>

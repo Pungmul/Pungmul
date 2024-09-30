@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS account (
                         password VARCHAR(255) NOT NULL,
                         withdraw BOOLEAN DEFAULT TRUE,
                         last_password_changed TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        enabled BOOLEAN DEFAULT TRUE,
+                        enabled BOOLEAN DEFAULT FALSE,
                         account_expired BOOLEAN DEFAULT FALSE,
                         account_locked BOOLEAN DEFAULT FALSE,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS verification_tokens (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         user_id BIGINT NOT NULL,
                         token VARCHAR(255) NOT NULL,
-                        expiry_date TIMESTAMP NOT NULL,
+                        expired_at TIMESTAMP NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         FOREIGN KEY (user_id) REFERENCES user(id)

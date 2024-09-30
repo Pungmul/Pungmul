@@ -47,4 +47,11 @@
         FROM account
         WHERE login_id = #{loginId};
     </select>
+
+    <update id="setEnabledAccount" parameterType="java.lang.Long">
+        UPDATE account
+        SET enabled = true
+        WHERE id = #{accountId}
+    </update>
+
 </mapper>

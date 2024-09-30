@@ -3,6 +3,7 @@ package pungmul.pungmul.repository.member.mapper;
 import org.apache.ibatis.annotations.Mapper;
 import pungmul.pungmul.domain.member.auth.VerificationToken;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Mapper
@@ -12,4 +13,6 @@ public interface VerificationTokenMapper {
     Optional<VerificationToken> findByToken(String token);
 
     void deleteByUserId(Long userId);
+
+    void deleteExpiredTokens(LocalDateTime now);
 }

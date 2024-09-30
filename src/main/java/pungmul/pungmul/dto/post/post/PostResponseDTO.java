@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import pungmul.pungmul.domain.file.Image;
+import pungmul.pungmul.domain.post.Comment;
+import pungmul.pungmul.dto.post.CommentResponseDTO;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class PostResponseDTO {
     private String title;
     private String content;
     private List<Image> imageList;
+    private List<CommentResponseDTO> commentList;
     private Integer viewCount;
     private Integer likedNum;
     private Integer timeSincePosted;

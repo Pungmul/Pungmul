@@ -3,8 +3,11 @@ package pungmul.pungmul.repository.post.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.domain.post.Comment;
+import pungmul.pungmul.dto.post.CommentResponseDTO;
 import pungmul.pungmul.repository.post.mapper.CommentMapper;
 import pungmul.pungmul.repository.post.repository.CommentRepository;
+
+import java.util.List;
 
 
 @Repository
@@ -36,6 +39,11 @@ public class MybatisCommentRepository implements CommentRepository {
     @Override
     public void plusCommentLikeNum(Long commentId) {
         commentMapper.plusCommentLikeNum(commentId);
+    }
+
+    @Override
+    public List<Comment> getCommentsByPostId(Long postId) {
+        return commentMapper.getCommentsByPostId(postId);
     }
 
     @Override

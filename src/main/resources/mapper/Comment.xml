@@ -23,6 +23,14 @@
         WHERE id = #{commentId}
     </select>
 
+    <!-- SELECT Comment By PostId -->
+    <select id="getCommentsByPostId" parameterType="java.lang.Long" resultMap="CommentResultMap">
+        SELECT *
+        FROM comment
+        WHERE post_id = #{postId}
+    </select>
+
+
 
     <!-- Insert Comment -->
     <insert id="save" parameterType="pungmul.pungmul.domain.post.Comment" useGeneratedKeys="true" keyProperty="id">

@@ -18,6 +18,7 @@ public class MybatisAccountRepository implements AccountRepository {
         accountMapper.saveAccount(account);
     }
 
+
     @Override
     public Optional<Account> getAccountByAccountId(Long accountId) {
         return Optional.ofNullable(accountMapper.getAccountByAccountId(accountId));
@@ -31,5 +32,10 @@ public class MybatisAccountRepository implements AccountRepository {
     @Override
     public Optional<Account> getAccountByEmail(String email) {
         return Optional.ofNullable(accountMapper.getAccountByEmail(email));
+    }
+
+    @Override
+    public void setEnabledAccount(Long accountId) {
+        accountMapper.setEnabledAccount(accountId);
     }
 }
