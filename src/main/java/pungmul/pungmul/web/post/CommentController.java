@@ -50,14 +50,14 @@ public class CommentController {
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/{commentId}")
-    public ResponseEntity<BaseResponse<Void>> replyCommentByCommentId(
+    public ResponseEntity<BaseResponse<CommentResponseDTO>> replyCommentByCommentId(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long commentId,
             @RequestParam Long postId,
             @RequestBody RequestCommentDTO requestCommentDTO
     ) {
-        commentService.addComment(userDetails.getAccountId(), postId, commentId, requestCommentDTO);
+        CommentResponseDTO commentResponseDTO = commentService.addComment(userDetails.getAccountId(), postId, commentId, requestCommentDTO);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.ofSuccess(BaseResponseCode.OK));
+                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, commentResponseDTO));
     }
 }
