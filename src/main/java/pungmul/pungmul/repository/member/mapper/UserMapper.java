@@ -9,7 +9,7 @@ public interface UserMapper {
 
     User getUserByUserId(Long id);
 
-    User getUserByLoginId(String loginId);
+//    User getUserByLoginId(String loginId);
 
     User getUserByAccountId(Long accountId);
 

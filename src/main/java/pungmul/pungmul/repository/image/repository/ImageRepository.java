@@ -17,5 +17,6 @@ public interface ImageRepository {
 
     List<Image> getImagesByDomainIdAndType(DomainType domainType, Long domainId);
 
+
     public Image getImageByConvertedName(String convertedName);
 }

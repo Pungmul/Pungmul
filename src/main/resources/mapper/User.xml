@@ -42,10 +42,10 @@
         SELECT * FROM user WHERE account_id = #{accountId}
     </select>
 
-    <!-- Select Users By LoginId -->
-    <select id="getUserByLoginId" resultMap="UserResultMap">
-        SELECT * FROM user WHERE login_id = #{loginId}
-    </select>
+<!--    &lt;!&ndash; Select Users By LoginId &ndash;&gt;-->
+<!--    <select id="getUserByLoginId" resultMap="UserResultMap">-->
+<!--        SELECT * FROM user WHERE login_id = #{loginId}-->
+<!--    </select>-->
 
     <!-- Select Users By Email -->
     <select id="getUserByEmail" resultMap="UserResultMap">

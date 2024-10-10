@@ -146,7 +146,7 @@ public class CreateMemberService {
                 .build();
     }
 
-    private static SetRoleRequestDTO getRoleRequestDTO(Account account) {
+    private SetRoleRequestDTO getRoleRequestDTO(Account account) {
         return SetRoleRequestDTO.builder()
                 .username(account.getLoginId())
                 .roleName(UserRole.ROLE_USER.getAuthority())
@@ -174,7 +174,7 @@ public class CreateMemberService {
                 .build();
     }
 
-    private static RequestImageDTO getRequestProfileImageDTO(MultipartFile profile, User user) {
+    private RequestImageDTO getRequestProfileImageDTO(MultipartFile profile, User user) {
         return RequestImageDTO.builder()
                 .domainId(user.getId())
                 .imageFile(profile)
@@ -189,41 +189,6 @@ public class CreateMemberService {
                 .instrument(instrumentStatus.getInstrument())
                 .instrumentAbility(instrumentStatus.getInstrumentAbility())
                 .major(instrumentStatus.isMajor())
-                .build();
-    }
-
-    public GetMemberResponseDTO getMemberInfo(Long accountId) {
-        Account account = accountRepository.getAccountByAccountId(accountId)
-                .orElseThrow(NoSuchElementException::new);
-        User user = userRepository.getUserByAccountId(accountId)
-                .orElseThrow(NoSuchElementException::new);
-        List<InstrumentStatus> instrumentStatusList = instrumentStatusRepository.getAllInstrumentStatusByUserId(userRepository.getUserIdByAccountId(accountId))
-                .orElse(Collections.emptyList() );
-
-        return getGetMemberResponseDTO(account, user, instrumentStatusList);
-    }
-
-    private static GetMemberResponseDTO getGetMemberResponseDTO(Account account, User user, List<InstrumentStatus> instrumentStatusList) {
-        return GetMemberResponseDTO.builder()
-                .loginId(account.getLoginId())
-                .name(user.getName())
-                .clubName(user.getClubName())
-                .birth(user.getBirth())
-                .clubAge(user.getClubAge())
-                .gender(user.getGender())
-                .phoneNumber(user.getPhoneNumber())
-                .email(user.getEmail())
-                .area(user.getArea())
-                .instrumentStatusDTOList(
-                        instrumentStatusList.stream()
-                                .map(instrumentStatus -> InstrumentStatusResponseDTO.builder()
-                                        .instrument(instrumentStatus.getInstrument())
-                                        .instrumentAbility(instrumentStatus.getInstrumentAbility())
-                                        .major(instrumentStatus.isMajor())
-                                        .build()
-                                )
-                                .collect(Collectors.toList())
-                )
                 .build();
     }
 }
