@@ -7,7 +7,7 @@ import java.util.List;
 public interface FriendRepository {
     List<Friend> getFriendList(Long userId);
 
-    void sendFriendRequest(Long userId, Long receiverId);
+    void sendFriendRequest(Long senderId, Long receiverId);
 
     void acceptFriendRequest(Long friendRequestId);
 
