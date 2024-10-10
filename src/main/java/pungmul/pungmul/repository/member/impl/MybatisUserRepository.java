@@ -29,10 +29,10 @@ public class MybatisUserRepository implements UserRepository {
         return Optional.ofNullable(userMapper.getUserByAccountId(accountId));
     }
 
-    @Override
-    public Optional<User> getUserByLoginId(String loginId) {
-        return Optional.ofNullable(userMapper.getUserByLoginId(loginId));
-    }
+//    @Override
+//    public Optional<User> getUserByLoginId(String loginId) {
+//        return Optional.ofNullable(userMapper.getUserByLoginId(loginId));
+//    }
 
     @Override
     public Optional<User> getUserByEmail(String email) {

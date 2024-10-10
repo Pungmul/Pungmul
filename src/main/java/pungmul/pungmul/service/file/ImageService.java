@@ -49,18 +49,24 @@ public class ImageService {
         return imageRepository.getImageByImageId(imageId);
     }
 
+    public Image getAnonymousImage(){
+        return imageRepository.getImageByConvertedName(anonymousProfileName);
+    }
+
 
     public List<Image> getImagesByDomainId(DomainType domainType, Long domainId) {
         List<Image> images = imageRepository.getImagesByDomainIdAndType(domainType, domainId);
-//        log.info(images.size() + " images found");
+        log.info(images.size() + " images found");
 
         // 기본 이미지 설정
         if (images.isEmpty()) {
             // 기본 이미지 리스트로 대체
-            if (domainType == DomainType.PROFILE)
+            if (domainType == DomainType.PROFILE) {
+                log.info("anonymousProfile");
                 return Collections.singletonList(imageRepository.getImageByConvertedName(anonymousProfileName));
+            }
             else
-                throw new NoSuchElementException();
+                throw new NoSuchElementException("존재하지 않는 이미지");
         }
         return images;
     }

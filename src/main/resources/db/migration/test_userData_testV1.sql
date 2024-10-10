@@ -1,15 +1,15 @@
 INSERT INTO account (login_id, password, withdraw, enabled, account_expired, account_locked, created_at, updated_at)
 VALUES
-    ('user1', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user2', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user3', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user4', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user5', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user6', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user7', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user8', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user9', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
-    ('user10', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW());
+    ('user1@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user2@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user3@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user4@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user5@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user6@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user7@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user8@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user9@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW()),
+    ('user10@example.com', 'password123', FALSE, TRUE, FALSE, FALSE, NOW(), NOW());
 
 INSERT INTO user (account_id, name, club_name, birth, club_age, gender, phone_number, email, club_id, area, created_at, updated_at)
 VALUES

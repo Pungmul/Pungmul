@@ -56,6 +56,13 @@ public class TestDataInitializer {
             } else {
                 System.out.println("Post and Content data already sufficient, no need to insert post test data.");
             }
+
+            //  friend 데이터
+            if (isFriendDataUnderLimit()){
+                executeSqlFile("db/migration/balanced_friends_data_testV1.sql");
+            } else {
+                System.out.println("Friend data already sufficient, no need to insert friend test data.");
+            }
         };
     }
 
@@ -78,17 +85,23 @@ public class TestDataInitializer {
     }
 
     // Post와 Content 데이터가 10개 이하인지를 확인하는 메서드
+
     private boolean isPostDataUnderLimit() {
         Integer postCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM post", Integer.class);
         Integer contentCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM content", Integer.class);
 
         return postCount <= 10 && contentCount <= 10;  // 두 테이블 모두 10개 이하일 때만 true 반환
     }
-
     private boolean isUserDataUnderLimit() {
         Integer accountCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM account", Integer.class);
 
         return accountCount < 10;  // 두 테이블 모두 10개 이하일 때만 true 반환
+    }
+
+    private boolean isFriendDataUnderLimit() {
+        Integer friendCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM friends", Integer.class);
+
+        return friendCount < 50;
     }
     // 주어진 경로의 SQL 파일을 실행하는 메서드
     private void executeSqlFile(String filePath) {

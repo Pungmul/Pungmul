@@ -11,7 +11,7 @@ public interface UserRepository {
 
     public Optional<User> getUserByAccountId(Long accountId);
 
-    public Optional<User> getUserByLoginId(String loginId);
+//    public Optional<User> getUserByLoginId(String loginId);
 
     public Optional<User> getUserByEmail(String email);
 

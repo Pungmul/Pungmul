@@ -18,6 +18,7 @@ import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.service.member.CreateMemberService;
 import pungmul.pungmul.service.member.LoginService;
 import pungmul.pungmul.core.response.BaseResponse;
+import pungmul.pungmul.service.member.MemberService;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class MemberController {
 
     // 회원 생성과 로그인 처리 서비스
     private final CreateMemberService createMemberService;
+    private final MemberService memberService;
     private final LoginService loginService;
 
     /**
@@ -64,7 +66,7 @@ public class MemberController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
     public ResponseEntity<BaseResponse<GetMemberResponseDTO>> getMemberInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        GetMemberResponseDTO memberInfo = createMemberService.getMemberInfo(userDetails.getAccountId());
+        GetMemberResponseDTO memberInfo = memberService.getMemberInfo(userDetails.getAccountId());
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, memberInfo));
     }
 
