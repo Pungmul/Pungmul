@@ -33,9 +33,9 @@ public class FriendController {
     @PostMapping("/request")
     public ResponseEntity<BaseResponse<Void>> sendFriendRequest(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestParam String receiverUserName
+            @RequestParam String receiverUsername
             ){
-        friendService.sendFriendRequest(userDetails, receiverUserName);
+        friendService.sendFriendRequest(userDetails, receiverUsername);
 
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
     }

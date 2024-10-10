@@ -21,8 +21,8 @@ public class MybatisFriendRepository implements FriendRepository {
     }
 
     @Override
-    public void sendFriendRequest(Long userId, Long receiverId) {
-        friendMapper.sendFriendRequest(userId, receiverId);
+    public void sendFriendRequest(Long senderId, Long receiverId) {
+        friendMapper.sendFriendRequest(senderId, receiverId);
     }
 
     @Override

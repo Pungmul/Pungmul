@@ -9,6 +9,7 @@ import pungmul.pungmul.domain.friend.Friend;
 import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.friend.FriendListResponseDTO;
+import pungmul.pungmul.dto.friend.FriendRequestDTO;
 import pungmul.pungmul.dto.member.SimpleUserDTO;
 import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
@@ -62,24 +63,40 @@ public class FriendService {
 
     private FriendListResponseDTO getFriendResponseDTO(List<Friend> friendList, Long userId) {
 
-        for (Friend friend : friendList) {
-            log.info("sender : {}, receiver : {}, status : {}", friend.getSenderId(), friend.getReceiverId(), friend.getStatus());
-        }
-        List<SimpleUserDTO> acceptedFriendList = friendList.stream()
+
+        List<FriendRequestDTO> acceptedFriendList = friendList.stream()
                 .filter(friend -> friend.getStatus() == FriendStatus.ACCEPTED)
-                .map(friend -> memberService.getSimpleUserDTO(getFriendId(friend, userId)))
+                .map(friend -> getFriendRequestDTO(userId, friend))
                 .collect(Collectors.toList());
 
-
-        List<SimpleUserDTO> requestedFriendList = friendList.stream()
+        List<FriendRequestDTO> requestedFriendList = friendList.stream()
                 .filter(friend -> friend.getStatus() == FriendStatus.PENDING)
-                .map(friend -> memberService.getSimpleUserDTO(getFriendId(friend, userId)))
+                .map(friend -> getFriendRequestDTO(userId, friend))
                 .collect(Collectors.toList());
+
+//        List<FriendRequestDTO> requestedFriendList = friendList.stream()
+//                .filter(friend -> friend.getStatus() == FriendStatus.PENDING)
+//                .map(friend -> memberService.getSimpleUserDTO(getFriendId(friend, userId)))
+//                .collect(Collectors.toList());
         log.info("requested : {}", requestedFriendList);
 
         return FriendListResponseDTO.builder()
                 .friendList(acceptedFriendList)
                 .requestedFriendList(requestedFriendList)
+                .build();
+    }
+
+    private FriendRequestDTO getFriendRequestDTO(Long userId, Friend friend) {
+        return FriendRequestDTO.builder()
+                .friendRequestId(friend.getId())  // friendRequestId로 friend의 ID를 사용
+                .friendStatus(friend.getStatus())  // friend의 상태를 그대로 사용
+                .simpleUserDTO(
+                        SimpleUserDTO.builder()
+                                .userId(getFriendId(friend, userId))  // getFriendId를 통해 friend의 상대방 ID를 가져옴
+                                .name(memberService.getSimpleUserDTO(getFriendId(friend, userId)).getName())  // 상대방의 이름 가져옴
+                                .profileImage(memberService.getSimpleUserDTO(getFriendId(friend, userId)).getProfileImage())  // 상대방의 프로필 이미지 가져옴
+                                .build()
+                )
                 .build();
     }
 
