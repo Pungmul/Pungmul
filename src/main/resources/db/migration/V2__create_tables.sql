@@ -217,4 +217,16 @@ CREATE TABLE IF NOT EXISTS friends (
                                 CONSTRAINT fk_friends_user_id FOREIGN KEY (sender_id) REFERENCES user(id),
                                 CONSTRAINT fk_friends_friend_id FOREIGN KEY (receiver_id) REFERENCES user(id)
 );
+CREATE TABLE IF NOT EXISTS meeting (
+                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                         meeting_name VARCHAR(20) NOT NULL UNIQUE,
+                         meeting_description VARCHAR(100),
+                         is_public BOOLEAN DEFAULT TRUE,
+                         meeting_status ENUM('CREATED', 'ACTIVE', 'DORMANT', 'CLOSED') NOT NULL,
+                         founder_user_id BIGINT NOT NULL,
+                         member_num INT DEFAULT 1,
+                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                         FOREIGN KEY (founder_user_id) REFERENCES user(id)
+);
 
