@@ -7,16 +7,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.core.exception.custom.meeting.MeetingNameAlreadyExistsException;
-import pungmul.pungmul.domain.meeting.InvitationStatus;
-import pungmul.pungmul.domain.meeting.Meeting;
-import pungmul.pungmul.domain.meeting.MeetingInvitation;
-import pungmul.pungmul.domain.meeting.MeetingStatus;
+import pungmul.pungmul.domain.meeting.*;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.meeting.*;
 import pungmul.pungmul.repository.meeting.repository.MeetingInvitationRepository;
+import pungmul.pungmul.repository.meeting.repository.MeetingParticipantRepository;
 import pungmul.pungmul.repository.meeting.repository.MeetingRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,6 +28,7 @@ public class MeetingService {
     private final UserRepository userRepository;
     private final MeetingRepository meetingRepository;
     private final MeetingInvitationRepository meetingInvitationRepository;
+    private final MeetingParticipantRepository meetingParticipantRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
     public CreateMeetingResponseDTO createMeeting(UserDetails userDetails, CreateMeetingRequestDTO createMeetingRequestDTO) {
@@ -39,6 +39,15 @@ public class MeetingService {
 
         Meeting meeting = getMeeting(userDetails, createMeetingRequestDTO);
         meetingRepository.createMeeting(meeting);
+
+        MeetingParticipant founderParticipant = MeetingParticipant.builder()
+                .meetingId(meeting.getId())
+                .userId(userRepository.getUserByEmail(userDetails.getUsername()).map(User::getId).orElseThrow(NoSuchElementException::new))
+                .joinedAt(LocalDate.now())
+                .isHost(Boolean.TRUE)
+                .build();
+
+        meetingParticipantRepository.save(founderParticipant);
         return getCreateMeetingResponseDTO(meeting);
     }
 
@@ -127,17 +136,40 @@ public class MeetingService {
                 .build();
     }
 
-    public MeetingInvitationReplyResponseDTO replyInvitation(MeetingInvitationReplyRequestDTO replyRequest) {
+    public MeetingInvitationReplyResponseDTO replyInvitation(UserDetails userDetails, MeetingInvitationReplyRequestDTO replyRequest) {
         // 초대 정보 조회
         MeetingInvitation invitation = meetingInvitationRepository
                 .getInvitationById(replyRequest.getInvitationId())
                 .orElseThrow(() -> new NoSuchElementException("해당 초대가 존재하지 않습니다."));
 
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
+                .map(User::getId)
+                .orElseThrow(NoSuchElementException::new);
+
         // 초대 상태 업데이트
-//        invitation.setInvitationStatus(replyRequest.getInvitationStatus());
         meetingInvitationRepository.updateInvitationStatus(invitation.getId(), replyRequest.getInvitationStatus());
 
+        // 초대가 ACCEPTED 상태인 경우 모임 참가자 테이블에 추가
+        if (replyRequest.getInvitationStatus() == InvitationStatus.ACCEPTED) {
+            // 참가자 정보 저장
+            MeetingParticipant participant = getMeetingParticipant(replyRequest, userId);
+            meetingParticipantRepository.save(participant);
+        }
+
         // 응답 데이터 작성
+        return getMeetingInvitationReplyResponseDTO(replyRequest, invitation);
+    }
+
+    private static MeetingParticipant getMeetingParticipant(MeetingInvitationReplyRequestDTO replyRequest, Long userId) {
+        return MeetingParticipant.builder()
+                .meetingId(replyRequest.getMeetingId())
+                .userId(userId)
+                .joinedAt(LocalDate.now())
+                .isHost(Boolean.FALSE)
+                .build();
+    }
+
+    private static MeetingInvitationReplyResponseDTO getMeetingInvitationReplyResponseDTO(MeetingInvitationReplyRequestDTO replyRequest, MeetingInvitation invitation) {
         return MeetingInvitationReplyResponseDTO.builder()
                 .meetingId(invitation.getMeetingId())
                 .invitationStatus(replyRequest.getInvitationStatus())

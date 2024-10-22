@@ -46,9 +46,10 @@ public class MeetingController {
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/reply")
     public ResponseEntity<BaseResponse<MeetingInvitationReplyResponseDTO>> replyInvitation(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody MeetingInvitationReplyRequestDTO meetingInvitationReplyRequestDTO
     ){
-        MeetingInvitationReplyResponseDTO reply = meetingService.replyInvitation(meetingInvitationReplyRequestDTO);
+        MeetingInvitationReplyResponseDTO reply = meetingService.replyInvitation(userDetails, meetingInvitationReplyRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reply));
     }
 

@@ -231,16 +231,30 @@ CREATE TABLE IF NOT EXISTS meeting (
 );
 
 CREATE TABLE IF NOT EXISTS meeting_invitation (
-                                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                    meeting_id BIGINT NOT NULL,
-                                    founder_id BIGINT NOT NULL,
-                                    receiver_id BIGINT NOT NULL,
-                                    invitation_status ENUM('PENDING', 'ACCEPTED', 'DECLINED', 'DEFERRED') DEFAULT 'PENDING',
-                                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                    FOREIGN KEY (meeting_id) REFERENCES meeting(id),
-                                    FOREIGN KEY (founder_id) REFERENCES user(id),
-                                    FOREIGN KEY (receiver_id) REFERENCES user(id)
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        meeting_id BIGINT NOT NULL,
+                        founder_id BIGINT NOT NULL,
+                        receiver_id BIGINT NOT NULL,
+                        invitation_status ENUM('PENDING', 'ACCEPTED', 'DECLINED', 'DEFERRED') DEFAULT 'PENDING',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        FOREIGN KEY (meeting_id) REFERENCES meeting(id),
+                        FOREIGN KEY (founder_id) REFERENCES user(id),
+                        FOREIGN KEY (receiver_id) REFERENCES user(id)
 );
+
+CREATE TABLE IF NOT EXISTS meeting_participant (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        meeting_id BIGINT NOT NULL,
+                        user_id BIGINT NOT NULL,
+                        joined_at DATE NOT NULL, -- 참가한 날짜
+                        is_host BOOLEAN NOT NULL DEFAULT FALSE, -- 모임 주최 여부
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 생성일
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 수정일
+                        FOREIGN KEY (meeting_id) REFERENCES meeting(id), -- 모임 ID 외래키
+                        FOREIGN KEY (user_id) REFERENCES user(id) -- 사용자 ID 외래키
+);
+
+
 
 
