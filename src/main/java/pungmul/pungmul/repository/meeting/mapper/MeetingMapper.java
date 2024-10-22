@@ -8,4 +8,6 @@ public interface MeetingMapper {
     void createMeeting(Meeting meeting);
 
     boolean existsByMeetingName(String meetingName);
+
+    Meeting getMeetingById(Long meetingId);
 }

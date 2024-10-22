@@ -8,4 +8,6 @@ public interface MeetingRepository {
     void createMeeting(Meeting meeting);
 
     boolean existsByMeetingName(String meetingName);
+
+    Meeting getMeetingByMeetingId(Long meetingId);
 }

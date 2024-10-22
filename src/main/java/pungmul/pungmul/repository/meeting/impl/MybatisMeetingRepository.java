@@ -25,4 +25,9 @@ public class MybatisMeetingRepository implements MeetingRepository {
     public boolean existsByMeetingName(String meetingName) {
         return meetingMapper.existsByMeetingName(meetingName);
     }
+
+    @Override
+    public Meeting getMeetingByMeetingId(Long meetingId) {
+        return meetingMapper.getMeetingById(meetingId);
+    }
 }

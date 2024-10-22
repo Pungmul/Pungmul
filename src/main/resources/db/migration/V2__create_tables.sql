@@ -235,7 +235,7 @@ CREATE TABLE IF NOT EXISTS meeting_invitation (
                                     meeting_id BIGINT NOT NULL,
                                     founder_id BIGINT NOT NULL,
                                     receiver_id BIGINT NOT NULL,
-                                    invitation_status ENUM('PENDING', 'ACCEPTED', 'DECLINED') DEFAULT 'PENDING',
+                                    invitation_status ENUM('PENDING', 'ACCEPTED', 'DECLINED', 'DEFERRED') DEFAULT 'PENDING',
                                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                     FOREIGN KEY (meeting_id) REFERENCES meeting(id),

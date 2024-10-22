@@ -14,10 +14,14 @@
         <result property="updatedAt" column="updated_at" />
     </resultMap>
 
-    <insert id="createMeetingInvitation" parameterType="pungmul.pungmul.domain.meeting.MeetingInvitation">
+    <insert id="createMeetingInvitation" parameterType="pungmul.pungmul.domain.meeting.MeetingInvitation" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO meeting_invitation (meeting_id, founder_id, receiver_id, invitation_status)
         VALUES (#{meetingId}, #{founderId}, #{receiverId}, #{invitationStatus});
     </insert>
+
+    <select id="getInvitationById" resultMap="MeetingInvitationResultMap">
+        SELECT * FROM meeting_invitation WHERE id = #{invitationId}
+    </select>
 
     <select id="getInvitationsByReceiverId" resultMap="MeetingInvitationResultMap">
         SELECT * FROM meeting_invitation WHERE receiver_id = #{receiverId}

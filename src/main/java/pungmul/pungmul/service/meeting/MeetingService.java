@@ -12,16 +12,14 @@ import pungmul.pungmul.domain.meeting.Meeting;
 import pungmul.pungmul.domain.meeting.MeetingInvitation;
 import pungmul.pungmul.domain.meeting.MeetingStatus;
 import pungmul.pungmul.domain.member.user.User;
-import pungmul.pungmul.dto.meeting.CreateMeetingRequestDTO;
-import pungmul.pungmul.dto.meeting.CreateMeetingResponseDTO;
-import pungmul.pungmul.dto.meeting.InviteUserToMeetingRequestDTO;
+import pungmul.pungmul.dto.meeting.*;
 import pungmul.pungmul.repository.meeting.repository.MeetingInvitationRepository;
 import pungmul.pungmul.repository.meeting.repository.MeetingRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -55,9 +53,10 @@ public class MeetingService {
             User receiver = userRepository.getUserByEmail(email)
                     .orElseThrow(NoSuchElementException::new);
 
-            meetingInvitationRepository.createMeetingInvitation(getMeetingInvitation(meetingId, founder, receiver));
+            MeetingInvitation meetingInvitation = getMeetingInvitation(meetingId, founder, receiver);
+            meetingInvitationRepository.createMeetingInvitation(meetingInvitation);
 
-            sendInvitation(receiver, founder);
+            sendInvitation(receiver, founder, meetingId, meetingInvitation.getId());
         }
     }
 
@@ -95,22 +94,54 @@ public class MeetingService {
                 .build();
     }
 
-    private void sendInvitation(User receiver, User founder) {
+    private void sendInvitation(User receiver, User founder, Long meetingId, Long invitationId) {
+        //  전송 경로
         String dest = "/sub/meeting/" + receiver.getEmail();
+
         // 메시지 내용 (초대 메시지의 내용을 정의)
+        MeetingInvitationMessageDTO invitationMessage = getInvitationMessage(founder, meetingId, invitationId);
 
-        String message = founder.getName() + "님이 모임에 초대합니다.";
-
-        // convertAndSendToUser를 사용하여 각 사용자에게 메시지 전송
-        messagingTemplate.convertAndSend(dest, message);
+        // convertAndSend를 사용하여 각 사용자에게 메시지 전송
+        messagingTemplate.convertAndSend(dest, invitationMessage);
     }
 
-    private static MeetingInvitation getMeetingInvitation(Long meetingId, User founder, User receiver) {
+    private MeetingInvitationMessageDTO getInvitationMessage(User founder, Long meetingId, Long invitationId) {
+        Meeting meeting = meetingRepository.getMeetingByMeetingId(meetingId);
+        return MeetingInvitationMessageDTO.builder()
+                .meetingId(meetingId)
+                .invitationId(invitationId)
+                .meetingName(meeting.getMeetingName())
+                .founderId(founder.getId())
+                .founderName(founder.getName())
+                .message(founder.getName() + "님이 모임에 초대합니다.")
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    private MeetingInvitation getMeetingInvitation(Long meetingId, User founder, User receiver) {
         return MeetingInvitation.builder()
                 .meetingId(meetingId)
                 .founderId(founder.getId())
                 .receiverId(receiver.getId())
                 .invitationStatus(InvitationStatus.PENDING)
+                .build();
+    }
+
+    public MeetingInvitationReplyResponseDTO replyInvitation(MeetingInvitationReplyRequestDTO replyRequest) {
+        // 초대 정보 조회
+        MeetingInvitation invitation = meetingInvitationRepository
+                .getInvitationById(replyRequest.getInvitationId())
+                .orElseThrow(() -> new NoSuchElementException("해당 초대가 존재하지 않습니다."));
+
+        // 초대 상태 업데이트
+//        invitation.setInvitationStatus(replyRequest.getInvitationStatus());
+        meetingInvitationRepository.updateInvitationStatus(invitation.getId(), replyRequest.getInvitationStatus());
+
+        // 응답 데이터 작성
+        return MeetingInvitationReplyResponseDTO.builder()
+                .meetingId(invitation.getMeetingId())
+                .invitationStatus(replyRequest.getInvitationStatus())
+                .message("초대에 대한 응답이 " + replyRequest.getInvitationStatus().getDescription() + " 처리되었습니다.")
                 .build();
     }
 }

@@ -12,9 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
-import pungmul.pungmul.dto.meeting.CreateMeetingRequestDTO;
-import pungmul.pungmul.dto.meeting.CreateMeetingResponseDTO;
-import pungmul.pungmul.dto.meeting.InviteUserToMeetingRequestDTO;
+import pungmul.pungmul.dto.meeting.*;
 import pungmul.pungmul.service.meeting.MeetingService;
 
 @Slf4j
@@ -43,6 +41,15 @@ public class MeetingController {
     ){
         meetingService.inviteUserToMeeting(userDetails, inviteUserToMeetingRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/reply")
+    public ResponseEntity<BaseResponse<MeetingInvitationReplyResponseDTO>> replyInvitation(
+            @RequestBody MeetingInvitationReplyRequestDTO meetingInvitationReplyRequestDTO
+    ){
+        MeetingInvitationReplyResponseDTO reply = meetingService.replyInvitation(meetingInvitationReplyRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reply));
     }
 
     @MessageMapping("/meeting/{userEmail}")

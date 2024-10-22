@@ -5,6 +5,7 @@ import pungmul.pungmul.domain.meeting.InvitationStatus;
 import pungmul.pungmul.domain.meeting.MeetingInvitation;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface MeetingInvitationMapper {
@@ -13,4 +14,6 @@ public interface MeetingInvitationMapper {
     List<MeetingInvitation> getInvitationsByReceiverId(Long receiverId);
 
     void updateInvitationStatus(Long invitationId, InvitationStatus status);
-    }
+
+    Optional<MeetingInvitation> getInvitationById(Long invitationId);
+}

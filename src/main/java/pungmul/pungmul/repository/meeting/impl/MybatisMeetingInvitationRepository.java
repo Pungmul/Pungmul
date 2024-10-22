@@ -8,6 +8,7 @@ import pungmul.pungmul.repository.meeting.mapper.MeetingInvitationMapper;
 import pungmul.pungmul.repository.meeting.repository.MeetingInvitationRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -27,5 +28,10 @@ public class MybatisMeetingInvitationRepository implements MeetingInvitationRepo
     @Override
     public void updateInvitationStatus(Long invitationId, InvitationStatus status) {
         meetingInvitationMapper.updateInvitationStatus(invitationId, status);
+    }
+
+    @Override
+    public Optional<MeetingInvitation> getInvitationById(Long invitationId) {
+        return meetingInvitationMapper.getInvitationById(invitationId);
     }
 }
