@@ -230,3 +230,17 @@ CREATE TABLE IF NOT EXISTS meeting (
                          FOREIGN KEY (founder_user_id) REFERENCES user(id)
 );
 
+CREATE TABLE IF NOT EXISTS meeting_invitation (
+                                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                    meeting_id BIGINT NOT NULL,
+                                    founder_id BIGINT NOT NULL,
+                                    receiver_id BIGINT NOT NULL,
+                                    invitation_status ENUM('PENDING', 'ACCEPTED', 'DECLINED') DEFAULT 'PENDING',
+                                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                    FOREIGN KEY (meeting_id) REFERENCES meeting(id),
+                                    FOREIGN KEY (founder_id) REFERENCES user(id),
+                                    FOREIGN KEY (receiver_id) REFERENCES user(id)
+);
+
+

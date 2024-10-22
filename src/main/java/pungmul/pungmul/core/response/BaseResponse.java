@@ -63,4 +63,12 @@ public class BaseResponse<E> {
                 .build();
     }
 
+    public static <E> BaseResponse<E> ofFail(ResponseCode responseCode, String errorMessage){
+        return BaseResponse.<E>builder()
+                .code(responseCode.getCode())
+                .message(responseCode.getMessage())
+                .success(false)
+                .response(null)
+                .build();
+    }
 }

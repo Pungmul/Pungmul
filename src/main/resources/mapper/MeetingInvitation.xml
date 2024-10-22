@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.meeting.mapper.MeetingInvitationMapper">
+
+    <resultMap id="MeetingInvitationResultMap" type="pungmul.pungmul.domain.meeting.MeetingInvitation">
+        <id property="id" column="id" />
+        <result property="meetingId" column="meeting_id" />
+        <result property="founderId" column="founder_id" />
+        <result property="receiverId" column="receiver_id" />
+        <result property="invitationStatus" column="invitation_status" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <insert id="createMeetingInvitation" parameterType="pungmul.pungmul.domain.meeting.MeetingInvitation">
+        INSERT INTO meeting_invitation (meeting_id, founder_id, receiver_id, invitation_status)
+        VALUES (#{meetingId}, #{founderId}, #{receiverId}, #{invitationStatus});
+    </insert>
+
+    <select id="getInvitationsByReceiverId" resultMap="MeetingInvitationResultMap">
+        SELECT * FROM meeting_invitation WHERE receiver_id = #{receiverId}
+    </select>
+
+    <update id="updateInvitationStatus" parameterType="map">
+        UPDATE meeting_invitation
+        SET invitation_status = #{status}
+        WHERE id = #{invitationId}
+    </update>
+
+</mapper>
