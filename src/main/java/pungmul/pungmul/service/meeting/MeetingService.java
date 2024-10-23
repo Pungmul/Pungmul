@@ -7,18 +7,27 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.core.exception.custom.meeting.MeetingNameAlreadyExistsException;
+import pungmul.pungmul.domain.friend.Friend;
+import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.meeting.*;
 import pungmul.pungmul.domain.member.user.User;
+import pungmul.pungmul.dto.friend.FriendRequestDTO;
 import pungmul.pungmul.dto.meeting.*;
+import pungmul.pungmul.dto.member.SimpleUserDTO;
+import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.repository.meeting.repository.MeetingInvitationRepository;
 import pungmul.pungmul.repository.meeting.repository.MeetingParticipantRepository;
 import pungmul.pungmul.repository.meeting.repository.MeetingRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.service.friend.FriendService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -30,6 +39,8 @@ public class MeetingService {
     private final MeetingInvitationRepository meetingInvitationRepository;
     private final MeetingParticipantRepository meetingParticipantRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final FriendRepository friendRepository;
+    private final FriendService friendService;
 
     public CreateMeetingResponseDTO createMeeting(UserDetails userDetails, CreateMeetingRequestDTO createMeetingRequestDTO) {
 
@@ -176,6 +187,27 @@ public class MeetingService {
                 .message("초대에 대한 응답이 " + replyRequest.getInvitationStatus().getDescription() + " 처리되었습니다.")
                 .build();
     }
+
+    public FriendsToInviteResponseDTO getFriendsToInvite(UserDetails userDetails) {
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
+                .map(User::getId)
+                .orElseThrow(NoSuchElementException::new);
+
+        // 친구 목록 중에서 ACCEPTED 상태인 친구만 필터링
+        List<SimpleUserDTO> friendList = friendRepository.getFriendList(userId).stream()
+                .filter(friend -> friend.getStatus() == FriendStatus.ACCEPTED)
+                // 양방향 관계에서 한쪽만 조회되도록 필터링
+                .filter(friend -> friend.getSenderId() < friend.getReceiverId())
+                .map(friend -> friendService.getFriendRequestDTO(userId, friend))
+                .map(FriendRequestDTO::getSimpleUserDTO)
+                .collect(Collectors.toList());
+
+        // FriendsToInviteResponseDTO에 담아서 반환
+        return FriendsToInviteResponseDTO.builder()
+                .friendsToInvite(friendList)
+                .build();
+    }
+
 }
 
 

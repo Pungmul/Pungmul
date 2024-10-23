@@ -17,12 +17,19 @@
     <select id="getFriendList" resultMap="FriendResultMap">
         SELECT *
         FROM friends
-        WHERE
-            (status = 'ACCEPTED' AND (sender_id = #{userId} OR receiver_id = #{userId}))
-           OR
-            (status = 'PENDING' AND receiver_id = #{userId})
+        WHERE status = 'ACCEPTED'
+          AND (sender_id = #{userId} OR receiver_id = #{userId})
 
+        UNION
+
+        SELECT *
+        FROM friends
+        WHERE status = 'PENDING'
+          AND receiver_id = #{userId}
     </select>
+
+
+
 
     <!-- 친구 요청 보내기 -->
     <insert id="sendFriendRequest" parameterType="map">

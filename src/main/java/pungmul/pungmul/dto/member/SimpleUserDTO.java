@@ -12,6 +12,7 @@ import pungmul.pungmul.domain.file.Image;
 @NoArgsConstructor
 public class SimpleUserDTO {
     private Long userId;
+    private String username;
     private String name;
     private Image profileImage;
 

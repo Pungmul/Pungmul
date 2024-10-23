@@ -188,11 +188,11 @@ CREATE TABLE IF NOT EXISTS chat_room (
 );
 
 CREATE TABLE IF NOT EXISTS chat_room_members (
-                                                 chat_room_id varchar(36) NOT NULL,
-                                                 user_id BIGINT NOT NULL,
-                                                 PRIMARY KEY (chat_room_id, user_id),
-                                                 FOREIGN KEY (chat_room_id) REFERENCES chat_room(room_uuid) ON DELETE CASCADE,
-                                                 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+                                 chat_room_id varchar(36) NOT NULL,
+                                 user_id BIGINT NOT NULL,
+                                 PRIMARY KEY (chat_room_id, user_id),
+                                 FOREIGN KEY (chat_room_id) REFERENCES chat_room(room_uuid) ON DELETE CASCADE,
+                                 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
 

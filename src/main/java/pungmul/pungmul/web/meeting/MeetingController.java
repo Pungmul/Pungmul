@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.meeting.*;
+import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.service.meeting.MeetingService;
 
 @Slf4j
@@ -32,9 +33,16 @@ public class MeetingController {
         CreateMeetingResponseDTO meeting = meetingService.createMeeting(userDetails, createMeetingRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED,meeting));
     }
+    @GetMapping("/invite")
+    public ResponseEntity<BaseResponse<FriendsToInviteResponseDTO>> getFriendsToInvite(
+            @AuthenticationPrincipal UserDetails userDetails
+    ){
+        FriendsToInviteResponseDTO friendsToInvite = meetingService.getFriendsToInvite(userDetails);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, friendsToInvite));
+    }
 
 //    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/invite")  // GET /invite 호출.
+    @PostMapping("/invite")  // POST /invite 호출.
     public ResponseEntity<BaseResponse<Void>> inviteUserToMeeting(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody InviteUserToMeetingRequestDTO inviteUserToMeetingRequestDTO
