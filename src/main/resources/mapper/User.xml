@@ -39,6 +39,7 @@
         FROM user
         WHERE email LIKE CONCAT('%', #{keyword}, '%')
            OR name LIKE CONCAT('%', #{keyword}, '%')
+            AND #{keyword} IS NOT NULL
     </select>
 
     <!-- Select User By Id -->
