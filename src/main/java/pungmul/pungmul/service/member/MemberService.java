@@ -44,6 +44,7 @@ public class MemberService {
 
         return SimpleUserDTO.builder()
                     .userId(user.getId())
+                    .username(user.getEmail())
                     .name(user.getName())
                     .profileImage(profile)
                     .build();

@@ -188,11 +188,11 @@ CREATE TABLE IF NOT EXISTS chat_room (
 );
 
 CREATE TABLE IF NOT EXISTS chat_room_members (
-                                                 chat_room_id varchar(36) NOT NULL,
-                                                 user_id BIGINT NOT NULL,
-                                                 PRIMARY KEY (chat_room_id, user_id),
-                                                 FOREIGN KEY (chat_room_id) REFERENCES chat_room(room_uuid) ON DELETE CASCADE,
-                                                 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+                                 chat_room_id varchar(36) NOT NULL,
+                                 user_id BIGINT NOT NULL,
+                                 PRIMARY KEY (chat_room_id, user_id),
+                                 FOREIGN KEY (chat_room_id) REFERENCES chat_room(room_uuid) ON DELETE CASCADE,
+                                 FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
 
@@ -217,4 +217,44 @@ CREATE TABLE IF NOT EXISTS friends (
                                 CONSTRAINT fk_friends_user_id FOREIGN KEY (sender_id) REFERENCES user(id),
                                 CONSTRAINT fk_friends_friend_id FOREIGN KEY (receiver_id) REFERENCES user(id)
 );
+CREATE TABLE IF NOT EXISTS meeting (
+                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                         meeting_name VARCHAR(20) NOT NULL UNIQUE,
+                         meeting_description VARCHAR(100),
+                         is_public BOOLEAN DEFAULT TRUE,
+                         meeting_status ENUM('CREATED', 'ACTIVE', 'DORMANT', 'CLOSED') NOT NULL,
+                         founder_user_id BIGINT NOT NULL,
+                         member_num INT DEFAULT 1,
+                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                         FOREIGN KEY (founder_user_id) REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS meeting_invitation (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        meeting_id BIGINT NOT NULL,
+                        founder_id BIGINT NOT NULL,
+                        receiver_id BIGINT NOT NULL,
+                        invitation_status ENUM('PENDING', 'ACCEPTED', 'DECLINED', 'DEFERRED') DEFAULT 'PENDING',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        FOREIGN KEY (meeting_id) REFERENCES meeting(id),
+                        FOREIGN KEY (founder_id) REFERENCES user(id),
+                        FOREIGN KEY (receiver_id) REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS meeting_participant (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        meeting_id BIGINT NOT NULL,
+                        user_id BIGINT NOT NULL,
+                        joined_at DATE NOT NULL, -- 참가한 날짜
+                        is_host BOOLEAN NOT NULL DEFAULT FALSE, -- 모임 주최 여부
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 생성일
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 수정일
+                        FOREIGN KEY (meeting_id) REFERENCES meeting(id), -- 모임 ID 외래키
+                        FOREIGN KEY (user_id) REFERENCES user(id) -- 사용자 ID 외래키
+);
+
+
+
 

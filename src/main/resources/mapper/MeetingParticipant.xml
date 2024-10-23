@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.meeting.mapper.MeetingParticipantMapper">
+
+    <!-- MeetingParticipant ResultMap -->
+    <resultMap id="MeetingParticipantResultMap" type="pungmul.pungmul.domain.meeting.MeetingParticipant">
+        <id property="id" column="id"/>
+        <result property="meetingId" column="meeting_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="joinedAt" column="joined_at"/>
+        <result property="isHost" column="is_host"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- Insert MeetingParticipant -->
+    <insert id="insertMeetingParticipant" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO meeting_participant (meeting_id, user_id, joined_at, is_host)
+        VALUES (#{meetingId}, #{userId}, #{joinedAt}, #{isHost})
+    </insert>
+
+    <!-- Update MeetingParticipant -->
+    <update id="updateMeetingParticipant">
+        UPDATE meeting_participant
+        SET meeting_id = #{meetingId},
+            user_id = #{userId},
+            joined_at = #{joinedAt},
+            is_host = #{isHost},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- Select MeetingParticipant by ID -->
+    <select id="getMeetingParticipantById" resultMap="MeetingParticipantResultMap">
+        SELECT * FROM meeting_participant WHERE id = #{id}
+    </select>
+
+    <!-- Select MeetingParticipants by Meeting ID -->
+    <select id="getMeetingParticipantsByMeetingId" resultMap="MeetingParticipantResultMap">
+        SELECT * FROM meeting_participant WHERE meeting_id = #{meetingId}
+    </select>
+
+    <!-- Delete MeetingParticipant by ID -->
+    <delete id="deleteMeetingParticipantById">
+        DELETE FROM meeting_participant WHERE id = #{id}
+    </delete>
+
+</mapper>

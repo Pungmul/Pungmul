@@ -16,6 +16,7 @@ import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.member.MemberService;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -62,15 +63,18 @@ public class FriendService {
     }
 
     private FriendListResponseDTO getFriendResponseDTO(List<Friend> friendList, Long userId) {
+        HashSet<Long> processedFriendIds = new HashSet<>();
 
 
         List<FriendRequestDTO> acceptedFriendList = friendList.stream()
                 .filter(friend -> friend.getStatus() == FriendStatus.ACCEPTED)
+                .filter(friend -> processedFriendIds.add(getFriendId(friend, userId)))
                 .map(friend -> getFriendRequestDTO(userId, friend))
                 .collect(Collectors.toList());
 
         List<FriendRequestDTO> requestedFriendList = friendList.stream()
                 .filter(friend -> friend.getStatus() == FriendStatus.PENDING)
+                .filter(friend -> processedFriendIds.add(getFriendId(friend, userId)))
                 .map(friend -> getFriendRequestDTO(userId, friend))
                 .collect(Collectors.toList());
 
@@ -86,17 +90,15 @@ public class FriendService {
                 .build();
     }
 
-    private FriendRequestDTO getFriendRequestDTO(Long userId, Friend friend) {
+    public FriendRequestDTO getFriendRequestDTO(Long userId, Friend friend) {
+
+        Long friendId = getFriendId(friend, userId);    //  양방향 친구 관계에서 상대방의 userId를 가져옴
+        SimpleUserDTO simpleUserDTO = memberService.getSimpleUserDTO(friendId); //  친구의 simpleUserDTO
+
         return FriendRequestDTO.builder()
-                .friendRequestId(friend.getId())  // friendRequestId로 friend의 ID를 사용
-                .friendStatus(friend.getStatus())  // friend의 상태를 그대로 사용
-                .simpleUserDTO(
-                        SimpleUserDTO.builder()
-                                .userId(getFriendId(friend, userId))  // getFriendId를 통해 friend의 상대방 ID를 가져옴
-                                .name(memberService.getSimpleUserDTO(getFriendId(friend, userId)).getName())  // 상대방의 이름 가져옴
-                                .profileImage(memberService.getSimpleUserDTO(getFriendId(friend, userId)).getProfileImage())  // 상대방의 프로필 이미지 가져옴
-                                .build()
-                )
+                .friendRequestId(friend.getId())  // friend의 ID 사용
+                .friendStatus(friend.getStatus())  // friend의 상태 그대로 사용
+                .simpleUserDTO(simpleUserDTO)  // 상대방의 정보 넣기
                 .build();
     }
 
