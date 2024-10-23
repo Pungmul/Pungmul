@@ -6,6 +6,7 @@ import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.member.mapper.UserMapper;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -44,5 +45,10 @@ public class MybatisUserRepository implements UserRepository {
                 .orElseThrow(NoSuchElementException::new);
 
         return user.getId();
+    }
+
+    @Override
+    public List<User> searchUsersByKeyword(String keyword) {
+        return userMapper.searchUsersByKeyword(keyword);
     }
 }

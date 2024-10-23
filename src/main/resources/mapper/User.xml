@@ -32,6 +32,15 @@
 <!--        SELECT LAST_INSERT_ID()-->
 <!--    </select>-->
 
+
+    <!-- 이메일 또는 이름에 keyword가 포함된 사용자 목록을 검색 -->
+    <select id="searchUsersByKeyword" resultMap="UserResultMap">
+        SELECT *
+        FROM user
+        WHERE email LIKE CONCAT('%', #{keyword}, '%')
+           OR name LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
     <!-- Select User By Id -->
     <select id="getUserByUserId" resultMap="UserResultMap">
         SELECT * FROM user WHERE id = #{id}
