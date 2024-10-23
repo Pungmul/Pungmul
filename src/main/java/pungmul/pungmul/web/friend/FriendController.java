@@ -10,7 +10,12 @@ import org.springframework.web.bind.annotation.*;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.friend.FriendListResponseDTO;
+import pungmul.pungmul.dto.member.SimpleUserListResponseDTO;
+import pungmul.pungmul.dto.member.SimpleUserDTO;
 import pungmul.pungmul.service.friend.FriendService;
+import pungmul.pungmul.service.member.MemberService;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -18,6 +23,7 @@ import pungmul.pungmul.service.friend.FriendService;
 @RequestMapping("/api/friends")
 public class FriendController {
     private final FriendService friendService;
+    private final MemberService memberService;
 
     //  친구 목록 보기
     @PreAuthorize("hasRole('USER')")
@@ -26,6 +32,13 @@ public class FriendController {
             @AuthenticationPrincipal UserDetails userDetails){
         FriendListResponseDTO friendList = friendService.getFriendList(userDetails);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, friendList));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/request")
+    public ResponseEntity<BaseResponse<SimpleUserListResponseDTO>> searchUsers(@RequestParam String keyword) {
+        SimpleUserListResponseDTO userList = memberService.searchUsers(keyword);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, userList));
     }
 
     //  친구 신청

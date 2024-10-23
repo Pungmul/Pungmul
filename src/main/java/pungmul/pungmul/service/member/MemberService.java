@@ -8,6 +8,7 @@ import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.domain.member.user.User;
+import pungmul.pungmul.dto.member.SimpleUserListResponseDTO;
 import pungmul.pungmul.dto.member.GetMemberResponseDTO;
 import pungmul.pungmul.dto.member.InstrumentStatusResponseDTO;
 import pungmul.pungmul.dto.member.SimpleUserDTO;
@@ -84,4 +85,41 @@ public class MemberService {
                 )
                 .build();
     }
+
+//    public SimpleUserListResponseDTO searchUsers(String keyword) {
+//        List<User> users = userRepository.searchUsersByKeyword(keyword);
+//
+//        return (SimpleUserListResponseDTO) users.stream()
+//                .map(user -> SimpleUserDTO.builder()
+//                        .userId(user.getId())
+//                        .username(user.getEmail())
+//                        .name(user.getName())
+//                        .profileImage(
+//                                imageRepository.getImagesByDomainIdAndType(DomainType.PROFILE, user.getId()).stream().findFirst().orElseGet(imageService::getAnonymousImage)
+//                        )
+//                        .build())
+//                .collect(Collectors.toList());
+//    }
+
+    public SimpleUserListResponseDTO searchUsers(String keyword) {
+        List<User> users = userRepository.searchUsersByKeyword(keyword);
+
+        // 사용자 리스트를 SimpleUserDTO 리스트로 변환
+        List<SimpleUserDTO> simpleUserDTOList = users.stream()
+                .map(user -> SimpleUserDTO.builder()
+                        .userId(user.getId())
+                        .username(user.getEmail())
+                        .name(user.getName())
+                        .profileImage(
+                                imageRepository.getImagesByDomainIdAndType(DomainType.PROFILE, user.getId()).stream().findFirst().orElseGet(imageService::getAnonymousImage)
+                        )
+                        .build())
+                .collect(Collectors.toList());
+
+        // SimpleUserListResponseDTO에 변환된 리스트를 담아 반환
+        return SimpleUserListResponseDTO.builder()
+                .simpleUserDTOList(simpleUserDTOList)  // 필드명을 적절하게 사용하세요
+                .build();
+    }
+
 }
