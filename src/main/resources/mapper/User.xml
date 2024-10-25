@@ -37,9 +37,9 @@
     <select id="searchUsersByKeyword" resultMap="UserResultMap">
         SELECT *
         FROM user
-        WHERE email LIKE CONCAT('%', #{keyword}, '%')
-           OR name LIKE CONCAT('%', #{keyword}, '%')
-            AND #{keyword} IS NOT NULL
+        WHERE (email LIKE CONCAT('%', #{keyword}, '%')
+            OR name LIKE CONCAT('%', #{keyword}, '%'))
+          AND #{keyword} IS NOT NULL AND #{keyword} != ''
     </select>
 
     <!-- Select User By Id -->
