@@ -207,16 +207,29 @@ CREATE TABLE IF NOT EXISTS chat_messages (
                                 image_url VARCHAR(255)
 );
 CREATE TABLE IF NOT EXISTS friends (
-                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                sender_id BIGINT NOT NULL,
-                                receiver_id BIGINT NOT NULL,
-                                status ENUM('PENDING', 'ACCEPTED', 'DECLINED', 'BLOCK') NOT NULL DEFAULT 'PENDING',
-                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                UNIQUE (sender_id, receiver_id),
-                                CONSTRAINT fk_friends_user_id FOREIGN KEY (sender_id) REFERENCES user(id),
-                                CONSTRAINT fk_friends_friend_id FOREIGN KEY (receiver_id) REFERENCES user(id)
+                            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            sender_id BIGINT NOT NULL,
+                            receiver_id BIGINT NOT NULL,
+                            status ENUM('PENDING', 'ACCEPTED', 'DECLINED', 'BLOCK') NOT NULL DEFAULT 'PENDING',
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+                            -- 가상 열 생성
+                            least_id BIGINT AS (LEAST(sender_id, receiver_id)) STORED,
+                            greatest_id BIGINT AS (GREATEST(sender_id, receiver_id)) STORED,
+
+                            -- UNIQUE 제약 조건을 가상 열에 적용
+                            CONSTRAINT uq_sender_receiver UNIQUE (least_id, greatest_id),
+
+                            -- 송신자와 수신자가 같을 수 없다는 제약 조건
+                            CONSTRAINT check_sender_receiver_diff CHECK (sender_id <> receiver_id),
+
+                            CONSTRAINT fk_friends_sender_id FOREIGN KEY (sender_id) REFERENCES user(id),
+                            CONSTRAINT fk_friends_receiver_id FOREIGN KEY (receiver_id) REFERENCES user(id)
 );
+
+
+
 CREATE TABLE IF NOT EXISTS meeting (
                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
                          meeting_name VARCHAR(20) NOT NULL UNIQUE,

@@ -101,7 +101,7 @@ public class TestDataInitializer {
     private boolean isFriendDataUnderLimit() {
         Integer friendCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM friends", Integer.class);
 
-        return friendCount < 50;
+        return friendCount < 20;
     }
     // 주어진 경로의 SQL 파일을 실행하는 메서드
     private void executeSqlFile(String filePath) {

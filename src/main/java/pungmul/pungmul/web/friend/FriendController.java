@@ -9,7 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
+import pungmul.pungmul.dto.friend.AvailableFriendDTO;
 import pungmul.pungmul.dto.friend.FriendListResponseDTO;
+import pungmul.pungmul.dto.friend.ReqFriendStatusResponseDTO;
 import pungmul.pungmul.dto.member.SimpleUserListResponseDTO;
 import pungmul.pungmul.dto.member.SimpleUserDTO;
 import pungmul.pungmul.service.friend.FriendService;
@@ -34,11 +36,14 @@ public class FriendController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, friendList));
     }
 
+    //  친구 요청 가능한 사용자 목록
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/request")
-    public ResponseEntity<BaseResponse<SimpleUserListResponseDTO>> searchUsers(@RequestParam String keyword) {
-        SimpleUserListResponseDTO userList = memberService.searchUsers(keyword);
-        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, userList));
+    public ResponseEntity<BaseResponse<List<AvailableFriendDTO>>> searchUsers(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) String keyword) {
+        List<AvailableFriendDTO> availableFriends = friendService.searchUsersToReqFriend(keyword, userDetails);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, availableFriends));
     }
 
     //  친구 신청

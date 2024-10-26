@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import pungmul.pungmul.domain.friend.Friend;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface FriendMapper {
@@ -16,4 +17,6 @@ public interface FriendMapper {
     void declineFriendRequest(Long friendRequestId);
 
     void blockFriend(Long friendRequestId);
+
+    Optional<Friend> findFriendByUsers(Long loginUserId, Long userId);
 }

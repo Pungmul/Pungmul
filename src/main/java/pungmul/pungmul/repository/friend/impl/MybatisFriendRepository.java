@@ -8,6 +8,7 @@ import pungmul.pungmul.repository.friend.mapper.FriendMapper;
 import pungmul.pungmul.repository.friend.repository.FriendRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -38,5 +39,10 @@ public class MybatisFriendRepository implements FriendRepository {
     @Override
     public void blockFriend(Long friendRequestId) {
         friendMapper.blockFriend(friendRequestId);
+    }
+
+    @Override
+    public Optional<Friend> findFriendByUsers(Long loginUserId, Long userId) {
+        return friendMapper.findFriendByUsers(loginUserId, userId);
     }
 }
