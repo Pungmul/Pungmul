@@ -20,6 +20,7 @@ import pungmul.pungmul.repository.meeting.repository.MeetingParticipantRepositor
 import pungmul.pungmul.repository.meeting.repository.MeetingRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.friend.FriendService;
+import pungmul.pungmul.service.message.MessageService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class MeetingService {
     private final SimpMessagingTemplate messagingTemplate;
     private final FriendRepository friendRepository;
     private final FriendService friendService;
+    private final MessageService messageService;
 
     public CreateMeetingResponseDTO createMeeting(UserDetails userDetails, CreateMeetingRequestDTO createMeetingRequestDTO) {
 

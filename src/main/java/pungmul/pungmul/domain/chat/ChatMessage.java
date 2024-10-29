@@ -16,7 +16,7 @@ public class ChatMessage {
     private String senderUsername;  // userId 대신 username으로 변경
     private String receiverUsername;  // userId 대신 username으로 변경
     private String content;
-    private MessageType messageType;
+    private ChatType chatType;
     private String imageUrl;
     private String chatRoomUUID;
     private LocalDateTime timestamp;

@@ -36,10 +36,10 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/chat").setAllowedOrigins("*")
             .addInterceptors(handshakeInterceptor);
-        registry.addEndpoint("/ws/meeting").setAllowedOrigins("*")
+        registry.addEndpoint("/ws/alarm").setAllowedOrigins("*")
                 .addInterceptors(handshakeInterceptor);
-
-
+        registry.addEndpoint("/ws/invitation").setAllowedOrigins("*")
+                .addInterceptors(handshakeInterceptor);
     }
 
     @Override

@@ -22,7 +22,6 @@ import pungmul.pungmul.service.meeting.MeetingService;
 @RequestMapping("/api/meeting")
 public class MeetingController {
     private final MeetingService meetingService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("")
@@ -59,12 +58,5 @@ public class MeetingController {
     ){
         MeetingInvitationReplyResponseDTO reply = meetingService.replyInvitation(userDetails, meetingInvitationReplyRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reply));
-    }
-
-    @MessageMapping("/meeting/{userEmail}")
-    public void inviteToMeetingTest(@DestinationVariable String userEmail, String message){
-        log.info("Received message : {} for user : {}", message, userEmail);
-
-        messagingTemplate.convertAndSend("/sub/meeting/" + userEmail, message);
     }
 }

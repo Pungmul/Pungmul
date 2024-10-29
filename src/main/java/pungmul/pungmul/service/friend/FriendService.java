@@ -10,17 +10,20 @@ import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.friend.Friend;
 import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.member.user.User;
+import pungmul.pungmul.domain.message.MessageType;
 import pungmul.pungmul.dto.friend.AvailableFriendDTO;
 import pungmul.pungmul.dto.friend.FriendListResponseDTO;
 import pungmul.pungmul.dto.friend.FriendRequestDTO;
-import pungmul.pungmul.dto.friend.ReqFriendStatusResponseDTO;
 import pungmul.pungmul.dto.member.SimpleUserDTO;
+import pungmul.pungmul.dto.message.friend.FriendRequestInvitationMessageDTO;
 import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.repository.image.repository.ImageRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.file.ImageService;
 import pungmul.pungmul.service.member.MemberService;
+import pungmul.pungmul.service.message.MessageService;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,14 +36,8 @@ public class FriendService {
     private final MemberService memberService;
     private final ImageService imageService;
     private final ImageRepository imageRepository;
+    private final MessageService messageService;
 
-//    public FriendListResponseDTO getFriendList(UserDetails userDetails) {
-//        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-//                .map(User::getId)
-//                .orElseThrow(NoSuchElementException::new);
-//        List<Friend> friendList = friendRepository.getFriendList(userId); //  수락된 친구 관계 & 나한테 온 친구 요청 반환
-//        return getFriendResponseDTO(friendList, userId);
-//    }
 
     public FriendListResponseDTO getFriendList(UserDetails userDetails) {
         Long userId = userRepository.getUserByEmail(userDetails.getUsername())
@@ -74,18 +71,6 @@ public class FriendService {
                 .build();
     }
 
-
-    private FriendRequestDTO toFriendRequestDTO(Friend friend, Long userId, Boolean isRequestSentByUser) {
-        Long otherUserId = getFriendId(friend, userId); // 상대방 userId를 추출
-        SimpleUserDTO simpleUserDTO = toSimpleUserDTO(otherUserId); // 상대방 userId로 SimpleUserDTO 생성
-
-        return FriendRequestDTO.builder()
-                .friendRequestId(friend.getId())
-                .friendStatus(friend.getStatus()) // 상태 그대로 사용
-                .simpleUserDTO(simpleUserDTO) // 상대방 정보
-                .isRequestSentByUser(isRequestSentByUser) // ACCEPTED일 경우 null, PENDING일 경우 true/false
-                .build();
-    }
     @Transactional(isolation = Isolation.READ_COMMITTED)  // 트랜잭션이 직렬화되어 동시에 실행되는 트랜잭션 충돌을 방지
     public void sendFriendRequest(UserDetails userDetails, String receiverUserName) {
         isReqToSelfCheck(userDetails, receiverUserName);
@@ -99,69 +84,20 @@ public class FriendService {
                 .orElseThrow(NoSuchElementException::new);
 
         friendRepository.sendFriendRequest(userId, receiverId);
+
+        // 알림 메시지 생성 및 전송
+        FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, userId);
+        messageService.sendMessage(MessageType.INVITATION, receiverUserName, invitationMessage);
     }
 
-    private static void isReqToSelfCheck(UserDetails userDetails, String receiverUserName) {
-        if (userDetails.getUsername().equals(receiverUserName)) {
-            throw new IllegalArgumentException("자기 자신에게 친구 요청");
-        }
-    }
-
-    public void acceptFriendRequest(Long friendRequestId) {
-        friendRepository.acceptFriendRequest(friendRequestId);
-    }
-
-    public void declineFriendRequest(Long friendRequestId) {
-        friendRepository.declineFriendRequest(friendRequestId);
-    }
-
-    public void blockFriend(Long friendRequestId) {
-        friendRepository.blockFriend(friendRequestId);
-    }
-
-//    private FriendListResponseDTO getFriendResponseDTO(List<Friend> friendList, Long userId) {
-//        HashSet<Long> processedFriendIds = new HashSet<>();
-//
-//        List<FriendRequestDTO> acceptedFriendList = friendList.stream()
-//                .filter(friend -> friend.getStatus() == FriendStatus.ACCEPTED)
-//                .filter(friend -> processedFriendIds.add(getFriendId(friend, userId)))
-//                .map(friend -> getFriendRequestDTO(userId, friend))
-//                .collect(Collectors.toList());
-//
-//        List<FriendRequestDTO> requestedFriendList = friendList.stream()
-//                .filter(friend -> friend.getStatus() == FriendStatus.PENDING)
-//                .filter(friend -> processedFriendIds.add(getFriendId(friend, userId)))
-//                .map(friend -> getFriendRequestDTO(userId, friend))
-//                .collect(Collectors.toList());
-//
-////        List<FriendRequestDTO> requestedFriendList = friendList.stream()
-////                .filter(friend -> friend.getStatus() == FriendStatus.PENDING)
-////                .map(friend -> memberService.getSimpleUserDTO(getFriendId(friend, userId)))
-////                .collect(Collectors.toList());
-//        log.info("requested : {}", requestedFriendList);
-//
-//        return FriendListResponseDTO.builder()
-//                .friendList(acceptedFriendList)
-//                .requestedFriendList(requestedFriendList)
-//                .build();
-//    }
-
-    public FriendRequestDTO getFriendRequestDTO(Long userId, Friend friend) {
-
-        Long friendId = getFriendId(friend, userId);    //  양방향 친구 관계에서 상대방의 userId를 가져옴
-        SimpleUserDTO simpleUserDTO = memberService.getSimpleUserDTO(friendId); //  친구의 simpleUserDTO
-
-        return FriendRequestDTO.builder()
-                .friendRequestId(friend.getId())  // friend의 ID 사용
-                .friendStatus(friend.getStatus())  // friend의 상태 그대로 사용
-                .simpleUserDTO(simpleUserDTO)  // 상대방의 정보 넣기
+    public FriendRequestInvitationMessageDTO getInvitationMessage(UserDetails userDetails, Long userId) {
+        return FriendRequestInvitationMessageDTO.builder()
+                .senderId(userId)
+                .senderName(userRepository.getUserByEmail(userDetails.getUsername()).orElseThrow(NoSuchElementException::new).getName())  // 실제 이름이 필요하다면 User 엔티티에서 가져올 수 있음
+                .content(userDetails.getUsername() + "님이 친구 요청을 보냈습니다.")
+                .sentAt(LocalDateTime.now())
                 .build();
     }
-
-    private Long getFriendId(Friend friend, Long userId) {
-        return friend.getSenderId().equals(userId) ? friend.getReceiverId() : friend.getSenderId();
-    }
-
 
     @Transactional(readOnly = true)
     public List<AvailableFriendDTO> searchUsersToReqFriend(String keyword, UserDetails userDetails) {
@@ -204,6 +140,53 @@ public class FriendService {
                 .filter(Objects::nonNull) // null 제거
                 .collect(Collectors.toList());
     }
+
+    private FriendRequestDTO toFriendRequestDTO(Friend friend, Long userId, Boolean isRequestSentByUser) {
+        Long otherUserId = getFriendId(friend, userId); // 상대방 userId를 추출
+        SimpleUserDTO simpleUserDTO = toSimpleUserDTO(otherUserId); // 상대방 userId로 SimpleUserDTO 생성
+
+        return FriendRequestDTO.builder()
+                .friendRequestId(friend.getId())
+                .friendStatus(friend.getStatus()) // 상태 그대로 사용
+                .simpleUserDTO(simpleUserDTO) // 상대방 정보
+                .isRequestSentByUser(isRequestSentByUser) // ACCEPTED일 경우 null, PENDING일 경우 true/false
+                .build();
+    }
+
+    private static void isReqToSelfCheck(UserDetails userDetails, String receiverUserName) {
+        if (userDetails.getUsername().equals(receiverUserName)) {
+            throw new IllegalArgumentException("자기 자신에게 친구 요청");
+        }
+    }
+
+    public void acceptFriendRequest(Long friendRequestId) {
+        friendRepository.acceptFriendRequest(friendRequestId);
+    }
+
+    public void declineFriendRequest(Long friendRequestId) {
+        friendRepository.declineFriendRequest(friendRequestId);
+    }
+
+    public void blockFriend(Long friendRequestId) {
+        friendRepository.blockFriend(friendRequestId);
+    }
+
+    public FriendRequestDTO getFriendRequestDTO(Long userId, Friend friend) {
+
+        Long friendId = getFriendId(friend, userId);    //  양방향 친구 관계에서 상대방의 userId를 가져옴
+        SimpleUserDTO simpleUserDTO = memberService.getSimpleUserDTO(friendId); //  친구의 simpleUserDTO
+
+        return FriendRequestDTO.builder()
+                .friendRequestId(friend.getId())  // friend의 ID 사용
+                .friendStatus(friend.getStatus())  // friend의 상태 그대로 사용
+                .simpleUserDTO(simpleUserDTO)  // 상대방의 정보 넣기
+                .build();
+    }
+
+    private Long getFriendId(Friend friend, Long userId) {
+        return friend.getSenderId().equals(userId) ? friend.getReceiverId() : friend.getSenderId();
+    }
+
 
     private SimpleUserDTO toSimpleUserDTO(Long otherUserId) {
         User otherUser = userRepository.getUserByUserId(otherUserId)
