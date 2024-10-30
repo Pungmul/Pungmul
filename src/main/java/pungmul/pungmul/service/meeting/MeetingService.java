@@ -11,6 +11,8 @@ import pungmul.pungmul.domain.friend.Friend;
 import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.meeting.*;
 import pungmul.pungmul.domain.member.user.User;
+import pungmul.pungmul.domain.message.MessageDomainType;
+import pungmul.pungmul.domain.message.MessageType;
 import pungmul.pungmul.dto.friend.FriendRequestDTO;
 import pungmul.pungmul.dto.meeting.*;
 import pungmul.pungmul.dto.member.SimpleUserDTO;
@@ -78,9 +80,24 @@ public class MeetingService {
             MeetingInvitation meetingInvitation = getMeetingInvitation(meetingId, founder, receiver);
             meetingInvitationRepository.createMeetingInvitation(meetingInvitation);
 
-            sendInvitation(receiver, founder, meetingId, meetingInvitation.getId());
+            // 새로운 메시지 전송 로직으로 초대 메시지 전송
+            sendInvitationMessage(receiver, founder, meetingId, meetingInvitation.getId());
         }
     }
+    // 새로운 메시지 전송 메서드
+    private void sendInvitationMessage(User receiver, User founder, Long meetingId, Long invitationId) {
+        // MeetingInvitationMessageDTO를 생성
+        MeetingInvitationMessageDTO invitationMessage = getInvitationMessage(founder, meetingId, invitationId);
+
+        // MessageService를 사용하여 메시지 전송
+        messageService.sendMessage(
+                MessageType.INVITATION,
+                MessageDomainType.MEETING,
+                receiver.getEmail(), // 수신자 identifier로 이메일 사용
+                invitationMessage // 초대 메시지 내용
+        );
+    }
+
 
     private CreateMeetingResponseDTO getCreateMeetingResponseDTO(Meeting meeting) {
 //        String founderName = userRepository.getUserByUserId(meeting.getFounderUserId())
@@ -135,8 +152,8 @@ public class MeetingService {
                 .meetingName(meeting.getMeetingName())
                 .founderId(founder.getId())
                 .founderName(founder.getName())
-                .message(founder.getName() + "님이 모임에 초대합니다.")
-                .createdAt(LocalDateTime.now())
+                .content(founder.getName() + "님이 모임에 초대합니다.")
+//                .sentAt(LocalDateTime.now())
                 .build();
     }
 
@@ -210,9 +227,15 @@ public class MeetingService {
                 .build();
     }
 
+        public void processInvitationMessage(String username, MeetingInvitationMessageDTO message) {
+            log.info("Processing meeting invitation for user: {}", username);
+
+            // MessageService를 통해 메시지를 전송
+            messageService.sendMessage(MessageType.INVITATION, MessageDomainType.MEETING, username, message);
+
+            log.info("Meeting invitation sent for user: {}", username);
+        }
 }
-
-
 
 
 

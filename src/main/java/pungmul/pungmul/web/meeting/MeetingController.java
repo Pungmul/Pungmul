@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,6 +49,18 @@ public class MeetingController {
     ){
         meetingService.inviteUserToMeeting(userDetails, inviteUserToMeetingRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
+    }
+
+    // 모임 초대 메시지를 수신하는 메소드
+    @MessageMapping("/invitation/meeting/{username}")
+    public void receiveMeetingInvitation(
+            @DestinationVariable String username,
+            @Payload MeetingInvitationMessageDTO message) {
+
+        log.info("Meeting invitation received for user: {}", username);
+
+        // 수신한 초대 메시지를 처리
+        meetingService.processInvitationMessage(username, message);
     }
 
     @PreAuthorize("hasRole('USER')")
