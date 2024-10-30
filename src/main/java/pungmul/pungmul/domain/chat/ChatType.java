@@ -1,5 +1,5 @@
 package pungmul.pungmul.domain.chat;
 
-public enum MessageType {
+public enum ChatType {
     CHAT, JOIN, LEAVE, IMAGE
 }

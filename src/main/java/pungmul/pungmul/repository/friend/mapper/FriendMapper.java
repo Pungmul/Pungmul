@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface FriendMapper {
     List<Friend> getFriendList(Long userId);
 
-    void sendFriendRequest(Long senderId, Long receiverId);
+    void sendFriendRequest(Friend friend);
 
     void acceptFriendRequest(Long friendRequestId);
 

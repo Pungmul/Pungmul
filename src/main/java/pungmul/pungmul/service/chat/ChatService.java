@@ -81,7 +81,7 @@ public class ChatService {
                 .senderUsername(senderName)
                 .receiverUsername(chatMessageRequestDTO.getReceiverUsername())
                 .content(chatMessageRequestDTO.getContent())
-                .messageType(chatMessageRequestDTO.getMessageType())
+                .chatType(chatMessageRequestDTO.getChatType())
                 .imageUrl(chatMessageRequestDTO.getImageUrl())
                 .chatRoomUUID(chatRoomUUID)
                 .build();

@@ -43,7 +43,7 @@
     </select>
 
     <!-- 친구 요청 보내기 -->
-    <insert id="sendFriendRequest" parameterType="map">
+    <insert id="sendFriendRequest" parameterType="map" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO friends (sender_id, receiver_id, status)
         VALUES (#{senderId}, #{receiverId}, 'PENDING')
     </insert>

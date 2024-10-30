@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +23,6 @@ import pungmul.pungmul.service.meeting.MeetingService;
 @RequestMapping("/api/meeting")
 public class MeetingController {
     private final MeetingService meetingService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("")
@@ -51,6 +51,18 @@ public class MeetingController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
     }
 
+    // 모임 초대 메시지를 수신하는 메소드
+    @MessageMapping("/invitation/meeting/{username}")
+    public void receiveMeetingInvitation(
+            @DestinationVariable String username,
+            @Payload MeetingInvitationMessageDTO message) {
+
+        log.info("Meeting invitation received for user: {}", username);
+
+        // 수신한 초대 메시지를 처리
+        meetingService.processInvitationMessage(username, message);
+    }
+
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/reply")
     public ResponseEntity<BaseResponse<MeetingInvitationReplyResponseDTO>> replyInvitation(
@@ -59,12 +71,5 @@ public class MeetingController {
     ){
         MeetingInvitationReplyResponseDTO reply = meetingService.replyInvitation(userDetails, meetingInvitationReplyRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reply));
-    }
-
-    @MessageMapping("/meeting/{userEmail}")
-    public void inviteToMeetingTest(@DestinationVariable String userEmail, String message){
-        log.info("Received message : {} for user : {}", message, userEmail);
-
-        messagingTemplate.convertAndSend("/sub/meeting/" + userEmail, message);
     }
 }

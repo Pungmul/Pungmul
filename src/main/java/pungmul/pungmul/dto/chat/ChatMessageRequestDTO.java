@@ -3,7 +3,7 @@ package pungmul.pungmul.dto.chat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pungmul.pungmul.domain.chat.MessageType;
+import pungmul.pungmul.domain.chat.ChatType;
 
 @Data
 @AllArgsConstructor
@@ -11,6 +11,6 @@ import pungmul.pungmul.domain.chat.MessageType;
 public class ChatMessageRequestDTO {
     private String receiverUsername;
     private String content;
-    private MessageType messageType;
+    private ChatType chatType;
     private String imageUrl;
 }
