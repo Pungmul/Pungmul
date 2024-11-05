@@ -108,7 +108,9 @@ CREATE TABLE IF NOT EXISTS instrument_status (
                         major BOOLEAN DEFAULT FALSE,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                        FOREIGN KEY (user_id) REFERENCES user(id)
+                        FOREIGN KEY (user_id) REFERENCES user(id),
+                        UNIQUE (user_id, instrument)  -- user_id와 instrument의 조합을 고유하게 설정
+
 );
 
 CREATE TABLE IF NOT EXISTS category (

@@ -42,22 +42,23 @@
           AND instrument = #{instrument}
     </select>
 
-    <!-- Update InstrumentStatus -->
-    <update id="updateInstrumentStatus" parameterType="InstrumentStatus">
-        <!-- 다른 instrument의 major 값을 FALSE로 설정 -->
+    <!-- 다른 instrument의 major 값을 FALSE로 설정하는 메서드 -->
+    <update id="setMajorFalseForOtherInstruments" parameterType="InstrumentStatus">
         <if test="major == true">
             UPDATE instrument_status
             SET major = FALSE
             WHERE user_id = #{userId}
             AND instrument != #{instrument};
         </if>
+    </update>
 
-        <!-- instrumentAbility와 major 값을 업데이트 -->
+    <!-- 특정 instrument의 instrumentAbility와 major 값을 업데이트하는 메서드 -->
+    <update id="updateInstrumentAbilityAndMajor" parameterType="InstrumentStatus">
         UPDATE instrument_status
         SET instrument_ability = #{instrumentAbility},
-        major = #{major}
+            major = #{major}
         WHERE user_id = #{userId}
-        AND instrument = #{instrument};
+          AND instrument = #{instrument};
     </update>
 
 </mapper>

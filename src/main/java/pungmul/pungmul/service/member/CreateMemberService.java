@@ -264,12 +264,16 @@ public class CreateMemberService {
                 .build();
     }
 
+    @Transactional
     public UpdateInstrumentResponseDTO updateInstrumentStatus(UserDetails userDetails, UpdateInstrumentRequestDTO updateInstrumentRequestDTO) {
         User user = userRepository.getUserByEmail(userDetails.getUsername())
                 .orElseThrow(NoSuchElementException::new);
 
         InstrumentStatus instrumentStatus = getUpdateInstrumentStatus(user, updateInstrumentRequestDTO);
-        instrumentStatusRepository.updateInstrumentStatus(instrumentStatus);
+//        instrumentStatusRepository.updateInstrumentStatus(instrumentStatus);
+
+        instrumentStatusRepository.setMajorFalseForOtherInstruments(instrumentStatus);
+        instrumentStatusRepository.updateInstrumentAbilityAndMajor(instrumentStatus);
 
         return UpdateInstrumentResponseDTO.builder()
                 .instruments(instrumentStatusRepository.getAllInstrumentStatusByUserId(user.getId())

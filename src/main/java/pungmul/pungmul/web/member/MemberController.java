@@ -87,7 +87,7 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PatchMapping("/instrument")
+    @PatchMapping("/inst")
     public ResponseEntity<BaseResponse<UpdateInstrumentResponseDTO>> updateInstrument(
             @AuthenticationPrincipal UserDetails userDetail,
             @RequestBody UpdateInstrumentRequestDTO updateInstrumentRequestDTO
