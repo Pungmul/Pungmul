@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.core.exception.custom.member.AccountEmailNotVerifiedException;
+import pungmul.pungmul.core.exception.custom.member.AccountWithdrawnException;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.auth.SessionUser;
 import pungmul.pungmul.domain.member.user.User;
@@ -73,11 +74,14 @@ public class LoginService {
     @Transactional
     public AuthenticationResponseDTO authenticate(String username) {
 
-        Account enabledAccount = accountRepository.getAccountByLoginId(username)
+        Account enabledAccount = accountRepository.getAccountByLoginIdForLogin(username)
                 .orElseThrow(NoSuchElementException::new);
 
         if (!enabledAccount.isEnabled())
             throw new AccountEmailNotVerifiedException();
+
+        if (enabledAccount.isWithdraw())
+            throw new AccountWithdrawnException("삭제된 계정입니다.");
 
         //jwt, refresh token 발급
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -111,7 +115,7 @@ public class LoginService {
     }
 
     public void isValidCredentials(LoginDTO loginDTO) {
-        Account account = accountRepository.getAccountByLoginId(loginDTO.getLoginId())
+        Account account = accountRepository.getAccountByLoginIdForLogin(loginDTO.getLoginId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (account == null || !passwordEncoder.matches(loginDTO.getPassword(), account.getPassword())) {

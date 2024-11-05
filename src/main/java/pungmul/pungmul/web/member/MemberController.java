@@ -87,7 +87,7 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PatchMapping("/instrument")
+    @PatchMapping("/inst")
     public ResponseEntity<BaseResponse<UpdateInstrumentResponseDTO>> updateInstrument(
             @AuthenticationPrincipal UserDetails userDetail,
             @RequestBody UpdateInstrumentRequestDTO updateInstrumentRequestDTO
@@ -95,8 +95,6 @@ public class MemberController {
         UpdateInstrumentResponseDTO updateInstrumentResponseDTO = createMemberService.updateInstrumentStatus(userDetail,updateInstrumentRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, updateInstrumentResponseDTO));
     }
-
-
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
@@ -113,6 +111,13 @@ public class MemberController {
             ){
         SearchUserResponseDTO searchUserResponseDTO = memberService.searchUsers(userDetails, keyword);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, searchUserResponseDTO));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("")
+    public ResponseEntity<BaseResponse<Void>> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        createMemberService.deleteUser(userDetails);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
     }
 
     @PostMapping("/login")

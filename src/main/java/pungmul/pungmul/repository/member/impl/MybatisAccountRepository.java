@@ -25,6 +25,11 @@ public class MybatisAccountRepository implements AccountRepository {
     }
 
     @Override
+    public Optional<Account> getAccountByLoginIdForLogin(String loginId) {
+        return Optional.ofNullable(accountMapper.getAccountByLoginIdForLogin(loginId));
+    }
+
+    @Override
     public Optional<Account> getAccountByLoginId(String loginId) {
         return Optional.ofNullable(accountMapper.getAccountByLoginId(loginId));
     }
@@ -42,5 +47,10 @@ public class MybatisAccountRepository implements AccountRepository {
     @Override
     public void updatePassword(Long accountId, String password) {
         accountMapper.updatePassword(accountId, password);
+    }
+
+    @Override
+    public void deleteAccount(String loginId) {
+        accountMapper.deleteAccount(loginId);
     }
 }

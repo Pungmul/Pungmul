@@ -17,6 +17,7 @@
         <result property="email" column="email" />
         <result property="clubId" column="club_id" />
         <result property="area" column="area" />
+        <result property="expired" column="expired" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
     </resultMap>
@@ -27,31 +28,38 @@
         VALUES (#{accountId}, #{name}, #{clubName}, #{birth}, #{clubAge}, #{gender}, #{phoneNumber}, #{email}, #{clubId}, #{area})
     </insert>
 
-<!--    &lt;!&ndash; Select the last inserted ID &ndash;&gt;-->
-<!--    <select id="selectLastInsertUserId" resultType="java.lang.Long">-->
-<!--        SELECT LAST_INSERT_ID()-->
-<!--    </select>-->
+    <!-- 소프트 삭제 - 사용자를 삭제된 상태로 설정 -->
+    <update id="deleteUser" parameterType="java.lang.String">
+        UPDATE user
+        SET expired = TRUE
+        WHERE email = #{email}
+    </update>
 
-
-    <!-- 이메일 또는 이름에 keyword가 포함된 사용자 목록을 검색 -->
+    <!-- 이메일 또는 이름에 keyword가 포함된 사용자 목록을 검색 (소프트 삭제된 사용자는 제외) -->
     <select id="searchUsersByKeyword" resultMap="UserResultMap">
         SELECT *
         FROM user
         WHERE (email LIKE CONCAT('%', #{keyword}, '%')
             OR name LIKE CONCAT('%', #{keyword}, '%'))
+          AND expired = FALSE
           AND #{keyword} IS NOT NULL AND #{keyword} != ''
     </select>
 
-    <!-- Select User By Id -->
+    <!-- Select User By Id (소프트 삭제된 사용자는 제외) -->
     <select id="getUserByUserId" resultMap="UserResultMap">
-        SELECT * FROM user WHERE id = #{id}
+        SELECT * FROM user
+        WHERE id = #{id}
+          AND expired = FALSE
     </select>
 
-    <!-- Select Users By AccountId -->
+    <!-- Select Users By AccountId (소프트 삭제된 사용자는 제외) -->
     <select id="getUserByAccountId" resultMap="UserResultMap">
-        SELECT * FROM user WHERE account_id = #{accountId}
+        SELECT * FROM user
+        WHERE account_id = #{accountId}
+          AND expired = FALSE
     </select>
 
+    <!-- Update User -->
     <update id="updateUser" parameterType="pungmul.pungmul.domain.member.user.User">
         UPDATE user
         <set>
@@ -59,14 +67,14 @@
             <if test="area != null">, area = #{area}</if>
             <if test="clubId != null">, club_id = #{clubId}</if>
             <if test="clubName != null">, club_name = #{clubName}</if>
+            <if test="expired != null">, expired = #{expired}</if>
         </set>
         WHERE id = #{id}
     </update>
 
-    <!-- Select Users By Email -->
+    <!-- Select Users By Email (소프트 삭제된 사용자는 제외) -->
     <select id="getUserByEmail" resultMap="UserResultMap">
-        SELECT * FROM user WHERE email = #{email}
+        SELECT * FROM user WHERE email = #{email} AND expired = FALSE
     </select>
-
 
 </mapper>
