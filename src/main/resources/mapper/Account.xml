@@ -24,10 +24,12 @@
         VALUES (#{loginId}, #{password})
     </insert>
 
-<!--    &lt;!&ndash; Select the last inserted ID &ndash;&gt;-->
-<!--    <select id="selectLastInsertAccountId" resultType="java.lang.Long">-->
-<!--        SELECT LAST_INSERT_ID()-->
-<!--    </select>-->
+    <!-- Update Password -->
+    <update id="updatePassword" parameterType="map">
+        UPDATE account
+        SET password = #{password}
+        WHERE id = #{accountId}
+    </update>
 
     <!-- Select Account By Id -->
     <select id="getAccountByAccountId" resultMap="AccountResultMap">

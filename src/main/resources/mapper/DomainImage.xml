@@ -22,4 +22,31 @@
         VALUES (#{domainType}, #{domainId}, #{imageId}, #{userId})
     </insert>
 
+    <!-- Deactivate All Images for Domain -->
+    <update id="deactivateAllPrimaryImages" parameterType="map">
+        UPDATE domain_image
+        SET is_primary = FALSE
+        WHERE domain_type = #{domainType}
+          AND domain_id = #{domainId}
+    </update>
+
+    <!-- Activate Specific Primary Image -->
+    <update id="activatePrimaryImage" parameterType="map">
+        UPDATE domain_image
+        SET is_primary = TRUE
+        WHERE domain_type = #{domainType}
+          AND domain_id = #{domainId}
+          AND image_id = #{imageId}
+    </update>
+
+
+    <!-- Deactivate Primary Image -->
+    <update id="deactivatePrimaryImage" parameterType="map">
+        UPDATE domain_image
+        SET is_primary = FALSE
+        WHERE domain_type = #{domainType}
+          AND domain_id = #{domainId}
+          AND is_primary = TRUE
+    </update>
+
 </mapper>

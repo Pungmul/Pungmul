@@ -12,10 +12,7 @@ import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.friend.ReqFriendStatusResponseDTO;
-import pungmul.pungmul.dto.member.SimpleUserListResponseDTO;
-import pungmul.pungmul.dto.member.GetMemberResponseDTO;
-import pungmul.pungmul.dto.member.InstrumentStatusResponseDTO;
-import pungmul.pungmul.dto.member.SimpleUserDTO;
+import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.repository.image.repository.ImageRepository;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
@@ -25,6 +22,7 @@ import pungmul.pungmul.service.file.ImageService;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -86,6 +84,23 @@ public class MemberService {
                                 )
                                 .collect(Collectors.toList())
                 )
+                .build();
+    }
+
+    public SearchUserResponseDTO searchUsers(UserDetails userDetails, String keyword) {
+        List<SimpleUserDTO> users = userRepository.searchUsersByKeyword(keyword).stream()
+                .filter(user -> !user.getEmail().equals(userDetails.getUsername()))
+                .map(user -> SimpleUserDTO.builder()
+                        .username(user.getEmail())
+                        .userId(user.getId())
+                        .name(user.getName())
+                        .profileImage(imageRepository.getImagesByDomainIdAndType(DomainType.PROFILE, user.getId())
+                                .stream().findFirst().orElseGet(imageService::getAnonymousImage))
+                        .build())  // 빌더의 완료
+                .toList();
+
+        return SearchUserResponseDTO.builder()
+                .users(users)
                 .build();
     }
 }
