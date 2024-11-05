@@ -19,6 +19,8 @@ public interface UserMapper {
 
     List<User> searchUsersByKeyword(String keyword);
 
+    void updateUser(User updateUser);
+
 //    Long selectLastInsertId();
 
 }

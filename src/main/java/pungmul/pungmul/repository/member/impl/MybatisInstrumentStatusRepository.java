@@ -34,4 +34,9 @@ public class MybatisInstrumentStatusRepository implements InstrumentStatusReposi
     public Optional<InstrumentStatus> getInstrumentStatusByUserIdAndInstrumentType(Long userId, Instrument instrument) {
         return Optional.ofNullable(instrumentStatusMapper.getInstrumentStatusByUserIdAndInstrumentType(userId, instrument));
     }
+
+    @Override
+    public void updateInstrumentStatus(InstrumentStatus instrumentStatus) {
+        instrumentStatusMapper.updateInstrumentStatus(instrumentStatus);
+    }
 }

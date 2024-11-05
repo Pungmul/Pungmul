@@ -19,4 +19,6 @@ public interface UserRepository {
     public Long getUserIdByAccountId(Long accountId);
 
     List<User> searchUsersByKeyword(String keyword);
+
+    void updateUser(User updateUser);
 }

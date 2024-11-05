@@ -51,4 +51,9 @@ public class MybatisUserRepository implements UserRepository {
     public List<User> searchUsersByKeyword(String keyword) {
         return userMapper.searchUsersByKeyword(keyword);
     }
+
+    @Override
+    public void updateUser(User updateUser) {
+        userMapper.updateUser(updateUser);
+    }
 }

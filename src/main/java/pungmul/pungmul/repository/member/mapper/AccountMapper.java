@@ -16,5 +16,7 @@ public interface AccountMapper {
 
     void setEnabledAccount(Long accountId);
 
+    void updatePassword(Long accountId, String password);
+
 //    Long selectLastInsertAccountId();
 }

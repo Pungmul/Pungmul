@@ -16,4 +16,5 @@ public interface InstrumentStatusMapper {
 
     InstrumentStatus getInstrumentStatusByUserIdAndInstrumentType(Long userId, Instrument instrument);
 
+    void updateInstrumentStatus(InstrumentStatus instrumentStatus);
 }

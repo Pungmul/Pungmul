@@ -25,4 +25,19 @@ public class MybatisDomainImageRepository implements DomainImageRepository {
     public List<DomainImage> getDomainImagesByDomainId(DomainType domainType, Long domainId) {
         return domainImageMapper.getDomainImageByDomainId(domainType, domainId);
     }
+
+    @Override
+    public void deactivatePrimaryImage(DomainType domainType, Long domainId) {
+        domainImageMapper.deactivatePrimaryImage(domainType, domainId);
+    }
+
+    @Override
+    public void deactivateAllPrimaryImages(DomainType domainType, Long domainId) {
+        domainImageMapper.deactivateAllPrimaryImages(domainType, domainId);
+    }
+
+    @Override
+    public void activatePrimaryImage(DomainType domainType, Long domainId, Long imageId) {
+        domainImageMapper.activatePrimaryImage(domainType, domainId, imageId);
+    }
 }

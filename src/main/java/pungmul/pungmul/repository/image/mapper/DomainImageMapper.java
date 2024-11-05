@@ -13,4 +13,9 @@ public interface DomainImageMapper {
 
     List<DomainImage> getDomainImageByDomainId(DomainType domainType, Long domainId);
 
+    void deactivatePrimaryImage(DomainType domainType, Long domainId);
+
+    void deactivateAllPrimaryImages(DomainType domainType, Long domainId);
+
+    void activatePrimaryImage(DomainType domainType, Long domainId, Long imageId);
 }

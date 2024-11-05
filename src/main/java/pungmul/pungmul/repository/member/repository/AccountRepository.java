@@ -14,4 +14,6 @@ public interface AccountRepository {
     public Optional<Account> getAccountByEmail(String email);
 
     public void setEnabledAccount(Long accountId);
-    }
+
+    void updatePassword(Long accountId, String password);
+}

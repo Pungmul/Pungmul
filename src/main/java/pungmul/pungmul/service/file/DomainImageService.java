@@ -49,4 +49,9 @@ public class DomainImageService {
                 .map(this::getDomainImageDTO)
                 .collect(Collectors.toList());
     }
+
+    public void updatePrimaryImage(DomainType domainType, Long domainId, Long imageId) {
+        domainImageRepository.deactivateAllPrimaryImages(domainType, domainId);
+        domainImageRepository.activatePrimaryImage(domainType, domainId, imageId);
+    }
 }

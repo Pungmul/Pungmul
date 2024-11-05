@@ -2,24 +2,25 @@ package pungmul.pungmul.service.member;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.account.Account;
+import pungmul.pungmul.domain.member.instrument.InstrumentAbility;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.member.account.UserRole;
 import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
 import pungmul.pungmul.dto.file.RequestImageDTO;
-import pungmul.pungmul.dto.member.GetMemberResponseDTO;
-import pungmul.pungmul.dto.member.InstrumentStatusResponseDTO;
+import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
-import pungmul.pungmul.dto.member.CreateMemberRequestDTO;
-import pungmul.pungmul.dto.member.CreateAccountResponseDTO;
+import pungmul.pungmul.service.file.DomainImageService;
 import pungmul.pungmul.service.file.ImageService;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class CreateMemberService {
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
     private final UserRoleService userRoleService;
-    private final EmailService emailService;
+    private final DomainImageService domainImageService;
 
 
     /**
@@ -62,6 +63,77 @@ public class CreateMemberService {
         accountRepository.setEnabledAccount(accountId);
 
         return getCreateMemberResponse(accountId, userId);
+    }
+
+    @Transactional
+    public UpdateMemberResponseDTO updateMember(UserDetails userDetails, UpdateMemberRequestDTO updateMemberRequestDTO, MultipartFile profile) throws IOException {
+        //  1. password 수정
+        if (!updateMemberRequestDTO.getPassword().isEmpty())
+            updatePassword(userDetails, updateMemberRequestDTO.getPassword());
+
+        //  2. user 수정
+        updateUserInfo(userDetails, updateMemberRequestDTO);
+
+        //  3. profile 수정
+        if (!profile.isEmpty())
+            updateProfileImage(userDetails, profile);
+
+        return getUpdateMemberResponseDTO(userDetails);
+    }
+
+    public UpdateMemberResponseDTO getUpdateMemberResponseDTO(UserDetails userDetails) {
+        User user = userRepository.getUserByEmail(userDetails.getUsername())
+                .orElseThrow(NoSuchElementException::new);
+
+        return UpdateMemberResponseDTO.builder()
+                .name(user.getName())
+                .clubName(user.getClubName())
+                .phoneNumber(user.getPhoneNumber())
+                .area(user.getArea())
+                .clubId(user.getClubId())
+                .updateAt(user.getUpdatedAt())
+                .build();
+    }
+
+    private void updateProfileImage(UserDetails userDetails, MultipartFile profile) throws IOException {
+        User user = userRepository.getUserByEmail(userDetails.getUsername())
+                .orElseThrow(NoSuchElementException::new);
+
+        if (profile != null && !profile.isEmpty()) {
+            RequestImageDTO requestProfileImageDTO = getRequestProfileImageDTO(profile, user);
+            Long imageId = imageService.saveImage(requestProfileImageDTO);
+            updateProfileImage(user.getId(), imageId);
+        }
+    }
+
+    private void updateProfileImage(Long userId, Long imageId) {
+        domainImageService.updatePrimaryImage(DomainType.PROFILE,userId, imageId);
+    }
+
+    private void updateUserInfo(UserDetails userDetails, UpdateMemberRequestDTO updateMemberRequestDTO) {
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
+                .map(User::getId)
+                .orElseThrow(() -> new UsernameNotFoundException(userDetails.getUsername()));
+        User updateUser = getUpdateUser(userId, updateMemberRequestDTO);
+        log.info(updateUser.getPhoneNumber());
+        userRepository.updateUser(updateUser);
+    }
+
+    private static User getUpdateUser(Long userId, UpdateMemberRequestDTO updateMemberRequestDTO) {
+        return User.builder()
+                .id(userId)
+                .phoneNumber(updateMemberRequestDTO.getPhoneNumber())
+                .area(updateMemberRequestDTO.getArea())
+                .clubId(updateMemberRequestDTO.getClubId())
+                .clubName(updateMemberRequestDTO.getClubName())
+                .build();
+    }
+
+    private void updatePassword(UserDetails userDetails, String password) throws IOException {
+        Long accountId = accountRepository.getAccountByLoginId(userDetails.getUsername())
+                .map(Account::getId)
+                .orElseThrow(() -> new UsernameNotFoundException(userDetails.getUsername()));
+        accountRepository.updatePassword(accountId, password);
     }
 
     /**
@@ -189,6 +261,28 @@ public class CreateMemberService {
                 .instrument(instrumentStatus.getInstrument())
                 .instrumentAbility(instrumentStatus.getInstrumentAbility())
                 .major(instrumentStatus.isMajor())
+                .build();
+    }
+
+    public UpdateInstrumentResponseDTO updateInstrumentStatus(UserDetails userDetails, UpdateInstrumentRequestDTO updateInstrumentRequestDTO) {
+        User user = userRepository.getUserByEmail(userDetails.getUsername())
+                .orElseThrow(NoSuchElementException::new);
+
+        InstrumentStatus instrumentStatus = getUpdateInstrumentStatus(user, updateInstrumentRequestDTO);
+        instrumentStatusRepository.updateInstrumentStatus(instrumentStatus);
+
+        return UpdateInstrumentResponseDTO.builder()
+                .instruments(instrumentStatusRepository.getAllInstrumentStatusByUserId(user.getId())
+                        .orElseThrow(NoSuchElementException::new))
+                .build();
+    }
+
+    private static InstrumentStatus getUpdateInstrumentStatus(User user, UpdateInstrumentRequestDTO updateInstrumentRequestDTO) {
+        return InstrumentStatus.builder()
+                .userId(user.getId())
+                .instrument(updateInstrumentRequestDTO.getInstrument())
+                .instrumentAbility(updateInstrumentRequestDTO.getInstrumentAbility())
+                .major(updateInstrumentRequestDTO.getMajor())
                 .build();
     }
 }

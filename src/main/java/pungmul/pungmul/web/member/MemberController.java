@@ -8,11 +8,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.response.BaseResponseCode;
+import pungmul.pungmul.domain.member.instrument.Instrument;
+import pungmul.pungmul.domain.member.instrument.InstrumentAbility;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.service.member.CreateMemberService;
@@ -64,6 +67,38 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('USER')")
+    @PatchMapping("")
+    public ResponseEntity<BaseResponse<UpdateMemberResponseDTO>> updateMember(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Validated @RequestPart("accountData") UpdateMemberRequestDTO updateMemberRequestDTO,
+            @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+        UpdateMemberResponseDTO updateMemberResponseDTO = createMemberService.updateMember(userDetails,updateMemberRequestDTO, profile);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, updateMemberResponseDTO));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/inst")
+    public ResponseEntity<BaseResponse<List<Long>>> regInstrument(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PatchMapping("")
+    public ResponseEntity<BaseResponse<UpdateInstrumentResponseDTO>> updateInstrument(
+            @AuthenticationPrincipal UserDetails userDetail,
+            @RequestBody UpdateInstrumentRequestDTO updateInstrumentRequestDTO
+            ){
+        UpdateInstrumentResponseDTO updateInstrumentResponseDTO = createMemberService.updateInstrumentStatus(userDetail,updateInstrumentRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, updateInstrumentResponseDTO));
+    }
+
+
+
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("")
     public ResponseEntity<BaseResponse<GetMemberResponseDTO>> getMemberInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         GetMemberResponseDTO memberInfo = memberService.getMemberInfo(userDetails.getAccountId());
@@ -71,11 +106,13 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/inst")
-    public ResponseEntity<BaseResponse<List<Long>>> regInstrument(@AuthenticationPrincipal UserDetailsImpl userDetails, @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
+    @GetMapping("/users")
+    public ResponseEntity<BaseResponse<SearchUserResponseDTO>> searchUsers(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) String keyword
+            ){
+        SearchUserResponseDTO searchUserResponseDTO = memberService.searchUsers(userDetails, keyword);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, searchUserResponseDTO));
     }
 
     @PostMapping("/login")
@@ -88,34 +125,4 @@ public class MemberController {
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));
     }
 
-//    @GetMapping("/logout")
-//    public ResponseEntity<BaseResponse<Void>> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        log.info("logout - userName  : {} ", userDetails.getUsername());
-//        loginService.logout(userDetails);
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(BaseResponse.ofSuccess(ResponseCode.NO_CONTENT));
-//    }
-
-//    @PostMapping("/logout")
-//    public ResponseEntity<BaseResponse<Void>> logout(HttpServletRequest request) {
-//        // 기존 세션이 있는지 확인
-//        HttpSession session = request.getSession(false);  // false -> 새로운 세션을 생성하지 않고, 기존 세션을 반환
-//        if (session == null) {
-//            // 세션이 없으면 사용자가 로그인되어 있지 않은 상태이므로 401 UNAUTHORIZED 반환
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body(BaseResponse.ofFail(ResponseCode.UNAUTHORIZED));
-//        }
-//        // 세션 무효화하여 로그아웃 처리
-//        session.invalidate();
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(BaseResponse.ofSuccess(ResponseCode.NO_CONTENT));
-//    }
-
-//    @PostMapping("/login")
-//    public ResponseEntity<BaseResponse<LoginResponseDTO>> login(@Validated @RequestBody LoginDTO loginDTO,
-//                                                                HttpServletRequest request) throws AuthenticationException {
-//        LoginResponseDTO loginResponseDTO = loginService.processLogin(loginDTO, request);
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(BaseResponse.ofSuccess(ResponseCode.OK,loginResponseDTO));
-//    }
 }

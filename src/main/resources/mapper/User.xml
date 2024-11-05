@@ -52,10 +52,16 @@
         SELECT * FROM user WHERE account_id = #{accountId}
     </select>
 
-<!--    &lt;!&ndash; Select Users By LoginId &ndash;&gt;-->
-<!--    <select id="getUserByLoginId" resultMap="UserResultMap">-->
-<!--        SELECT * FROM user WHERE login_id = #{loginId}-->
-<!--    </select>-->
+    <update id="updateUser" parameterType="pungmul.pungmul.domain.member.user.User">
+        UPDATE user
+        <set>
+            <if test="phoneNumber != null">phone_number = #{phoneNumber}</if>
+            <if test="area != null">, area = #{area}</if>
+            <if test="clubId != null">, club_id = #{clubId}</if>
+            <if test="clubName != null">, club_name = #{clubName}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
 
     <!-- Select Users By Email -->
     <select id="getUserByEmail" resultMap="UserResultMap">

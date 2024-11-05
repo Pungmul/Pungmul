@@ -27,10 +27,18 @@ public class ImageService {
     @Value("${image.anonymous_profile.name}")
     private String anonymousProfileName;
 
-    public void saveImage(RequestImageDTO requestImageDTO) throws IOException {
+//    public void saveImage(RequestImageDTO requestImageDTO) throws IOException {
+//        // AWSFileStore의 saveImageToLocal 메소드를 호출하여 이미지를 AWS S3에 저장
+//        Image image = awsFileStore.saveImageToStorage(requestImageDTO.getUserId(), requestImageDTO.getImageFile());
+//        saveImageToRepo(requestImageDTO.getDomainId(), requestImageDTO.getDomainType(), image, requestImageDTO.getUserId());
+//    }
+
+    public Long saveImage(RequestImageDTO requestImageDTO) throws IOException {
         // AWSFileStore의 saveImageToLocal 메소드를 호출하여 이미지를 AWS S3에 저장
         Image image = awsFileStore.saveImageToStorage(requestImageDTO.getUserId(), requestImageDTO.getImageFile());
         saveImageToRepo(requestImageDTO.getDomainId(), requestImageDTO.getDomainType(), image, requestImageDTO.getUserId());
+
+        return image.getId();
     }
 
     private void saveImageToRepo(Long domainId, DomainType domainType, Image image, Long userId) {
@@ -70,4 +78,5 @@ public class ImageService {
         }
         return images;
     }
+
 }

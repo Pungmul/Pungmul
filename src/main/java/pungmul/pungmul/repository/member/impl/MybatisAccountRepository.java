@@ -38,4 +38,9 @@ public class MybatisAccountRepository implements AccountRepository {
     public void setEnabledAccount(Long accountId) {
         accountMapper.setEnabledAccount(accountId);
     }
+
+    @Override
+    public void updatePassword(Long accountId, String password) {
+        accountMapper.updatePassword(accountId, password);
+    }
 }

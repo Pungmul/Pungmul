@@ -10,4 +10,11 @@ public interface DomainImageRepository {
     void save(DomainImage domainImage);
 
     List<DomainImage> getDomainImagesByDomainId(DomainType domainType, Long domainId);
+
+    void deactivatePrimaryImage(DomainType domainType, Long domainId);
+
+    void deactivateAllPrimaryImages(DomainType domainType, Long domainId);
+
+    void activatePrimaryImage(DomainType domainType, Long domainId, Long imageId);
+
 }

@@ -16,4 +16,5 @@ public interface InstrumentStatusRepository {
 
     public Optional<InstrumentStatus> getInstrumentStatusByUserIdAndInstrumentType(Long userId, Instrument instrument);
 
+    void updateInstrumentStatus(InstrumentStatus instrumentStatus);
 }
