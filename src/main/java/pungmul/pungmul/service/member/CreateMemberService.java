@@ -281,6 +281,12 @@ public class CreateMemberService {
                 .build();
     }
 
+    @Transactional
+    public void deleteUser(UserDetails userDetails){
+        accountRepository.deleteAccount(userDetails.getUsername());
+        userRepository.deleteUser(userDetails.getUsername());
+    }
+
     private static InstrumentStatus getUpdateInstrumentStatus(User user, UpdateInstrumentRequestDTO updateInstrumentRequestDTO) {
         return InstrumentStatus.builder()
                 .userId(user.getId())

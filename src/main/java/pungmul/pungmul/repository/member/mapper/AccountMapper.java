@@ -10,6 +10,8 @@ public interface AccountMapper {
 
     Account getAccountByAccountId(Long accountId);
 
+    Account getAccountByLoginIdForLogin(String loginId);
+
     Account getAccountByLoginId(String loginId);
 
     Account getAccountByEmail(String email);
@@ -17,6 +19,8 @@ public interface AccountMapper {
     void setEnabledAccount(Long accountId);
 
     void updatePassword(Long accountId, String password);
+
+    void deleteAccount(String loginId);
 
 //    Long selectLastInsertAccountId();
 }

@@ -12,8 +12,6 @@ public interface UserRepository {
 
     public Optional<User> getUserByAccountId(Long accountId);
 
-//    public Optional<User> getUserByLoginId(String loginId);
-
     public Optional<User> getUserByEmail(String email);
 
     public Long getUserIdByAccountId(Long accountId);
@@ -21,4 +19,6 @@ public interface UserRepository {
     List<User> searchUsersByKeyword(String keyword);
 
     void updateUser(User updateUser);
+
+    void deleteUser(String email);
 }

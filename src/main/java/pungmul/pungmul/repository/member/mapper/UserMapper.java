@@ -21,6 +21,7 @@ public interface UserMapper {
 
     void updateUser(User updateUser);
 
+    void deleteUser(String email);
 //    Long selectLastInsertId();
 
 }

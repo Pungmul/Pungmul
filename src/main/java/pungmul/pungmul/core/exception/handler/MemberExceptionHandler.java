@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import pungmul.pungmul.core.exception.custom.member.InvalidPasswordException;
-import pungmul.pungmul.core.exception.custom.member.InvalidProfileImageException;
-import pungmul.pungmul.core.exception.custom.member.NoSuchUsernameException;
-import pungmul.pungmul.core.exception.custom.member.UsernameAlreadyExistsException;
+import pungmul.pungmul.core.exception.custom.member.*;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.core.response.code.MemberResponseCode;
@@ -49,6 +46,14 @@ public class MemberExceptionHandler {
     public ResponseEntity<BaseResponse<String>> handleNoSuchUsernameException(NoSuchUsernameException ex) {
         return new ResponseEntity<>(
                 BaseResponse.ofFail(MemberResponseCode.NOTFOUND_USERNAME),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(AccountWithdrawnException.class)
+    public ResponseEntity<BaseResponse<String>> handleAccountWithdrawnException(AccountWithdrawnException ex) {
+        return new ResponseEntity<>(
+                BaseResponse.ofFail(MemberResponseCode.DELETED_ACCOUNT),
                 HttpStatus.BAD_REQUEST
         );
     }

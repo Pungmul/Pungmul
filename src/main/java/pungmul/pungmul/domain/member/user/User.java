@@ -19,6 +19,7 @@ public class User {
     private Integer clubAge;
     private Gender gender;
     private String area;
+    private Boolean expired;
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private Long clubId;

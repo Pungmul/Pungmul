@@ -9,6 +9,8 @@ public interface AccountRepository {
 
     public Optional<Account> getAccountByAccountId(Long accountId);
 
+    public Optional<Account> getAccountByLoginIdForLogin(String loginId);
+
     public Optional<Account> getAccountByLoginId(String loginId);
 
     public Optional<Account> getAccountByEmail(String email);
@@ -16,4 +18,6 @@ public interface AccountRepository {
     public void setEnabledAccount(Long accountId);
 
     void updatePassword(Long accountId, String password);
+
+    void deleteAccount(String loginId);
 }

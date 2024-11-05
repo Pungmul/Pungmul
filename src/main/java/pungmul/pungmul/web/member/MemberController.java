@@ -96,8 +96,6 @@ public class MemberController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, updateInstrumentResponseDTO));
     }
 
-
-
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
     public ResponseEntity<BaseResponse<GetMemberResponseDTO>> getMemberInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -113,6 +111,13 @@ public class MemberController {
             ){
         SearchUserResponseDTO searchUserResponseDTO = memberService.searchUsers(userDetails, keyword);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, searchUserResponseDTO));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("")
+    public ResponseEntity<BaseResponse<Void>> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        createMemberService.deleteUser(userDetails);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
     }
 
     @PostMapping("/login")

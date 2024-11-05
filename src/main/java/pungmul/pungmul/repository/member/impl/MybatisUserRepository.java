@@ -30,11 +30,6 @@ public class MybatisUserRepository implements UserRepository {
         return Optional.ofNullable(userMapper.getUserByAccountId(accountId));
     }
 
-//    @Override
-//    public Optional<User> getUserByLoginId(String loginId) {
-//        return Optional.ofNullable(userMapper.getUserByLoginId(loginId));
-//    }
-
     @Override
     public Optional<User> getUserByEmail(String email) {
         return Optional.ofNullable(userMapper.getUserByEmail(email));
@@ -55,5 +50,10 @@ public class MybatisUserRepository implements UserRepository {
     @Override
     public void updateUser(User updateUser) {
         userMapper.updateUser(updateUser);
+    }
+
+    @Override
+    public void deleteUser(String email) {
+        userMapper.deleteUser(email);
     }
 }
