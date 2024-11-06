@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.friend.Friend;
+import pungmul.pungmul.domain.friend.FriendRequestFrom;
 import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.message.MessageDomainType;
@@ -134,18 +135,21 @@ public class FriendService {
                         if (status == FriendStatus.ACCEPTED || status == FriendStatus.BLOCK) {
                             return null; // 이미 친구 상태거나 차단된 경우 제외
                         } else if (status == FriendStatus.PENDING) {
-                            Boolean isRequestSentByUser = friend.getSenderId().equals(loginUserId);
+                            FriendRequestFrom requestFrom = friend.getSenderId().equals(loginUserId)
+                                    ? FriendRequestFrom.SEND
+                                    : FriendRequestFrom.RECEIVE;
+
                             return AvailableFriendDTO.builder()
                                     .user(toSimpleUserDTO(user.getId()))
-                                    .isRequestSentByUser(isRequestSentByUser) // 누가 보냈는지 정보 추가
+                                    .friendRequestFrom(requestFrom) // 누가 보냈는지 정보 추가
                                     .build();
                         }
                     }
 
-                    // 친구 요청이 없는 사용자라면 상태 설정
+                    // 친구 요청이 없는 사용자라면 상태를 NONE으로 설정
                     return AvailableFriendDTO.builder()
                             .user(toSimpleUserDTO(user.getId()))
-                            .isRequestSentByUser(null) // 친구 요청 상태가 없는 경우 null로 설정
+                            .friendRequestFrom(FriendRequestFrom.NONE) // 친구 요청 상태가 없는 경우 NONE으로 설정
                             .build();
                 })
                 .filter(Objects::nonNull) // null 제거
