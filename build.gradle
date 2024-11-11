@@ -35,6 +35,8 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'software.amazon.awssdk:apache-client:2.21.12'
+	implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
+
 
 
 	//JWT
@@ -65,6 +67,9 @@ dependencies {
 //	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 	implementation 'software.amazon.awssdk:s3:2.20.22'  // AWS SDK for S3
 	implementation 'software.amazon.awssdk:core:2.20.22'  // AWS SDK Core
+	implementation platform('software.amazon.awssdk:bom:2.20.91')
+	implementation 'software.amazon.awssdk:ssm' // AWS SSM (Parameter Store)
+
 
 	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.1.0")
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
