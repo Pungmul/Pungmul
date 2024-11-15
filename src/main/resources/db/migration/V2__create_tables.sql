@@ -271,6 +271,46 @@ CREATE TABLE IF NOT EXISTS meeting_participant (
                         FOREIGN KEY (user_id) REFERENCES user(id) -- 사용자 ID 외래키
 );
 
+CREATE TABLE IF NOT EXISTS lightning_meeting (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY, -- 기본 키
+                        meeting_name VARCHAR(255) NOT NULL, -- 모임 이름
+                        meeting_description TEXT, -- 모임 설명
+                        start_time DATETIME NOT NULL, -- 모임 시작 시간
+                        end_time DATETIME NOT NULL, -- 모임 종료 시간
+                        min_person_num INT NOT NULL, -- 최소 인원
+                        max_person_num INT NOT NULL, -- 최대 인원
+                        organizer_id BIGINT, -- 주최자 ID
+                        meeting_type ENUM('CLASSICPAN', 'FREEPAN', 'PRACTICE', 'PLAY') NOT NULL, -- 모임 유형
+                        latitude DOUBLE NOT NULL, -- 위도
+                        longitude DOUBLE NOT NULL, -- 경도
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 생성 시간
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 수정 시간
 
+                        -- 외래 키 제약 조건
+                        CONSTRAINT fk_lightning_meeting_organizer
+                        FOREIGN KEY (organizer_id) REFERENCES user (id)
+                        ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS lightning_meeting_participant (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        meeting_id BIGINT NOT NULL,
+                        user_id BIGINT NOT NULL,
+                        username VARCHAR(255),
+                        instrument_assigned ENUM('KKWAENGGWARI', 'JING', 'JANGGU', 'BUK', 'SOGO', 'TAEPYUNGSO'), -- Enum Instrument (nullable if not assigned)
+                        organizer BOOLEAN DEFAULT FALSE, -- Is this participant the organizer
+                        FOREIGN KEY (meeting_id) REFERENCES lightning_meeting (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS instrument_assignment (
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                        meeting_id BIGINT NOT NULL,
+                        instrument ENUM('KKWAENGGWARI', 'JING', 'JANGGU', 'BUK', 'SOGO', 'TAEPYUNGSO') NOT NULL, -- Enum Instrument
+                        min_participants INT DEFAULT 0,
+                        max_participants INT NOT NULL,
+                        current_participants INT DEFAULT 0 NOT NULL,
+                        FOREIGN KEY (meeting_id) REFERENCES lightning_meeting (id) ON DELETE CASCADE,
+                        UNIQUE (meeting_id, instrument)
+);
 
 

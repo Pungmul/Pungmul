@@ -49,4 +49,9 @@ public class MybatisInstrumentStatusRepository implements InstrumentStatusReposi
     public void updateInstrumentAbilityAndMajor(InstrumentStatus instrumentStatus) {
         instrumentStatusMapper.updateInstrumentAbilityAndMajor(instrumentStatus);
     }
+
+    @Override
+    public Instrument getMajorInstrumentByUserId(Long userId) {
+        return instrumentStatusMapper.getMajorInstrumentByUserId(userId);
+    }
 }

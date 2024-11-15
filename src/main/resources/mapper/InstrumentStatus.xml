@@ -61,4 +61,12 @@
           AND instrument = #{instrument};
     </update>
 
+    <!-- 특정 사용자(userId)의 주요 악기(major = TRUE) 조회 -->
+    <select id="getMajorInstrumentByUserId" parameterType="java.lang.Long" resultType="pungmul.pungmul.domain.member.instrument.Instrument">
+        SELECT instrument
+        FROM instrument_status
+        WHERE user_id = #{userId}
+          AND major = TRUE
+    </select>
+
 </mapper>

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -24,7 +25,10 @@ public class LightningMeeting {
     private MeetingType meetingType;
     private Double latitude;
     private Double longitude;
-    private List<InstrumentAssignment> instrumentAssignmentList;
+    @Builder.Default
+    private List<LightningMeetingParticipant> lightningMeetingParticipantList = new ArrayList<>();
+    @Builder.Default
+    private List<InstrumentAssignment> instrumentAssignmentList = new ArrayList<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

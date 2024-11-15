@@ -4,14 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pungmul.pungmul.domain.member.instrument.Instrument;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateLightningMeetingResponseDTO {
-    private Long lightningMeetingId;
-    private String lightningMeetingName;
-    private String organizerName;
-
+public class InstrumentAssignRequestDTO {
+    private Instrument instrument;
+    private Integer minPersonNum;
+    private Integer maxPersonNum;
 }
