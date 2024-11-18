@@ -299,13 +299,15 @@ CREATE TABLE IF NOT EXISTS lightning_meeting_participant (
                         username VARCHAR(255),
                         instrument_assigned ENUM('KKWAENGGWARI', 'JING', 'JANGGU', 'BUK', 'SOGO', 'TAEPYUNGSO'), -- Enum Instrument (nullable if not assigned)
                         organizer BOOLEAN DEFAULT FALSE, -- Is this participant the organizer
+                        latitude DOUBLE,
+                        longitude DOUBLE,
                         FOREIGN KEY (meeting_id) REFERENCES lightning_meeting (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS instrument_assignment (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         meeting_id BIGINT NOT NULL,
-                        instrument ENUM('KKWAENGGWARI', 'JING', 'JANGGU', 'BUK', 'SOGO', 'TAEPYUNGSO') NOT NULL, -- Enum Instrument
+                        instrument ENUM('KKWAENGGWARI',  'JING', 'JANGGU', 'BUK', 'SOGO', 'TAEPYUNGSO') NOT NULL, -- Enum Instrument
                         min_participants INT DEFAULT 0,
                         max_participants INT NOT NULL,
                         current_participants INT DEFAULT 0 NOT NULL,

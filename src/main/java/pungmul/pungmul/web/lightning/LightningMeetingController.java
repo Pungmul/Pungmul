@@ -6,16 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
-import pungmul.pungmul.dto.lightning.AddLightningMeetingParticipantRequestDTO;
-import pungmul.pungmul.dto.lightning.AddLightningMeetingParticipantResponseDTO;
-import pungmul.pungmul.dto.lightning.CreateLightningMeetingRequestDTO;
-import pungmul.pungmul.dto.lightning.CreateLightningMeetingResponseDTO;
+import pungmul.pungmul.dto.lightning.*;
 import pungmul.pungmul.service.lightning.LightningMeetingService;
 
 @Slf4j
@@ -24,6 +18,27 @@ import pungmul.pungmul.service.lightning.LightningMeetingService;
 @RestController
 public class LightningMeetingController {
     private final LightningMeetingService lightningMeetingService;
+
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/nearby")
+    public ResponseEntity<BaseResponse<GetNearLightningMeetingResponseDTO>> getNearLightningMeeting(
+            @RequestBody GetNearLightningMeetingRequestDTO getNearLightningMeetingRequestDTO
+    ){
+        GetNearLightningMeetingResponseDTO nearLightningMeeting = lightningMeetingService.getNearLightningMeetings(getNearLightningMeetingRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, nearLightningMeeting));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/participants")
+    public ResponseEntity<BaseResponse<GetMeetingParticipantsResponseDTO>> getMeetingParticipants(
+            @RequestBody GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO){
+        log.info("getMeetingParticipants");
+        GetMeetingParticipantsResponseDTO meetingParticipants = lightningMeetingService.getMeetingParticipants(getMeetingParticipantsRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, meetingParticipants));
+    }
+
+
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/meeting")

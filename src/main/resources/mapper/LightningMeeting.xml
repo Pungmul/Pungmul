@@ -101,7 +101,7 @@
     </update>
 
     <!-- 모든 LightningMeeting 조회 -->
-    <select id="findAllLightningMeetings" resultMap="LightningMeetingResultMap">
+    <select id="getAllLightningMeeting" resultMap="LightningMeetingResultMap">
         SELECT
             id,
             meeting_name,

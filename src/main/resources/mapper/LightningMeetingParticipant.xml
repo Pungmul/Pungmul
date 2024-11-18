@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-        <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="pungmul.pungmul.repository.lightning.mapper.LightningMeetingParticipantMapper">
     <!-- Result Map for LightningMeetingParticipant -->
@@ -11,14 +11,16 @@
         <result property="username" column="username" />
         <result property="instrumentAssigned" column="instrument_assigned" javaType="pungmul.pungmul.domain.member.instrument.Instrument" />
         <result property="organizer" column="organizer" />
+        <result property="latitude" column="latitude" />
+        <result property="longitude" column="longitude" />
     </resultMap>
 
     <!-- Insert Participant -->
     <insert id="addLightningMeetingParticipant" useGeneratedKeys="true" keyProperty="id" parameterType="pungmul.pungmul.domain.lightning.LightningMeetingParticipant">
         INSERT INTO lightning_meeting_participant
-        (meeting_id, user_id, username, instrument_assigned, organizer)
+            (meeting_id, user_id, username, instrument_assigned, organizer)
         VALUES
-        (#{meetingId}, #{userId}, #{username}, #{instrumentAssigned}, #{organizer});
+            (#{meetingId}, #{userId}, #{username}, #{instrumentAssigned}, #{organizer});
     </insert>
 
     <!-- Select Participants By Meeting ID -->
@@ -28,5 +30,10 @@
         WHERE meeting_id = #{meetingId};
     </select>
 
-
+    <!-- Select Participants' Locations -->
+    <select id="getMeetingParticipants" parameterType="java.lang.Long" resultType="pungmul.pungmul.core.geo.LatLong">
+        SELECT latitude, longitude
+        FROM lightning_meeting_participant
+        WHERE meeting_id = #{meetingId};
+    </select>
 </mapper>

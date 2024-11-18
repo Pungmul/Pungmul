@@ -50,60 +50,64 @@ public class TestDataInitializer {
                 }
             }
 
-            // Post 및 Content 데이터 확인 후 SQL 실행
             if (isPostDataUnderLimit()) {
                 executeSqlFile("db/migration/test_postData_testV1.sql");
             } else {
                 System.out.println("Post and Content data already sufficient, no need to insert post test data.");
             }
 
-            //  friend 데이터
-            if (isFriendDataUnderLimit()){
+            if (isFriendDataUnderLimit()) {
                 executeSqlFile("db/migration/balanced_friends_data_testV1.sql");
             } else {
                 System.out.println("Friend data already sufficient, no need to insert friend test data.");
+            }
+
+            // 참여자 데이터 확인 및 SQL 실행
+            if (isParticipantDataUnderLimit()) {
+                executeSqlFile("db/migration/unique_lightning_meeting_participant.sql");
+            } else {
+                System.out.println("Participant data already sufficient, no need to insert participant test data.");
             }
         };
     }
 
     private void createAccountsFromJson() throws IOException {
-        // JSON 파일 경로 설정
         String jsonFilePath = "src/main/resources/db/migration/test_memberData.json";
-
-        // JSON 파일을 읽어서 CreateMemberRequestDTO 리스트로 변환
         List<CreateMemberRequestDTO> memberRequests = objectMapper.readValue(
                 Files.readAllBytes(Paths.get(jsonFilePath)),
                 new TypeReference<List<CreateMemberRequestDTO>>() {}
         );
 
-        // 회원가입 API를 호출하여 회원 생성
         for (CreateMemberRequestDTO request : memberRequests) {
-            createMemberService.createMember(request, null);  // 프로필 이미지가 없으므로 null
+            createMemberService.createMember(request, null); // 프로필 이미지가 없으므로 null
         }
 
         System.out.println("All accounts from JSON file have been created.");
     }
 
-    // Post와 Content 데이터가 10개 이하인지를 확인하는 메서드
-
     private boolean isPostDataUnderLimit() {
         Integer postCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM post", Integer.class);
         Integer contentCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM content", Integer.class);
 
-        return postCount <= 10 && contentCount <= 10;  // 두 테이블 모두 10개 이하일 때만 true 반환
+        return postCount <= 10 && contentCount <= 10;
     }
+
     private boolean isUserDataUnderLimit() {
         Integer accountCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM account", Integer.class);
-
-        return accountCount < 10;  // 두 테이블 모두 10개 이하일 때만 true 반환
+        return accountCount < 10;
     }
 
     private boolean isFriendDataUnderLimit() {
         Integer friendCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM friends", Integer.class);
-
         return friendCount < 20;
     }
-    // 주어진 경로의 SQL 파일을 실행하는 메서드
+
+    // 참여자 데이터가 40건 이하인지 확인하는 메서드
+    private boolean isParticipantDataUnderLimit() {
+        Integer participantCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM lightning_meeting_participant", Integer.class);
+        return participantCount < 40;
+    }
+
     private void executeSqlFile(String filePath) {
         try (Connection conn = dataSource.getConnection()) {
             ScriptUtils.executeSqlScript(conn, new ClassPathResource(filePath));

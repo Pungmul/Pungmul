@@ -2,13 +2,15 @@ package pungmul.pungmul.service.lightning;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Lang;
+import org.geolatte.geom.G2D;
+import org.geolatte.geom.Point;
+import org.geolatte.geom.builder.DSL;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pungmul.pungmul.domain.lightning.InstrumentAssignment;
-import pungmul.pungmul.domain.lightning.LightningMeeting;
-import pungmul.pungmul.domain.lightning.LightningMeetingParticipant;
-import pungmul.pungmul.domain.lightning.MeetingType;
+import pungmul.pungmul.core.geo.LatLong;
+import pungmul.pungmul.domain.lightning.*;
 import pungmul.pungmul.domain.member.instrument.Instrument;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.lightning.*;
@@ -21,6 +23,10 @@ import pungmul.pungmul.repository.member.repository.UserRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
+import static pungmul.pungmul.core.geo.DistanceCalculator.calculateDistance;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -93,7 +99,58 @@ public class LightningMeetingService {
     }
 
 
+    /**
+     * 사용자 위치와 지도 레벨을 기준으로 주변 번개 모임 데이터를 필터링하여 반환하는 메소드.
+     *
+     * @param requestDTO 사용자의 현재 위치(위도, 경도)와 지도 레벨 정보를 담은 요청 DTO
+     * @return 사용자 위치와 지도 레벨을 기준으로 필터링된 번개 모임 리스트를 포함한 응답 DTO
+     *
+     * 로직 동작 과정:
+     * 1. 사용자로부터 요청된 위도(latitude), 경도(longitude), 지도 레벨(mapLevel)을 가져옵니다.
+     * 2. 데이터베이스에서 모든 번개 모임 정보를 조회합니다.
+     * 3. 지도 레벨에 따라 검색 반경(distanceThreshold)을 계산합니다.
+     *    - 지도 레벨에 따른 거리(MapLevelDistance)를 가져와 반경 * 2로 설정.
+     * 4. 모든 번개 모임 중에서 사용자 위치와 번개 모임 위치 간 거리를 계산하여 필터링합니다.
+     *    - 거리 계산 로직(calculateDistance)을 사용하여 두 위치 간 거리를 구합니다.
+     *    - 거리 값이 설정된 검색 반경 이내일 경우 결과에 포함합니다.
+     * 5. 필터링된 번개 모임 리스트를 응답 DTO에 담아 반환합니다.
+     */
+    public GetNearLightningMeetingResponseDTO getNearLightningMeetings(GetNearLightningMeetingRequestDTO requestDTO) {
 
+        Double userLatitude = requestDTO.getLatitude();
+        Double userLongitude = requestDTO.getLongitude();
+        Integer mapLevel = requestDTO.getMapLevel();
+
+        List<LightningMeeting> allMeetings = lightningMeetingRepository.getAllLightningMeeting();
+
+        // 지도 레벨에 따른 거리 계산 (미터)
+        int distanceThreshold = MapLevelDistance.getDistanceByLevel(mapLevel) * 2;
+
+        // 번개 모임 필터링
+        return GetNearLightningMeetingResponseDTO.builder()
+                        .lightningMeetingList(allMeetings.stream()
+                            .filter(meeting -> {
+                                // 사용자 위치와 모임 위치 간 거리 계산
+                                double distance = calculateDistance(
+                                        userLatitude,
+                                        userLongitude,
+                                        meeting.getLatitude(),
+                                        meeting.getLongitude()
+                                );
+                                return distance <= distanceThreshold;
+                                })
+                            .collect(Collectors.toList()))
+                        .build();
+    }
+
+    public GetMeetingParticipantsResponseDTO getMeetingParticipants(GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO) {
+        Long meetingId = getMeetingParticipantsRequestDTO.getMeetingId();
+        List<LatLong> meetingParticipants = lightningMeetingParticipantRepository.getMeetingParticipants(meetingId);
+        log.info(meetingParticipants.toString());
+        return GetMeetingParticipantsResponseDTO.builder()
+                .locations(meetingParticipants)
+                .build();
+    }
 
 
     /**
@@ -149,6 +206,10 @@ public class LightningMeetingService {
                 .username(userDetails.getUsername())
                 .instrumentAssigned(instrument) // 사용자 주 악기
                 .organizer(isOrganizer)
+                .location(LatLong.builder()
+                        .latitude(addLightningMeetingRequestDTO.getLatitude())
+                        .longitude(addLightningMeetingRequestDTO.getLongitude())
+                        .build())
                 .build();
     }
 
