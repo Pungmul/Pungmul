@@ -21,4 +21,6 @@ public interface InstrumentStatusMapper {
     void setMajorFalseForOtherInstruments(InstrumentStatus instrumentStatus);
 
     void updateInstrumentAbilityAndMajor(InstrumentStatus instrumentStatus);
+
+    Instrument getMajorInstrumentByUserId(Long userId);
 }

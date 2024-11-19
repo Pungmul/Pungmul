@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.lightning.mapper.LightningMeetingMapper">
+
+    <!-- ResultMap 정의 -->
+    <resultMap id="LightningMeetingResultMap" type="pungmul.pungmul.domain.lightning.LightningMeeting">
+        <id property="id" column="id" />
+        <result property="meetingName" column="meeting_name" />
+        <result property="meetingDescription" column="meeting_description" />
+        <result property="startTime" column="start_time" />
+        <result property="endTime" column="end_time" />
+        <result property="minPersonNum" column="min_person_num" />
+        <result property="maxPersonNum" column="max_person_num" />
+        <result property="organizerId" column="organizer_id" />
+        <result property="meetingType" column="meeting_type" />
+        <result property="latitude" column="latitude" />
+        <result property="longitude" column="longitude" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!-- LightningMeeting 생성 -->
+    <insert id="createLightningMeeting" parameterType="pungmul.pungmul.domain.lightning.LightningMeeting" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO lightning_meeting (
+            meeting_name,
+            meeting_description,
+            start_time,
+            end_time,
+            min_person_num,
+            max_person_num,
+            organizer_id,
+            meeting_type,
+            latitude,
+            longitude
+        )
+        VALUES (
+                   #{meetingName},
+                   #{meetingDescription},
+                   #{startTime},
+                   #{endTime},
+                   #{minPersonNum},
+                   #{maxPersonNum},
+                   #{organizerId},
+                   #{meetingType},
+                   #{latitude},
+                   #{longitude}
+               )
+    </insert>
+
+    <!-- 특정 LightningMeeting 조회 -->
+    <select id="findLightningMeetingById" parameterType="long" resultMap="LightningMeetingResultMap">
+        SELECT
+            id,
+            meeting_name,
+            meeting_description,
+            start_time,
+            end_time,
+            min_person_num,
+            max_person_num,
+            organizer_id,
+            meeting_type,
+            latitude,
+            longitude,
+            created_at,
+            updated_at
+        FROM lightning_meeting
+        WHERE id = #{id}
+    </select>
+
+    <!-- LightningMeeting 업데이트 -->
+    <update id="updateLightningMeeting" parameterType="pungmul.pungmul.domain.lightning.LightningMeeting">
+        UPDATE lightning_meeting
+        SET
+            meeting_name = #{meetingName},
+            meeting_description = #{meetingDescription},
+            start_time = #{startTime},
+            end_time = #{endTime},
+            min_person_num = #{minPersonNum},
+            max_person_num = #{maxPersonNum},
+            organizer_id = #{organizerId},
+            meeting_type = #{meetingType},
+            latitude = #{latitude},
+            longitude = #{longitude}
+        WHERE id = #{id}
+    </update>
+
+    <!-- LightningMeeting 삭제 -->
+    <delete id="deleteLightningMeetingById" parameterType="long">
+        DELETE FROM lightning_meeting
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 주최자 변경 -->
+    <update id="changeOrganizer" parameterType="map">
+        UPDATE lightning_meeting
+        SET organizer_id = #{newOrganizerId}
+        WHERE id = #{meetingId}
+    </update>
+
+    <!-- 모든 LightningMeeting 조회 -->
+    <select id="getAllLightningMeeting" resultMap="LightningMeetingResultMap">
+        SELECT
+            id,
+            meeting_name,
+            meeting_description,
+            start_time,
+            end_time,
+            min_person_num,
+            max_person_num,
+            organizer_id,
+            meeting_type,
+            latitude,
+            longitude,
+            created_at,
+            updated_at
+        FROM lightning_meeting
+    </select>
+
+</mapper>
