@@ -38,8 +38,6 @@ public class LightningMeetingController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, meetingParticipants));
     }
 
-
-
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/meeting")
     public ResponseEntity<BaseResponse<CreateLightningMeetingResponseDTO>> createLightningMeeting(

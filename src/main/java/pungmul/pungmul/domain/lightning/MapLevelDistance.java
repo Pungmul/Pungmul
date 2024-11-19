@@ -10,7 +10,9 @@ public enum MapLevelDistance {
     LEVEL_4(100),
     LEVEL_5(250),
     LEVEL_6(500),
-    LEVEL_7(1000);
+    LEVEL_7(1000),
+    LEVEL_8(2000),
+    LEVEL_9(4000);
 
     private final int distance; // 단위 거리 (미터)
 
