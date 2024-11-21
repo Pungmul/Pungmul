@@ -11,7 +11,6 @@ import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.domain.member.user.User;
-import pungmul.pungmul.dto.friend.ReqFriendStatusResponseDTO;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.repository.image.repository.ImageRepository;

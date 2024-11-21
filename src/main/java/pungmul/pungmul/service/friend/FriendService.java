@@ -15,6 +15,7 @@ import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.MessageType;
 import pungmul.pungmul.dto.friend.AvailableFriendDTO;
 import pungmul.pungmul.dto.friend.FriendListResponseDTO;
+import pungmul.pungmul.dto.friend.FriendReqResponseDTO;
 import pungmul.pungmul.dto.friend.FriendRequestDTO;
 import pungmul.pungmul.dto.member.SimpleUserDTO;
 import pungmul.pungmul.dto.message.friend.FriendRequestInvitationMessageDTO;
@@ -74,7 +75,7 @@ public class FriendService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)  // 트랜잭션이 직렬화되어 동시에 실행되는 트랜잭션 충돌을 방지
-    public void sendFriendRequest(UserDetails userDetails, String receiverUserName) {
+    public FriendReqResponseDTO sendFriendRequest(UserDetails userDetails, String receiverUserName) {
         isReqToSelfCheck(userDetails, receiverUserName);
 
         Long userId = userRepository.getUserByEmail(userDetails.getUsername())
@@ -91,6 +92,10 @@ public class FriendService {
         // 알림 메시지 생성 및 전송
         FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, friend.getId(), userId);
         messageService.sendMessage(MessageType.INVITATION, MessageDomainType.FRIEND, receiverUserName, invitationMessage);
+
+        return FriendReqResponseDTO.builder()
+                .friendId(friend.getId())
+                .build();
     }
 
     private static Friend getFriend(Long userId, Long receiverId) {
