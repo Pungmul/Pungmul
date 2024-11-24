@@ -26,10 +26,7 @@ import pungmul.pungmul.service.message.MessageService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -212,12 +209,19 @@ public class MeetingService {
                 .map(User::getId)
                 .orElseThrow(NoSuchElementException::new);
 
-        // 친구 목록 중에서 ACCEPTED 상태인 친구만 필터링
         List<SimpleUserDTO> friendList = friendRepository.getFriendList(userId).stream()
                 .filter(friend -> friend.getStatus() == FriendStatus.ACCEPTED)
                 // 양방향 관계에서 한쪽만 조회되도록 필터링
                 .filter(friend -> friend.getSenderId() < friend.getReceiverId())
-                .map(friend -> friendService.getFriendRequestDTO(userId, friend))
+                .map(friend -> {
+                    try {
+                        return friendService.getFriendRequestDTO(userId, friend);
+                    } catch (NoSuchElementException e) {
+                        log.warn("조회할 수 없는 사용자: {}", friend.getId(), e);
+                        return null; // 오류가 발생한 데이터는 제외
+                    }
+                })
+                .filter(Objects::nonNull) // null인 데이터를 제외
                 .map(FriendRequestDTO::getSimpleUserDTO)
                 .collect(Collectors.toList());
 

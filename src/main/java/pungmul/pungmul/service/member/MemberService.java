@@ -34,13 +34,14 @@ public class MemberService {
     private final ImageService imageService;
 
     public SimpleUserDTO getSimpleUserDTO(Long userId){
+        log.info("userId : {}", userId);
         return userRepository.getUserByUserId(userId)
                     .map(this::buildSimpleUserDTO)
                     .orElseThrow(NoSuchElementException::new);
     }
 
     private SimpleUserDTO buildSimpleUserDTO(User user){
-//        log.info("user name : {}", user.getName());
+        log.info("user name : {}", user.getName());
         Image profile = imageRepository.getImagesByDomainIdAndType(DomainType.PROFILE, user.getId()).stream().findFirst().orElseGet(imageService::getAnonymousImage);
 
         return SimpleUserDTO.builder()
