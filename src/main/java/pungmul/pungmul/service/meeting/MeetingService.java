@@ -64,22 +64,35 @@ public class MeetingService {
     }
 
     //  초대 메세지 전송 메소드. 로그인 사용자 정보와 메세지 전송 대상 이메일 리스트를 인자로 받음
-    public void inviteUserToMeeting(UserDetails userDetails, InviteUserToMeetingRequestDTO inviteUserToMeetingRequestDTO) {
+    public InviteUserToMeetingResponseDTO inviteUserToMeeting(UserDetails userDetails, InviteUserToMeetingRequestDTO inviteUserToMeetingRequestDTO) {
         List<String> inviteUserEmailList = inviteUserToMeetingRequestDTO.getInviteUserEmailList();
         Long meetingId = inviteUserToMeetingRequestDTO.getMeetingId();
         User founder = userRepository.getUserByEmail(userDetails.getUsername())
                 .orElseThrow(NoSuchElementException::new);
 
+        InviteUserToMeetingResponseDTO inviteUserToMeetingResponseDTO = new InviteUserToMeetingResponseDTO();
+
         for (String email : inviteUserEmailList) {
-            User receiver = userRepository.getUserByEmail(email)
-                    .orElseThrow(NoSuchElementException::new);
+            try {
+                User receiver = userRepository.getUserByEmail(email)
+                        .orElseThrow(() -> new NoSuchElementException("User not found: " + email));
 
-            MeetingInvitation meetingInvitation = getMeetingInvitation(meetingId, founder, receiver);
-            meetingInvitationRepository.createMeetingInvitation(meetingInvitation);
+                MeetingInvitation meetingInvitation = getMeetingInvitation(meetingId, founder, receiver);
+                meetingInvitationRepository.createMeetingInvitation(meetingInvitation);
 
-            // 새로운 메시지 전송 로직으로 초대 메시지 전송
-            sendInvitationMessage(receiver, founder, meetingId, meetingInvitation.getId());
+                sendInvitationMessage(receiver, founder, meetingId, meetingInvitation.getId());
+
+                inviteUserToMeetingResponseDTO.getInviteUsers()
+                        .add(InviteUserToMeetingResponseDTO.InviteUser.builder()
+                                .meetingId(meetingId)
+                                .email(receiver.getEmail()).build());
+            } catch (NoSuchElementException e) {
+                log.warn("Failed to invite user with email: {}", email, e);
+                inviteUserToMeetingResponseDTO.getFailedEmails().add(email);
+            }
         }
+
+        return inviteUserToMeetingResponseDTO;
     }
     // 새로운 메시지 전송 메서드
     private void sendInvitationMessage(User receiver, User founder, Long meetingId, Long invitationId) {
