@@ -43,12 +43,12 @@ public class MeetingController {
 
 //    @PreAuthorize("hasRole('USER')")
     @PostMapping("/invite")  // POST /invite 호출.
-    public ResponseEntity<BaseResponse<Void>> inviteUserToMeeting(
+    public ResponseEntity<BaseResponse<InviteUserToMeetingResponseDTO>> inviteUserToMeeting(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody InviteUserToMeetingRequestDTO inviteUserToMeetingRequestDTO
     ){
-        meetingService.inviteUserToMeeting(userDetails, inviteUserToMeetingRequestDTO);
-        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
+        InviteUserToMeetingResponseDTO inviteUserToMeetingResponseDTO = meetingService.inviteUserToMeeting(userDetails, inviteUserToMeetingRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, inviteUserToMeetingResponseDTO));
     }
 
     // 모임 초대 메시지를 수신하는 메소드

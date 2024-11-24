@@ -16,9 +16,7 @@ import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.MessageType;
 import pungmul.pungmul.dto.friend.AvailableFriendDTO;
 import pungmul.pungmul.dto.friend.FriendListResponseDTO;
-import pungmul.pungmul.dto.friend.ReqFriendStatusResponseDTO;
-import pungmul.pungmul.dto.member.SimpleUserListResponseDTO;
-import pungmul.pungmul.dto.member.SimpleUserDTO;
+import pungmul.pungmul.dto.friend.FriendReqResponseDTO;
 import pungmul.pungmul.dto.message.friend.FriendRequestInvitationMessageDTO;
 import pungmul.pungmul.service.friend.FriendService;
 import pungmul.pungmul.service.member.MemberService;
@@ -56,13 +54,13 @@ public class FriendController {
     //  친구 신청
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/request")
-    public ResponseEntity<BaseResponse<Void>> sendFriendRequest(
+    public ResponseEntity<BaseResponse<FriendReqResponseDTO>> sendFriendRequest(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam String receiverUsername
             ){
-        friendService.sendFriendRequest(userDetails, receiverUsername);
+        FriendReqResponseDTO friendReqResponseDTO = friendService.sendFriendRequest(userDetails, receiverUsername);
 
-        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, friendReqResponseDTO));
     }
 
     // 친구 요청 알림을 받는 메서드

@@ -26,10 +26,7 @@ import pungmul.pungmul.service.message.MessageService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -67,22 +64,35 @@ public class MeetingService {
     }
 
     //  초대 메세지 전송 메소드. 로그인 사용자 정보와 메세지 전송 대상 이메일 리스트를 인자로 받음
-    public void inviteUserToMeeting(UserDetails userDetails, InviteUserToMeetingRequestDTO inviteUserToMeetingRequestDTO) {
+    public InviteUserToMeetingResponseDTO inviteUserToMeeting(UserDetails userDetails, InviteUserToMeetingRequestDTO inviteUserToMeetingRequestDTO) {
         List<String> inviteUserEmailList = inviteUserToMeetingRequestDTO.getInviteUserEmailList();
         Long meetingId = inviteUserToMeetingRequestDTO.getMeetingId();
         User founder = userRepository.getUserByEmail(userDetails.getUsername())
                 .orElseThrow(NoSuchElementException::new);
 
+        InviteUserToMeetingResponseDTO inviteUserToMeetingResponseDTO = new InviteUserToMeetingResponseDTO();
+
         for (String email : inviteUserEmailList) {
-            User receiver = userRepository.getUserByEmail(email)
-                    .orElseThrow(NoSuchElementException::new);
+            try {
+                User receiver = userRepository.getUserByEmail(email)
+                        .orElseThrow(() -> new NoSuchElementException("User not found: " + email));
 
-            MeetingInvitation meetingInvitation = getMeetingInvitation(meetingId, founder, receiver);
-            meetingInvitationRepository.createMeetingInvitation(meetingInvitation);
+                MeetingInvitation meetingInvitation = getMeetingInvitation(meetingId, founder, receiver);
+                meetingInvitationRepository.createMeetingInvitation(meetingInvitation);
 
-            // 새로운 메시지 전송 로직으로 초대 메시지 전송
-            sendInvitationMessage(receiver, founder, meetingId, meetingInvitation.getId());
+                sendInvitationMessage(receiver, founder, meetingId, meetingInvitation.getId());
+
+                inviteUserToMeetingResponseDTO.getInviteUsers()
+                        .add(InviteUserToMeetingResponseDTO.InviteUser.builder()
+                                .meetingId(meetingId)
+                                .email(receiver.getEmail()).build());
+            } catch (NoSuchElementException e) {
+                log.warn("Failed to invite user with email: {}", email, e);
+                inviteUserToMeetingResponseDTO.getFailedEmails().add(email);
+            }
         }
+
+        return inviteUserToMeetingResponseDTO;
     }
     // 새로운 메시지 전송 메서드
     private void sendInvitationMessage(User receiver, User founder, Long meetingId, Long invitationId) {
@@ -212,12 +222,19 @@ public class MeetingService {
                 .map(User::getId)
                 .orElseThrow(NoSuchElementException::new);
 
-        // 친구 목록 중에서 ACCEPTED 상태인 친구만 필터링
         List<SimpleUserDTO> friendList = friendRepository.getFriendList(userId).stream()
                 .filter(friend -> friend.getStatus() == FriendStatus.ACCEPTED)
                 // 양방향 관계에서 한쪽만 조회되도록 필터링
                 .filter(friend -> friend.getSenderId() < friend.getReceiverId())
-                .map(friend -> friendService.getFriendRequestDTO(userId, friend))
+                .map(friend -> {
+                    try {
+                        return friendService.getFriendRequestDTO(userId, friend);
+                    } catch (NoSuchElementException e) {
+                        log.warn("조회할 수 없는 사용자: {}", friend.getId(), e);
+                        return null; // 오류가 발생한 데이터는 제외
+                    }
+                })
+                .filter(Objects::nonNull) // null인 데이터를 제외
                 .map(FriendRequestDTO::getSimpleUserDTO)
                 .collect(Collectors.toList());
 

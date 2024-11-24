@@ -11,7 +11,6 @@ import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.domain.member.user.User;
-import pungmul.pungmul.dto.friend.ReqFriendStatusResponseDTO;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.repository.image.repository.ImageRepository;
@@ -35,13 +34,14 @@ public class MemberService {
     private final ImageService imageService;
 
     public SimpleUserDTO getSimpleUserDTO(Long userId){
+        log.info("userId : {}", userId);
         return userRepository.getUserByUserId(userId)
                     .map(this::buildSimpleUserDTO)
                     .orElseThrow(NoSuchElementException::new);
     }
 
     private SimpleUserDTO buildSimpleUserDTO(User user){
-//        log.info("user name : {}", user.getName());
+        log.info("user name : {}", user.getName());
         Image profile = imageRepository.getImagesByDomainIdAndType(DomainType.PROFILE, user.getId()).stream().findFirst().orElseGet(imageService::getAnonymousImage);
 
         return SimpleUserDTO.builder()
