@@ -13,7 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InviteUserToMeetingResponseDTO {
+    @Builder.Default
     private List<InviteUser> inviteUsers = new ArrayList<>();
+    @Builder.Default
     private List<String> failedEmails = new ArrayList<>(); // 실패한 이메일 리스트
 
     @Getter
