@@ -235,9 +235,11 @@ public class LightningMeetingService {
      * @return LightningMeeting 객체.
      */
     private static LightningMeeting getLightningMeeting(CreateLightningMeetingRequestDTO createLightningMeetingRequestDTO, Long organizerId) {
+        log.info("recruitmentEndTime:{}",createLightningMeetingRequestDTO.getRecruitmentEndTime().toLocalTime());
         return LightningMeeting.builder()
                 .meetingName(createLightningMeetingRequestDTO.getMeetingName())
                 .meetingDescription(createLightningMeetingRequestDTO.getMeetingDescription())
+                .recruitmentEndTime(createLightningMeetingRequestDTO.getRecruitmentEndTime())
                 .startTime(createLightningMeetingRequestDTO.getStartTime())
                 .endTime(createLightningMeetingRequestDTO.getEndTime())
                 .minPersonNum(createLightningMeetingRequestDTO.getMinPersonNum())
