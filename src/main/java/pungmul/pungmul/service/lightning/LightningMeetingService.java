@@ -2,10 +2,7 @@ package pungmul.pungmul.service.lightning;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Lang;
-import org.geolatte.geom.G2D;
-import org.geolatte.geom.Point;
-import org.geolatte.geom.builder.DSL;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +17,13 @@ import pungmul.pungmul.repository.lightning.repository.LightningMeetingRepositor
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.geolatte.geom.crs.CoordinateReferenceSystems.WGS84;
 import static pungmul.pungmul.core.geo.DistanceCalculator.calculateDistance;
 
 @Slf4j
@@ -145,11 +143,74 @@ public class LightningMeetingService {
 
     public GetMeetingParticipantsResponseDTO getMeetingParticipants(GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO) {
         Long meetingId = getMeetingParticipantsRequestDTO.getMeetingId();
-        List<LatLong> meetingParticipants = lightningMeetingParticipantRepository.getMeetingParticipants(meetingId);
+        List<LatLong> meetingParticipants = lightningMeetingParticipantRepository.getMeetingParticipantLocations(meetingId);
         log.info(meetingParticipants.toString());
         return GetMeetingParticipantsResponseDTO.builder()
                 .locations(meetingParticipants)
                 .build();
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void checkMeetingDeadline(){
+        //  모집 시간이 지난 번개 미팅 리스트 반환
+        List<LightningMeeting> allByDeadline = lightningMeetingRepository.findAllByDeadline(LocalDateTime.now());
+
+        for (LightningMeeting meeting : allByDeadline) {
+            //  정식 판굿인 경우
+            if (meeting.getMeetingType() == MeetingType.CLASSICPAN) {
+                if (checkClassicParticipant(meeting))
+                    startLightningMeeting(meeting);
+                else
+                    cancelLightningMeeting(meeting);
+            }
+            //  정식 판굿이 아닌 경우
+            else {
+                if (meeting.getMinPersonNum() > getMeetingParticipantNum(meeting))
+                    startLightningMeeting(meeting);
+                else
+                    cancelLightningMeeting(meeting);
+            }
+        }
+    }
+
+    private Integer getMeetingParticipantNum(LightningMeeting meeting) {
+        return lightningMeetingParticipantRepository.getMeetingParticipantNum(meeting.getId());
+    }
+
+    private boolean checkClassicParticipant(LightningMeeting meeting) {
+        //  해당 정식판굿의 악기 구성 제한 정보
+        List<InstrumentAssignment> instrumentAssignmentList = meeting.getInstrumentAssignmentList();
+        //  모든 악기 제한에 대해
+        for (InstrumentAssignment instrumentAssignment : instrumentAssignmentList) {
+            //  현재 해당 악기로 가입한 사용자 수
+            Integer currentInstrumentAssign = lightningMeetingInstrumentAssignmentRepository.getCurrentInstrumentAssign(instrumentAssignment.getInstrument());
+            //  악기 조건을 충족하지 못하면 false
+            if (instrumentAssignment.getMinParticipants() > currentInstrumentAssign)
+                return false;
+        }
+        return true;
+    }
+
+    private void cancelLightningMeeting(LightningMeeting meeting) {
+        //  참가자들에게 번개 모임 취소 메세지 발송
+
+        //  해당 모임의 모든 사용자 INACTIVE
+        lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
+    }
+
+    private void startLightningMeeting(LightningMeeting meeting) {
+        //  참가자들에게 번개 모임 진행 메세지 발송
+
+    }
+
+    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    @Transactional
+    public void processExpiredMeetings() {
+        List<LightningMeeting> expiredMeetings = lightningMeetingRepository.findAllByDeadline(LocalDateTime.now());
+
+        // 모든 참가자의 status를 INACTIVE로 변경
+        expiredMeetings.stream().map(LightningMeeting::getId)
+                .forEach(lightningMeetingParticipantRepository::inactivateMeetingParticipants);
     }
 
 

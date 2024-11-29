@@ -125,4 +125,25 @@
         FROM lightning_meeting
     </select>
 
+    <!-- Find all LightningMeetings by deadline -->
+    <select id="findAllByDeadline" parameterType="java.time.LocalDateTime" resultMap="LightningMeetingResultMap">
+        SELECT
+        id,
+        meeting_name,
+        meeting_description,
+        recruitment_end_time,
+        start_time,
+        end_time,
+        min_person_num,
+        max_person_num,
+        organizer_id,
+        meeting_type,
+        latitude,
+        longitude,
+        created_at,
+        updated_at
+        FROM lightning_meeting
+        WHERE end_time &lt;= #{now}
+    </select>
+
 </mapper>

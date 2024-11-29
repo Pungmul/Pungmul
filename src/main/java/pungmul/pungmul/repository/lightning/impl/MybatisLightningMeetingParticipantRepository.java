@@ -23,7 +23,17 @@ public class MybatisLightningMeetingParticipantRepository implements LightningMe
     }
 
     @Override
-    public List<LatLong> getMeetingParticipants(Long meetingId) {
+    public List<LatLong> getMeetingParticipantLocations(Long meetingId) {
         return lightningMeetingParticipantMapper.getMeetingParticipants(meetingId);
+    }
+
+    @Override
+    public Integer getMeetingParticipantNum(Long meetingId) {
+        return lightningMeetingParticipantMapper.getMeetingParticipantNum(meetingId);
+    }
+
+    @Override
+    public void inactivateMeetingParticipants(Long meetingId) {
+        lightningMeetingParticipantMapper.inactivateMeetingParticipants(meetingId);
     }
 }

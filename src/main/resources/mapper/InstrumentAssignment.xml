@@ -56,4 +56,11 @@
         WHERE meeting_id = #{meetingId}
     </delete>
 
+    <!-- Retrieve current participants count for a specific instrument -->
+    <select id="getCurrentInstrumentAssign" parameterType="pungmul.pungmul.domain.member.instrument.Instrument" resultType="java.lang.Integer">
+        SELECT current_participants
+        FROM instrument_assignment
+        WHERE instrument = #{instrument}
+    </select>
+
 </mapper>

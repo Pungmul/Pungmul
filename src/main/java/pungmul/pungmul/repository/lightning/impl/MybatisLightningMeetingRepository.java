@@ -7,6 +7,7 @@ import pungmul.pungmul.domain.lightning.LightningMeeting;
 import pungmul.pungmul.repository.lightning.mapper.LightningMeetingMapper;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -23,5 +24,10 @@ public class MybatisLightningMeetingRepository implements LightningMeetingReposi
     @Override
     public List<LightningMeeting> getAllLightningMeeting() {
         return lightningMeetingMapper.getAllLightningMeeting();
+    }
+
+    @Override
+    public List<LightningMeeting> findAllByDeadline(LocalDateTime now) {
+        return lightningMeetingMapper.findAllByDeadline(now);
     }
 }

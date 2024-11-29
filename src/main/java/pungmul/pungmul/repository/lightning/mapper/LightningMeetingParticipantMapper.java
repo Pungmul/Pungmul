@@ -13,4 +13,8 @@ public interface LightningMeetingParticipantMapper {
     void addLightningMeetingParticipant(LightningMeetingParticipant lightningMeetingParticipant);
 
     List<LatLong> getMeetingParticipants(Long meetingId);
+
+    Integer getMeetingParticipantNum(Long meetingId);
+
+    void inactivateMeetingParticipants(Long meetingId);
 }

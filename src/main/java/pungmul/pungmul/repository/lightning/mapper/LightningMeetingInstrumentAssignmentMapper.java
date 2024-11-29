@@ -11,4 +11,6 @@ public interface LightningMeetingInstrumentAssignmentMapper {
     void increaseAssignment(Long meetingId, Instrument instrument);
 
     void decreaseAssignment(Long meetingId, Instrument instrument);
+
+    Integer getCurrentInstrumentAssign(Instrument instrument);
 }

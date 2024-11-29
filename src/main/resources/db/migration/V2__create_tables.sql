@@ -302,8 +302,9 @@ CREATE TABLE IF NOT EXISTS lightning_meeting_participant (
                         organizer BOOLEAN DEFAULT FALSE, -- Is this participant the organizer
                         latitude DOUBLE,
                         longitude DOUBLE,
+                        status ENUM('ACTIVE', 'INACTIVE'),
                         FOREIGN KEY (meeting_id) REFERENCES lightning_meeting (id) ON DELETE CASCADE
-);
+ );
 
 CREATE TABLE IF NOT EXISTS instrument_assignment (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,

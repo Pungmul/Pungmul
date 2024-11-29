@@ -24,4 +24,9 @@ public class MybatisLightningMeetingInstrumentAssignmentRepository implements Li
     public void createAssignment(InstrumentAssignment instrumentAssignment) {
         lightningMeetingInstrumentAssignmentMapper.createAssignment(instrumentAssignment);
     }
+
+    @Override
+    public Integer getCurrentInstrumentAssign(Instrument instrument) {
+        return lightningMeetingInstrumentAssignmentMapper.getCurrentInstrumentAssign(instrument);
+    }
 }
