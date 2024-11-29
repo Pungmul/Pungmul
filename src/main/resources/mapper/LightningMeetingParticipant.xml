@@ -13,6 +13,8 @@
         <result property="organizer" column="organizer" />
         <result property="latitude" column="latitude" />
         <result property="longitude" column="longitude" />
+        <result property="status" column="status" />
+
     </resultMap>
 
     <!-- Insert Participant -->
@@ -36,4 +38,19 @@
         FROM lightning_meeting_participant
         WHERE meeting_id = #{meetingId};
     </select>
+
+    <!-- Count ACTIVE Participants By Meeting ID -->
+    <select id="getMeetingParticipantNum" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM lightning_meeting_participant
+        WHERE meeting_id = #{meetingId}
+          AND status = 'ACTIVE';
+    </select>
+
+    <!-- Update all participants' status to INACTIVE for a specific meeting -->
+    <update id="inactivateMeetingParticipants" parameterType="java.lang.Long">
+        UPDATE lightning_meeting_participant
+        SET status = 'INACTIVE'
+        WHERE meeting_id = #{meetingId};
+    </update>
 </mapper>

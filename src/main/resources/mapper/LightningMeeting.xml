@@ -10,6 +10,7 @@
         <id property="id" column="id" />
         <result property="meetingName" column="meeting_name" />
         <result property="meetingDescription" column="meeting_description" />
+        <result property="recruitmentEndTime" column="recruitment_end_time" />
         <result property="startTime" column="start_time" />
         <result property="endTime" column="end_time" />
         <result property="minPersonNum" column="min_person_num" />
@@ -27,6 +28,7 @@
         INSERT INTO lightning_meeting (
             meeting_name,
             meeting_description,
+            recruitment_end_time,
             start_time,
             end_time,
             min_person_num,
@@ -39,6 +41,7 @@
         VALUES (
                    #{meetingName},
                    #{meetingDescription},
+                   #{recruitmentEndTime},
                    #{startTime},
                    #{endTime},
                    #{minPersonNum},
@@ -56,6 +59,7 @@
             id,
             meeting_name,
             meeting_description,
+            recruitment_end_time,
             start_time,
             end_time,
             min_person_num,
@@ -76,6 +80,7 @@
         SET
             meeting_name = #{meetingName},
             meeting_description = #{meetingDescription},
+            recruitment_end_time = #{recruitmentEndTime},
             start_time = #{startTime},
             end_time = #{endTime},
             min_person_num = #{minPersonNum},
@@ -106,6 +111,7 @@
             id,
             meeting_name,
             meeting_description,
+            recruitment_end_time,
             start_time,
             end_time,
             min_person_num,
@@ -117,6 +123,27 @@
             created_at,
             updated_at
         FROM lightning_meeting
+    </select>
+
+    <!-- Find all LightningMeetings by deadline -->
+    <select id="findAllByDeadline" parameterType="java.time.LocalDateTime" resultMap="LightningMeetingResultMap">
+        SELECT
+        id,
+        meeting_name,
+        meeting_description,
+        recruitment_end_time,
+        start_time,
+        end_time,
+        min_person_num,
+        max_person_num,
+        organizer_id,
+        meeting_type,
+        latitude,
+        longitude,
+        created_at,
+        updated_at
+        FROM lightning_meeting
+        WHERE end_time &lt;= #{now}
     </select>
 
 </mapper>

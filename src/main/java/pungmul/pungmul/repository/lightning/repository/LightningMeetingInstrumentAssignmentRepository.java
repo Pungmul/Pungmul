@@ -7,4 +7,6 @@ public interface LightningMeetingInstrumentAssignmentRepository {
     void increaseAssignment(Long meetingId, Instrument instrument);
 
     void createAssignment(InstrumentAssignment instrumentAssignment);
+
+    Integer getCurrentInstrumentAssign(Instrument instrument);
 }
