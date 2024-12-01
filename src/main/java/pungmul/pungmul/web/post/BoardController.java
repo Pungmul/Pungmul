@@ -47,14 +47,6 @@ public class BoardController {
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardList));
     }
 
-//    @PreAuthorize("hasRole('USER')")
-//    @GetMapping("/{categoryName}")
-//    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(@PathVariable Long categoryId){
-//        BoardDetailsResponseDTO boardDetailsResponseDTO = boardService.getInitialBoardData(categoryId);
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardDetailsResponseDTO));
-//    }
-
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{categoryId}")
     public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(@PathVariable Long categoryId){

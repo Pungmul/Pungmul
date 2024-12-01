@@ -124,7 +124,8 @@ public class PostService {
         Content content = getContent(userId, postId, postRequestDTO);
         contentRepository.save(content);
 
-        saveImageList(userId, content.getId(),files);
+        if (files.isEmpty())
+            saveImageList(userId, content.getId(),files);
     }
 
     private void saveImageList(Long userId, Long contentId, List<MultipartFile> images) throws IOException {
