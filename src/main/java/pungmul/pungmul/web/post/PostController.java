@@ -12,14 +12,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
+import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.LocalPostResponseDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
-import pungmul.pungmul.dto.post.post.CreatePostResponseDTO;
-import pungmul.pungmul.dto.post.post.PostResponseDTO;
-import pungmul.pungmul.dto.post.post.SimplePostDTO;
+import pungmul.pungmul.dto.post.post.*;
 import pungmul.pungmul.service.post.PostService;
 
 import java.io.IOException;
@@ -39,8 +39,8 @@ public class PostController {
             @RequestParam Long categoryId,
             @Validated @RequestPart("postData") PostRequestDTO postRequestDTO,
             @RequestPart(value = "files", required = false) List<MultipartFile> files
-    ) throws IOException {
-        CreatePostResponseDTO createPostResponseDTO = postService.addPost(userDetails.getAccountId(), categoryId, postRequestDTO, files);
+    ) throws IOException, ExceededPostingNumException, ForbiddenPostingUserException {
+        CreatePostResponseDTO createPostResponseDTO = postService.addPost(userDetails, categoryId, postRequestDTO, files);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createPostResponseDTO));
     }
@@ -65,4 +65,16 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, postLikeResponseDTO));
     }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/{postId}/report")
+    public ResponseEntity<BaseResponse<ReportPostResponseDTO>> reportPostByPostId(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long postId,
+            @RequestBody ReportPostRequestDTO reportPostRequestDTO
+    ) {
+        ReportPostResponseDTO reportPostResponseDTO = postService.reportPostByPostId(userDetails, postId, reportPostRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reportPostResponseDTO));
+    }
+
 }

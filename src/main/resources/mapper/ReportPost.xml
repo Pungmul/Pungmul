@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.post.mapper.ReportPostMapper">
+
+    <!-- ResultMap 정의 -->
+    <resultMap id="ReportPostResultMap" type="pungmul.pungmul.domain.post.ReportPost">
+        <id property="id" column="id" />
+        <result property="postId" column="post_id" />
+        <result property="userId" column="user_id" />
+        <result property="reportReason" column="report_reason" />
+        <result property="reportTime" column="report_time" />
+    </resultMap>
+
+    <!-- 신고 생성 -->
+    <insert id="reportPost" parameterType="pungmul.pungmul.domain.post.ReportPost" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO report_post (post_id, user_id, report_reason)
+            VALUES (#{postId}, #{userId}, #{reportReason})
+    </insert>
+
+    <!-- 특정 게시물에 대한 신고 조회 -->
+    <select id="findReportsByPostId" parameterType="long" resultMap="ReportPostResultMap">
+        SELECT
+            id,
+            post_id,
+            user_id,
+            report_reason,
+            report_time
+        FROM report_post
+        WHERE post_id = #{postId}
+    </select>
+
+    <!-- 중복 신고 확인 -->
+    <select id="getReportPost" parameterType="Long" resultMap="ReportPostResultMap">
+        SELECT * FROM report_post
+            WHERE id = #{id}
+    </select>
+
+    <!-- 중복 신고 확인 -->
+    <select id="existsByPostIdAndUserId" parameterType="map" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM report_post
+            WHERE post_id = #{postId}
+              AND user_id = #{userId}
+        )
+    </select>
+
+    <!-- 모든 신고 조회 -->
+    <select id="getAllReports" resultMap="ReportPostResultMap">
+        SELECT
+            id,
+            post_id,
+            user_id,
+            report_reason,
+            report_time
+        FROM report_post
+    </select>
+
+    <!-- 특정 신고 삭제 -->
+    <delete id="deleteReportById" parameterType="long">
+        DELETE FROM report_post
+        WHERE id = #{id}
+    </delete>
+</mapper>
