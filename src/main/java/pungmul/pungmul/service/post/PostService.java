@@ -9,24 +9,25 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
+import pungmul.pungmul.domain.post.ReportPost;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
 import pungmul.pungmul.dto.post.LocalPostResponseDTO;
-import pungmul.pungmul.dto.post.post.CreatePostResponseDTO;
-import pungmul.pungmul.dto.post.post.PostResponseDTO;
-import pungmul.pungmul.dto.post.post.SimplePostDTO;
+import pungmul.pungmul.dto.post.post.*;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.CategoryRepository;
 import pungmul.pungmul.repository.post.repository.ContentRepository;
 import pungmul.pungmul.repository.post.repository.PostRepository;
+import pungmul.pungmul.repository.post.repository.ReportPostRepository;
 import pungmul.pungmul.service.file.DomainImageService;
 import pungmul.pungmul.service.file.ImageService;
 
@@ -49,6 +50,7 @@ public class PostService {
     private final TimeSincePosted timeSincePosted;
     private final CommentService commentService;
     private final AccountRepository accountRepository;
+    private final ReportPostRepository reportPostRepository;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
@@ -229,6 +231,28 @@ public class PostService {
                 .isLiked(postLikedByUser)
                 .likedNum(postById.getLikeNum())
                 .viewCount(postById.getViewCount())
+                .build();
+    }
+
+    @Transactional
+    public ReportPostResponseDTO reportPostByPostId(UserDetailsImpl userDetails, Long postId, ReportPostRequestDTO reportPostRequestDTO) {
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
+                .map(User::getId)
+                .orElseThrow(NoSuchElementException::new);
+
+        ReportPost reportPost = ReportPost.builder()
+                .postId(postId)
+                .userId(userId)
+                .reportReason(reportPostRequestDTO.getReportReason())
+                .build();
+
+        reportPostRepository.reportPost(reportPost);
+
+        return ReportPostResponseDTO.builder()
+                .postId(postId)
+                .postName(contentRepository.getContentByPostId(postId).getTitle())
+                .reportReason(reportPost.getReportReason())
+                .reportTime(reportPostRepository.getReportPost(reportPost.getId()).getReportTime())
                 .build();
     }
 }

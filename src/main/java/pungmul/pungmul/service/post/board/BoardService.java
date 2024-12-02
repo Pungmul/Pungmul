@@ -52,11 +52,10 @@ public class BoardService {
     public BoardDetailsResponseDTO getInitialBoardData(Long categoryId) {
         if (!categoryRepository.isCategoryExistById(categoryId))
             throw new NoSuchElementException();
+
         BoardInfoDTO boardInfo = getBoardInfo(categoryId);
         SimplePostDTO hotPost = postService.getHotPost(categoryId);
         PageInfo<SimplePostDTO> recentPosts = postService.getPostsByCategory(categoryId, 1, 20);
-//        if (recentPosts.getList().isEmpty() || recentPosts.isIsLastPage())
-//            throw new NoMoreDataException("초기 호출에서 모든 게시물이 호출되었습니다.");
 
         return getBoardDetailsResponseDTO(boardInfo, hotPost, recentPosts);
     }

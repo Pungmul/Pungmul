@@ -17,9 +17,7 @@ import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.LocalPostResponseDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
-import pungmul.pungmul.dto.post.post.CreatePostResponseDTO;
-import pungmul.pungmul.dto.post.post.PostResponseDTO;
-import pungmul.pungmul.dto.post.post.SimplePostDTO;
+import pungmul.pungmul.dto.post.post.*;
 import pungmul.pungmul.service.post.PostService;
 
 import java.io.IOException;
@@ -65,4 +63,16 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, postLikeResponseDTO));
     }
+
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/{postId}/report")
+    public ResponseEntity<BaseResponse<ReportPostResponseDTO>> reportPostByPostId(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long postId,
+            @RequestBody ReportPostRequestDTO reportPostRequestDTO
+    ) {
+        ReportPostResponseDTO reportPostResponseDTO = postService.reportPostByPostId(userDetails, postId, reportPostRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reportPostResponseDTO));
+    }
+
 }

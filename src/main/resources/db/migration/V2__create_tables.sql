@@ -304,7 +304,7 @@ CREATE TABLE IF NOT EXISTS lightning_meeting_participant (
                         longitude DOUBLE,
                         status ENUM('ACTIVE', 'INACTIVE'),
                         FOREIGN KEY (meeting_id) REFERENCES lightning_meeting (id) ON DELETE CASCADE
- );
+);
 
 CREATE TABLE IF NOT EXISTS instrument_assignment (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -316,5 +316,17 @@ CREATE TABLE IF NOT EXISTS instrument_assignment (
                         FOREIGN KEY (meeting_id) REFERENCES lightning_meeting (id) ON DELETE CASCADE,
                         UNIQUE (meeting_id, instrument)
 );
+
+CREATE TABLE IF NOT EXISTS report_post (
+                                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                           post_id BIGINT NOT NULL,
+                                           user_id BIGINT NOT NULL,
+                                           report_reason ENUM('INCITING_TROUBLE', 'PORNOGRAPHY', 'SPAM', 'DEFAMATION', 'OFF_TOPIC', 'OTHER') NOT NULL,
+                                           report_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                           UNIQUE KEY unique_report (post_id, user_id),
+                                           FOREIGN KEY (post_id) REFERENCES post(id) ON DELETE CASCADE,
+                                           FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
 
 
