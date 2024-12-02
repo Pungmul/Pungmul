@@ -328,5 +328,10 @@ CREATE TABLE IF NOT EXISTS report_post (
                                            FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS post_limit (
+                                          user_id BIGINT NOT NULL PRIMARY KEY,
+                                          post_count INT DEFAULT 0, -- 현재 게시물 작성 횟수
+                                          last_reset_time DATETIME DEFAULT CURRENT_TIMESTAMP -- 마지막 초기화 시간
+);
 
 

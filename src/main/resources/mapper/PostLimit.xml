@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.post.mapper.PostLimitMapper">
+    <!-- ResultMap 정의 -->
+    <resultMap id="ReportPostResultMap" type="pungmul.pungmul.domain.post.PostLimit">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="postCount" column="post_count" />
+        <result property="lastResetTime" column="last_reset_time" />
+    </resultMap>
+
+    <!-- 사용자별 게시물 작성 제한 조회 -->
+    <select id="findPostLimitByUserId" parameterType="long" resultType="PostLimit">
+        SELECT user_id, post_count, last_reset_time
+        FROM post_limit
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 게시물 작성 제한 추가 (새 사용자) -->
+    <insert id="insertPostLimit" parameterType="PostLimit">
+        INSERT INTO post_limit (user_id, post_count, last_reset_time)
+        VALUES (#{userId}, #{postCount}, #{lastResetTime})
+    </insert>
+
+    <!-- 게시물 작성 횟수 증가 -->
+    <update id="incrementPostCount" parameterType="long">
+        UPDATE post_limit
+        SET post_count = post_count + 1
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 게시물 작성 횟수 초기화 -->
+    <update id="resetAllPostCounts">
+        UPDATE post_limit
+        SET post_count = 0, last_reset_time = CURRENT_TIMESTAMP
+    </update>
+
+    <update id="updatePostLimit" parameterType="map">
+        UPDATE post_limit
+        SET
+            post_count = 0,
+            last_reset_time = CURRENT_TIMESTAMP
+        WHERE id = #{postLimitId}
+    </update>
+</mapper>

@@ -12,6 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
+import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.LocalPostResponseDTO;
@@ -37,8 +39,8 @@ public class PostController {
             @RequestParam Long categoryId,
             @Validated @RequestPart("postData") PostRequestDTO postRequestDTO,
             @RequestPart(value = "files", required = false) List<MultipartFile> files
-    ) throws IOException {
-        CreatePostResponseDTO createPostResponseDTO = postService.addPost(userDetails.getAccountId(), categoryId, postRequestDTO, files);
+    ) throws IOException, ExceededPostingNumException, ForbiddenPostingUserException {
+        CreatePostResponseDTO createPostResponseDTO = postService.addPost(userDetails, categoryId, postRequestDTO, files);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createPostResponseDTO));
     }
