@@ -41,7 +41,7 @@
         FROM user
         WHERE (email LIKE CONCAT('%', #{keyword}, '%')
             OR name LIKE CONCAT('%', #{keyword}, '%'))
-          AND expired = FALSE
+#           AND expired = FALSE
           AND #{keyword} IS NOT NULL AND #{keyword} != ''
     </select>
 
@@ -49,14 +49,14 @@
     <select id="getUserByUserId" resultMap="UserResultMap">
         SELECT * FROM user
         WHERE id = #{id}
-          AND expired = FALSE
+#           AND expired = FALSE
     </select>
 
     <!-- Select Users By AccountId (소프트 삭제된 사용자는 제외) -->
     <select id="getUserByAccountId" resultMap="UserResultMap">
         SELECT * FROM user
         WHERE account_id = #{accountId}
-          AND expired = FALSE
+#           AND expired = FALSE
     </select>
 
     <!-- Update User -->
@@ -74,7 +74,8 @@
 
     <!-- Select Users By Email (소프트 삭제된 사용자는 제외) -->
     <select id="getUserByEmail" resultMap="UserResultMap">
-        SELECT * FROM user WHERE email = #{email} AND expired = FALSE
+        SELECT * FROM user WHERE email = #{email}
+#                              AND expired = FALSE
     </select>
 
 </mapper>

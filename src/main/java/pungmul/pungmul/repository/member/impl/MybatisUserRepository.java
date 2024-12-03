@@ -22,17 +22,17 @@ public class MybatisUserRepository implements UserRepository {
 
     @Override
     public Optional<User> getUserByUserId(Long userId) {
-        return Optional.ofNullable(userMapper.getUserByUserId(userId));
+        return Optional.ofNullable(userMapper.getUserByUserId(userId).masked());
     }
 
     @Override
     public Optional<User> getUserByAccountId(Long accountId) {
-        return Optional.ofNullable(userMapper.getUserByAccountId(accountId));
+        return Optional.ofNullable(userMapper.getUserByAccountId(accountId).masked());
     }
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        return Optional.ofNullable(userMapper.getUserByEmail(email));
+        return Optional.ofNullable(userMapper.getUserByEmail(email).masked());
     }
 
     public Long getUserIdByAccountId(Long accountId) {
@@ -44,7 +44,7 @@ public class MybatisUserRepository implements UserRepository {
 
     @Override
     public List<User> searchUsersByKeyword(String keyword) {
-        return userMapper.searchUsersByKeyword(keyword);
+        return userMapper.searchUsersByKeyword(keyword).stream().map(User::masked).toList();
     }
 
     @Override
