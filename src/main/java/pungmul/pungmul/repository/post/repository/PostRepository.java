@@ -25,5 +25,7 @@ public interface PostRepository {
 
     Optional<Post> getHotPost(Long categoryId);
 
-    Post getPostById(Long postId);
+    Optional<Post> getPostById(Long postId);
+
+    void hidePost(Long postId);
 }

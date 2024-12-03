@@ -6,4 +6,6 @@ public interface ReportPostRepository {
     public void reportPost(ReportPost reportPost);
 
     ReportPost getReportPost(Long id);
+
+    Integer getReportCountByPostId(Long postId);
 }

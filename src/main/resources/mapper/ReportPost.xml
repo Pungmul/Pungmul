@@ -20,6 +20,13 @@
             VALUES (#{postId}, #{userId}, #{reportReason})
     </insert>
 
+    <!-- 특정 게시물 누적 신고 횟수 조회 -->
+    <select id="getReportCountByPostId" parameterType="long" resultType="int">
+        SELECT COUNT(*)
+        FROM report_post
+        WHERE post_id = #{postId};
+    </select>
+
     <!-- 특정 게시물에 대한 신고 조회 -->
     <select id="findReportsByPostId" parameterType="long" resultMap="ReportPostResultMap">
         SELECT

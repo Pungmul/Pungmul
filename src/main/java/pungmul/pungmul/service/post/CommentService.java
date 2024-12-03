@@ -81,6 +81,7 @@ public class CommentService {
 
     public CommentResponseDTO getCommentResponseDTO(Comment comment) {
         log.info("comment content : {}", comment.getContent());
+        log.info("comment id : {}", comment.getId());
 
         return CommentResponseDTO.builder()
                 .commentId(comment.getId())

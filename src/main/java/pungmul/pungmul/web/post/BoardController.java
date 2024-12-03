@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.board.BoardDetailsResponseDTO;
@@ -49,8 +51,10 @@ public class BoardController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{categoryId}")
-    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(@PathVariable Long categoryId){
-        BoardDetailsResponseDTO boardDetailsResponseDTO = boardService.getInitialBoardData(categoryId);
+    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long categoryId){
+        BoardDetailsResponseDTO boardDetailsResponseDTO = boardService.getInitialBoardData(categoryId, userDetails);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardDetailsResponseDTO));
     }
@@ -58,12 +62,13 @@ public class BoardController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{categoryId}/add")
     public ResponseEntity<BaseResponse<PageInfo<SimplePostDTO>>> getAdditionalPosts(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long categoryId,
             @RequestParam(defaultValue = "2") Integer page,
             @RequestParam(defaultValue = "10") Integer size
     )
     {
-        PageInfo<SimplePostDTO> additionalPosts = boardService.getAdditionalPosts(categoryId, page, size);
+        PageInfo<SimplePostDTO> additionalPosts = boardService.getAdditionalPosts(categoryId, page, size, userDetails);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, additionalPosts));
     }

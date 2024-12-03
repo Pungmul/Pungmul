@@ -48,7 +48,7 @@ public class PostController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{postId}")
     public ResponseEntity<BaseResponse<PostResponseDTO>> getPostByPostId(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long postId) {
         PostResponseDTO post = postService.getPostById(userDetails,postId);
         return ResponseEntity.status(HttpStatus.OK)

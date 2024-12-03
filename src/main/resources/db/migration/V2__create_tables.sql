@@ -131,6 +131,7 @@ CREATE TABLE IF NOT EXISTS post (
                         deleted BOOLEAN DEFAULT FALSE,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        hidden BOOLEAN DEFAULT FALSE,
                         FOREIGN KEY (category_id) REFERENCES category(id)
     );
 

@@ -14,6 +14,7 @@ public class Post {
     private Integer viewCount;
     private Integer likeNum;
     private Boolean deleted;
+    private Boolean hidden;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
