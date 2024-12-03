@@ -1,13 +1,11 @@
-package pungmul.pungmul.service.member;
+package pungmul.pungmul.service.member.authentication.kakao;
 
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import pungmul.pungmul.dto.member.KakaoUserInfoResponseDTO;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component

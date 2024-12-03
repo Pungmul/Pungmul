@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
 import pungmul.pungmul.dto.admin.SetRoleResponseDTO;
-import pungmul.pungmul.service.member.UserRoleService;
+import pungmul.pungmul.service.member.authorization.UserRoleService;
 
 @Slf4j
 @RestController

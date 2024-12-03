@@ -1,6 +1,5 @@
 package pungmul.pungmul.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,12 +9,10 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,12 +20,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import pungmul.pungmul.config.security.JsonUsernamePasswordAuthenticationFilter;
 import pungmul.pungmul.config.security.JwtAuthenticationFilter;
 import pungmul.pungmul.config.security.JwtAuthenticationProvider;
-import pungmul.pungmul.config.security.LogoutHandlerImpl;
-import pungmul.pungmul.service.member.UserDetailsServiceImpl;
-import pungmul.pungmul.service.member.loginvalidation.user.LoginUserArgumentResolver;
+import pungmul.pungmul.service.member.authorization.UserDetailsServiceImpl;
+import pungmul.pungmul.service.member.authentication.user.LoginUserArgumentResolver;
 
 import java.util.List;
 

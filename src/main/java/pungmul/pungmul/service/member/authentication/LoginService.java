@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.member;
+package pungmul.pungmul.service.member.authentication;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -24,6 +24,7 @@ import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.dto.member.LoginDTO;
 import pungmul.pungmul.dto.member.LoginResponseDTO;
 import pungmul.pungmul.config.member.SessionConst;
+import pungmul.pungmul.service.member.authorization.UserDetailsServiceImpl;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;

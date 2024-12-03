@@ -12,12 +12,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import pungmul.pungmul.domain.file.DomainType;
-import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.member.CreateMemberRequestDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.file.ImageService;
-import pungmul.pungmul.service.member.CreateMemberService;
+import pungmul.pungmul.service.member.membermanagement.MemberManagementService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,7 +30,7 @@ import javax.sql.DataSource;
 public class TestDataInitializer {
     private final JdbcTemplate jdbcTemplate;
     private final DataSource dataSource;
-    private final CreateMemberService createMemberService;
+    private final MemberManagementService memberManagementService;
     private final ObjectMapper objectMapper;  // JSON 데이터를 읽어오기 위한 ObjectMapper
     private final ImageService imageService;
     private final UserRepository userRepository;
@@ -79,7 +77,7 @@ public class TestDataInitializer {
         );
 
         for (CreateMemberRequestDTO request : memberRequests) {
-            createMemberService.createMember(request, null); // 프로필 이미지가 없으므로 null
+            memberManagementService.createMember(request, null); // 프로필 이미지가 없으므로 null
         }
 
         System.out.println("All accounts from JSON file have been created.");

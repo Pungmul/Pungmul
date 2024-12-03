@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.member;
+package pungmul.pungmul.service.member.authentication;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

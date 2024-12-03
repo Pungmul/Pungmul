@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.member;
+package pungmul.pungmul.service.member.membermanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,13 +6,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
-import pungmul.pungmul.domain.friend.Friend;
-import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.member.*;
-import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.repository.image.repository.ImageRepository;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;

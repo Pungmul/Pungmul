@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.member;
+package pungmul.pungmul.service.member.authentication;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
