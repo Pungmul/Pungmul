@@ -30,8 +30,13 @@ public class MybatisPostRepository implements PostRepository {
     }
 
     @Override
-    public Post getPostById(Long postId) {
+    public Optional<Post> getPostById(Long postId) {
         return postMapper.getPostById(postId);
+    }
+
+    @Override
+    public void hidePost(Long postId) {
+        postMapper.hidePost(postId);
     }
 
     @Override

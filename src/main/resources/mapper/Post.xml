@@ -11,6 +11,7 @@
         <result property="viewCount" column="view_count" />
         <result property="likeNum" column="like_num" />
         <result property="deleted" column="deleted" />
+        <result property="hidden" column="hidden" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
     </resultMap>
@@ -84,5 +85,11 @@
         WHERE post_id = #{postId}
           AND user_id = #{userId}
     </select>
+
+    <update id="hidePost" parameterType="long">
+        UPDATE post
+        SET hidden = TRUE
+        WHERE id = #{postId};
+    </update>
 
 </mapper>

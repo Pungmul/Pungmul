@@ -8,4 +8,6 @@ public interface ReportPostMapper {
     void reportPost(ReportPost reportPost);
 
     ReportPost getReportPost(Long id);
+
+    Integer getReportCountByPostId(Long postId);
 }

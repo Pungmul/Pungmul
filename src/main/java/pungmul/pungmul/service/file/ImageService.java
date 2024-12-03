@@ -74,7 +74,8 @@ public class ImageService {
                 return Collections.singletonList(imageRepository.getImageByConvertedName(anonymousProfileName));
             }
             else
-                throw new NoSuchElementException("존재하지 않는 이미지");
+                log.info("no images found");
+//                throw new NoSuchElementException("존재하지 않는 이미지");
         }
         return images;
     }

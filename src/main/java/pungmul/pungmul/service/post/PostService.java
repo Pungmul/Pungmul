@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,22 +25,18 @@ import pungmul.pungmul.domain.post.ReportPost;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
-import pungmul.pungmul.dto.post.LocalPostResponseDTO;
 import pungmul.pungmul.dto.post.post.*;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.*;
-import pungmul.pungmul.service.file.DomainImageService;
 import pungmul.pungmul.service.file.ImageService;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -58,10 +55,15 @@ public class PostService {
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
 
-    public PostResponseDTO getPostById(UserDetails userDetails, Long postId) {
-        Post post = postRepository.getPostById(postId);
+    @Value("1")
+    private Integer FORBID_REPORT_COUNT_NUM;
+
+    public PostResponseDTO getPostById(UserDetailsImpl userDetails, Long postId) {
+        Post post = postRepository.getPostById(postId).orElseThrow(NoSuchElementException::new);
         Content content = getContentByPostId(postId);
         boolean postLikedByUser = isPostLikedByUser(userDetails, postId);
+
+        if (isNotAdminUser(userDetails) && isHiddenPost(post)) return getHiddenPostResponseDTO(post);
 
         return getPostResponseDTO(post, content, postLikedByUser);
     }
@@ -156,6 +158,57 @@ public class PostService {
         // 5. 결과 반환 (좋아요 상태 반영)
         return getPostLikeResponseDTO(postId, !isLiked, likedNum);
     }
+
+    @Transactional
+    public ReportPostResponseDTO reportPostByPostId(UserDetailsImpl userDetails, Long postId, ReportPostRequestDTO reportPostRequestDTO) {
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
+                .map(User::getId)
+                .orElseThrow(NoSuchElementException::new);
+
+        ReportPost reportPost = ReportPost.builder()
+                .postId(postId)
+                .userId(userId)
+                .reportReason(reportPostRequestDTO.getReportReason())
+                .build();
+
+        reportPostRepository.reportPost(reportPost);
+
+        if (reportPostRepository.getReportCountByPostId(postId) >= FORBID_REPORT_COUNT_NUM)
+            postRepository.hidePost(postId);
+
+        return ReportPostResponseDTO.builder()
+                .postId(postId)
+                .postName(contentRepository.getContentByPostId(postId).getTitle())
+                .reportReason(reportPost.getReportReason())
+                .reportTime(reportPostRepository.getReportPost(reportPost.getId()).getReportTime())
+                .build();
+    }
+
+    public PageInfo<SimplePostDTO> getPostsByCategory(Long categoryId, Integer page, Integer size, UserDetails userDetails) {
+        // 사용자 권한 확인
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        // 페이징 설정
+        PageHelper.startPage(page, size);
+
+        // 데이터베이스에서 모든 게시물 조회
+        List<Post> postListByCategory = postRepository.getPostListByCategory(categoryId);
+
+        // 관리자 권한이 없는 경우 hidden 또는 deleted가 true인 게시물 제외
+        List<Post> filteredPosts = postListByCategory.stream()
+                .filter(post -> isAdmin || (!post.getHidden() && !post.getDeleted())) // 조건에 따라 필터링
+                .toList();
+
+        // DTO 변환
+        List<SimplePostDTO> postDTOList = filteredPosts.stream()
+                .map(this::getSimplePostDTO)
+                .collect(Collectors.toList());
+
+        // 페이징 정보 생성 및 반환
+        return new PageInfo<>(postDTOList);
+    }
+
 
     private static PostLikeResponseDTO getPostLikeResponseDTO(Long postId, boolean isLiked, Integer likedNum) {
         return PostLikeResponseDTO.builder()
@@ -259,17 +312,6 @@ public class PostService {
                     .orElse("Unknown User");
     }
 
-    public PageInfo<SimplePostDTO> getPostsByCategory(Long categoryId, Integer page, Integer size) {
-        PageHelper.startPage(page, size);
-
-        List<Post> postListByCategory = postRepository.getPostListByCategory(categoryId);
-        List<SimplePostDTO> postDTOList = new ArrayList<>();
-        for (Post post : postListByCategory) {
-            postDTOList.add(getSimplePostDTO(post));
-        }
-        return new PageInfo<>(postDTOList);
-    }
-
     private PostResponseDTO getPostResponseDTO(Post postById, Content contentByPostId, Boolean postLikedByUser) {
         return PostResponseDTO.builder()
                 .postId(postById.getId())
@@ -286,25 +328,23 @@ public class PostService {
                 .build();
     }
 
-    @Transactional
-    public ReportPostResponseDTO reportPostByPostId(UserDetailsImpl userDetails, Long postId, ReportPostRequestDTO reportPostRequestDTO) {
-        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
-
-        ReportPost reportPost = ReportPost.builder()
-                .postId(postId)
-                .userId(userId)
-                .reportReason(reportPostRequestDTO.getReportReason())
+    private PostResponseDTO getHiddenPostResponseDTO(Post postById){
+        return PostResponseDTO.builder()
+                .postId(postById.getId())
+                .title("삭제된 게시글")
+                .content("")
+                .author("")
                 .build();
+    }
 
-        reportPostRepository.reportPost(reportPost);
+    private boolean isHiddenPost(Post post) {
+        return post.getHidden() || post.getDeleted();
+    }
+    private boolean isNotAdminUser(UserDetailsImpl userDetails) {
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        boolean isAdmin = authorities.stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
-        return ReportPostResponseDTO.builder()
-                .postId(postId)
-                .postName(contentRepository.getContentByPostId(postId).getTitle())
-                .reportReason(reportPost.getReportReason())
-                .reportTime(reportPostRepository.getReportPost(reportPost.getId()).getReportTime())
-                .build();
+        return !isAdmin;
     }
 }

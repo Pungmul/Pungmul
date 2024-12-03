@@ -1,7 +1,9 @@
 package pungmul.pungmul.service.member;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.account.UserRole;
 import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
@@ -11,6 +13,7 @@ import pungmul.pungmul.repository.member.repository.UserRoleRepository;
 
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserRoleService {
@@ -21,6 +24,7 @@ public class UserRoleService {
 //        userRoleRepository.insertRole(role);
 //    }
 
+    @Transactional
     public SetRoleResponseDTO addRoleToAccount(SetRoleRequestDTO setRoleRequestDTO) {
         String username = setRoleRequestDTO.getUsername();
         String roleName = setRoleRequestDTO.getRoleName();
@@ -29,6 +33,7 @@ public class UserRoleService {
                 .map(Account::getId)
                 .orElseThrow(() -> new IllegalArgumentException("Account not found for username: " + username));
         userRoleRepository.addRoleToAccount(accountId, roleName);
+        log.info("add user role : {}", userRoleRepository.getRolesByAccountId(accountId));
 
         return SetRoleResponseDTO.builder()
                 .username(username)

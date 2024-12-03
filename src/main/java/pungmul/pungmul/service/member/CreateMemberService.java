@@ -146,6 +146,8 @@ public class CreateMemberService {
         accountRepository.saveAccount(account);
         userRoleService.addRoleToAccount(getRoleRequestDTO(account));
 
+        log.info("user auth : {}", account.getRoles());
+
         return account.getId();
     }
 
@@ -245,6 +247,21 @@ public class CreateMemberService {
                 .clubId(createMemberRequestDto.getClubId())
                 .build();
     }
+
+    public String getUserStatus(Long accountId) {
+        Optional<Account> accountOptional = accountRepository.getAccountByAccountId(accountId);
+
+        if (accountOptional.isEmpty())
+            return "존재하지 않는 사용자";
+
+        Account account = accountOptional.get();
+        if (account.isWithdraw())
+            return "탈퇴한 사용자";
+
+        return "정상 사용자";
+    }
+
+
 
     private RequestImageDTO getRequestProfileImageDTO(MultipartFile profile, User user) {
         return RequestImageDTO.builder()

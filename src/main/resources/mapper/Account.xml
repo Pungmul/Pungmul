@@ -4,9 +4,8 @@
 
 <mapper namespace="pungmul.pungmul.repository.member.mapper.AccountMapper">
 
-    <!-- Account ResultMap -->
     <resultMap id="AccountResultMap" type="pungmul.pungmul.domain.member.account.Account">
-        <id property="id" column="id" />
+        <id property="id" column="account_id" />
         <result property="loginId" column="login_id" />
         <result property="password" column="password" />
         <result property="withdraw" column="withdraw" />
@@ -16,6 +15,9 @@
         <result property="accountLocked" column="account_locked" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
+        <collection property="roles" ofType="pungmul.pungmul.domain.member.account.UserRole">
+            <result property="role" column="role_name" />
+        </collection>
     </resultMap>
 
     <!-- Insert Account -->
@@ -31,34 +33,85 @@
         WHERE id = #{accountId}
     </update>
 
-    <!-- Select Account By Id (삭제된 계정 제외) -->
-    <select id="getAccountByAccountId" resultMap="AccountResultMap">
-        SELECT * FROM account
-        WHERE id = #{id}
-          AND withdraw = FALSE
+    <select id="getAccountByAccountId" parameterType="java.lang.Long" resultMap="AccountResultMap">
+        SELECT
+            a.id AS account_id,
+            a.login_id,
+            a.password,
+            a.withdraw,
+            a.last_password_changed,
+            a.enabled,
+            a.account_expired,
+            a.account_locked,
+            a.created_at,
+            a.updated_at,
+            r.role_name AS role_name
+        FROM account a
+                 LEFT JOIN account_roles ar ON a.id = ar.account_id
+                 LEFT JOIN roles r ON ar.role_id = r.id
+        WHERE a.id = #{id}
+          AND a.withdraw = FALSE;
     </select>
 
-    <!-- Email로 Account 조회 (삭제된 계정 제외) -->
-    <select id="getAccountByEmail" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.account.Account">
-        SELECT *
-        FROM account
-        WHERE login_id = #{email}
-          AND withdraw = FALSE;
+    <select id="getAccountByEmail" parameterType="java.lang.String" resultMap="AccountResultMap">
+        SELECT
+            a.id AS account_id,
+            a.login_id,
+            a.password,
+            a.withdraw,
+            a.last_password_changed,
+            a.enabled,
+            a.account_expired,
+            a.account_locked,
+            a.created_at,
+            a.updated_at,
+            r.role_name AS role_name
+        FROM account a
+                 LEFT JOIN account_roles ar ON a.id = ar.account_id
+                 LEFT JOIN roles r ON ar.role_id = r.id
+        WHERE a.login_id = #{email}
+          AND a.withdraw = FALSE;
     </select>
 
-    <!-- Login ID로 Account 조회 (삭제된 계정 제외) -->
-    <select id="getAccountByLoginId" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.account.Account">
-        SELECT *
-        FROM account
-        WHERE login_id = #{loginId}
-          AND withdraw = FALSE;
+    <!-- Login ID로 Account 조회 (삭제된 계정 제외, roles 포함) -->
+    <select id="getAccountByLoginId" parameterType="java.lang.String" resultMap="AccountResultMap">
+        SELECT
+            a.id AS account_id,
+            a.login_id,
+            a.password,
+            a.withdraw,
+            a.last_password_changed,
+            a.enabled,
+            a.account_expired,
+            a.account_locked,
+            a.created_at,
+            a.updated_at,
+            r.role_name AS role_name
+        FROM account a
+                 LEFT JOIN account_roles ar ON a.id = ar.account_id
+                 LEFT JOIN roles r ON ar.role_id = r.id
+        WHERE a.login_id = #{loginId}
+          AND a.withdraw = FALSE;
     </select>
 
-    <!-- Login ID로 Account 조회 (로그인 용으로 삭제 여부 무시) -->
-    <select id="getAccountByLoginIdForLogin" parameterType="java.lang.String" resultType="pungmul.pungmul.domain.member.account.Account">
-        SELECT *
-        FROM account
-        WHERE login_id = #{loginId}
+    <!-- Login ID로 Account 조회 (로그인 용으로 삭제 여부 무시, roles 포함) -->
+    <select id="getAccountByLoginIdForLogin" parameterType="java.lang.String" resultMap="AccountResultMap">
+        SELECT
+            a.id AS account_id,
+            a.login_id,
+            a.password,
+            a.withdraw,
+            a.last_password_changed,
+            a.enabled,
+            a.account_expired,
+            a.account_locked,
+            a.created_at,
+            a.updated_at,
+            r.role_name AS role_name
+        FROM account a
+                 LEFT JOIN account_roles ar ON a.id = ar.account_id
+                 LEFT JOIN roles r ON ar.role_id = r.id
+        WHERE a.login_id = #{loginId};
     </select>
 
     <!-- Enable Account -->

@@ -19,4 +19,9 @@ public class MybatisReportPostRepository implements ReportPostRepository {
     public ReportPost getReportPost(Long id) {
         return reportPostMapper.getReportPost(id);
     }
+
+    @Override
+    public Integer getReportCountByPostId(Long postId) {
+        return reportPostMapper.getReportCountByPostId(postId);
+    }
 }
