@@ -25,6 +25,7 @@ import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.core.response.code.MemberResponseCode;
 
+import javax.naming.AuthenticationException;
 import javax.naming.ServiceUnavailableException;
 import java.nio.file.AccessDeniedException;
 import java.security.SignatureException;
@@ -54,6 +55,12 @@ public final class GlobalExceptionHandler {
         public void logServiceException(Exception ex) {
             log.error("Exception occurred in service layer: ", ex);
         }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<BaseResponse<String>> handleAuthenticationException(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(BaseResponse.ofFail(BaseResponseCode.UNAUTHORIZED));
+    }
 
     // 1000 - 토큰 만료
 

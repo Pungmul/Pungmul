@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.member;
+package pungmul.pungmul.service.member.authentication.kakao;
 
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,9 @@ import pungmul.pungmul.dto.member.AuthenticationResponseDTO;
 import pungmul.pungmul.dto.member.KakaoTokenResponseDTO;
 import pungmul.pungmul.dto.member.KakaoUserInfoResponseDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
+import pungmul.pungmul.service.member.authentication.LoginService;
+
+import javax.security.auth.login.AccountLockedException;
 
 
 @Slf4j

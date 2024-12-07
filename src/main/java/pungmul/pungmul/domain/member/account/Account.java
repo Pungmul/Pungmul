@@ -31,6 +31,7 @@ public class Account {
 
     private boolean accountExpired;
 
+    @Setter
     private boolean accountLocked;
 
     @NotNull

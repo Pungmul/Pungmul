@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.member.loginvalidation.user;
+package pungmul.pungmul.service.member.authentication.user;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

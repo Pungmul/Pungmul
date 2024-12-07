@@ -23,10 +23,9 @@ import pungmul.pungmul.repository.friend.repository.FriendRepository;
 import pungmul.pungmul.repository.image.repository.ImageRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.file.ImageService;
-import pungmul.pungmul.service.member.MemberService;
+import pungmul.pungmul.service.member.membermanagement.MemberService;
 import pungmul.pungmul.service.message.MessageService;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 

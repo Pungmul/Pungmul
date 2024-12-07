@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS user (
                         club_age INT,
                         gender ENUM('MALE', 'FEMALE') NOT NULL,
                         phone_number VARCHAR(20) NOT NULL,
-                        email VARCHAR(50) UNIQUE NOT NULL,
+                        email VARCHAR(255) UNIQUE NOT NULL,
                         club_id BIGINT,
                         profile_image BIGINT,
                         area VARCHAR(255),
@@ -333,6 +333,18 @@ CREATE TABLE IF NOT EXISTS post_limit (
                                           user_id BIGINT NOT NULL PRIMARY KEY,
                                           post_count INT DEFAULT 0, -- 현재 게시물 작성 횟수
                                           last_reset_time DATETIME DEFAULT CURRENT_TIMESTAMP -- 마지막 초기화 시간
+);
+
+CREATE TABLE IF NOT EXISTS account_ban (
+                          id BIGINT AUTO_INCREMENT PRIMARY KEY, -- 밴 정보 고유 ID
+                          username varchar(255) NOT NULL,              -- 밴 대상 사용자 ID (FK)
+                          ban_reason TEXT NOT NULL,     -- 밴 사유
+                          ban_start_time DATETIME DEFAULT CURRENT_TIMESTAMP,     -- 밴 시작 시간
+                          ban_end_time DATETIME,                -- 밴 해제 시간 (NULL일 경우 무기한)
+                          is_active BOOLEAN DEFAULT TRUE,       -- 밴 활성화 여부
+                          created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 생성 시각
+                          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- 수정 시각
+
 );
 
 

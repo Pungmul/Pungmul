@@ -14,7 +14,7 @@ import pungmul.pungmul.core.response.code.MemberResponseCode;
 
 @Slf4j
 @RestControllerAdvice
-@Order(1)
+@Order(0)
 public class MemberExceptionHandler {
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<BaseResponse<String>> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
@@ -36,25 +36,31 @@ public class MemberExceptionHandler {
 
         log.info("Invalid password: {}", ex.getMessage());
         // 에러 코드를 사용해서 BaseResponse 생성
-        return new ResponseEntity<>(
-                BaseResponse.ofFail(MemberResponseCode.INVALID_PASSWORD),
-                HttpStatus.BAD_REQUEST
-        );
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(MemberResponseCode.INVALID_PASSWORD));
     }
 
     @ExceptionHandler(NoSuchUsernameException.class)
     public ResponseEntity<BaseResponse<String>> handleNoSuchUsernameException(NoSuchUsernameException ex) {
-        return new ResponseEntity<>(
-                BaseResponse.ofFail(MemberResponseCode.NOTFOUND_USERNAME),
-                HttpStatus.BAD_REQUEST
-        );
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(MemberResponseCode.NOTFOUND_USERNAME));
     }
 
     @ExceptionHandler(AccountWithdrawnException.class)
     public ResponseEntity<BaseResponse<String>> handleAccountWithdrawnException(AccountWithdrawnException ex) {
-        return new ResponseEntity<>(
-                BaseResponse.ofFail(MemberResponseCode.DELETED_ACCOUNT),
-                HttpStatus.BAD_REQUEST
-        );
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(BaseResponse.ofFail(MemberResponseCode.DELETED_ACCOUNT));
+    }
+
+    @ExceptionHandler(CustomAccountLockedException.class)
+    public ResponseEntity<BaseResponse<String>> handleAccountLockedException(CustomAccountLockedException ex) {
+        log.info("Account locked: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(BaseResponse.ofFail(MemberResponseCode.PAUSED_ACCOUNT));
+
     }
 }

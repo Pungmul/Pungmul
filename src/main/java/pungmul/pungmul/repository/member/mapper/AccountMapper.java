@@ -22,5 +22,11 @@ public interface AccountMapper {
 
     void deleteAccount(String loginId);
 
+    void banAccount(String username);
+
+    void updateAccount(Account account);
+
+    void unlockAccount(Long id);
+
 //    Long selectLastInsertAccountId();
 }

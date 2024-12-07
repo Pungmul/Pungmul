@@ -128,4 +128,18 @@
         WHERE login_id = #{loginId}
     </update>
 
+    <!-- Ban Account -->
+    <update id="banAccount" parameterType="java.lang.String">
+        UPDATE account
+        SET account_locked = TRUE
+        WHERE login_id = #{loginId}
+    </update>
+
+    <!-- Update Account -->
+    <update id="unlockAccount" parameterType="long">
+        UPDATE account
+        SET account_locked = False
+        WHERE id = #{id}
+    </update>
+
 </mapper>

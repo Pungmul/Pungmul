@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import pungmul.pungmul.core.exception.custom.member.TokenNotFoundException;
 import pungmul.pungmul.domain.member.auth.JwtToken;
 import pungmul.pungmul.repository.member.repository.JwtTokenRepository;
-import pungmul.pungmul.service.member.JwtTokenService;
+import pungmul.pungmul.service.member.authentication.JwtTokenService;
 
 @Slf4j
 @Service

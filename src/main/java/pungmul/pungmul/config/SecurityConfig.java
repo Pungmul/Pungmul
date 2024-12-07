@@ -1,6 +1,7 @@
 package pungmul.pungmul.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,26 +11,24 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import pungmul.pungmul.config.security.JsonUsernamePasswordAuthenticationFilter;
 import pungmul.pungmul.config.security.JwtAuthenticationFilter;
 import pungmul.pungmul.config.security.JwtAuthenticationProvider;
-import pungmul.pungmul.config.security.LogoutHandlerImpl;
-import pungmul.pungmul.service.member.UserDetailsServiceImpl;
-import pungmul.pungmul.service.member.loginvalidation.user.LoginUserArgumentResolver;
+import pungmul.pungmul.service.member.authorization.UserDetailsServiceImpl;
+import pungmul.pungmul.service.member.authentication.user.LoginUserArgumentResolver;
 
+import javax.naming.AuthenticationException;
 import java.util.List;
 
 @Slf4j
@@ -56,8 +55,20 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  세션 관리 정책. 세션 사용 안함
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 필터 순서 조정
+
+//        http.setSharedObject(AuthenticationEntryPoint.class, customAuthenticationEntryPoint());
+
         return http.build();
     }
+//    private AuthenticationEntryPoint customAuthenticationEntryPoint() {
+//        return (HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) -> {
+//            try {
+//                throw authException; // Spring Security의 AuthenticationException을 직접 던짐
+//            } catch (AuthenticationException e) {
+//                throw new RuntimeException(e);
+//            }
+//        };
+//    }
 
     @Bean
     public RoleHierarchy roleHierarchy() {
@@ -89,4 +100,6 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
                 .allowCredentials(true);
     }
+
+
 }

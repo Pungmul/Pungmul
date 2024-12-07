@@ -19,7 +19,6 @@ import pungmul.pungmul.dto.friend.FriendListResponseDTO;
 import pungmul.pungmul.dto.friend.FriendReqResponseDTO;
 import pungmul.pungmul.dto.message.friend.FriendRequestInvitationMessageDTO;
 import pungmul.pungmul.service.friend.FriendService;
-import pungmul.pungmul.service.member.MemberService;
 import pungmul.pungmul.service.message.MessageService;
 
 import java.util.List;

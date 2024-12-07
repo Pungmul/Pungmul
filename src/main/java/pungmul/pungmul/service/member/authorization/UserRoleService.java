@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.member;
+package pungmul.pungmul.service.member.authorization;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -14,16 +14,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.response.BaseResponseCode;
-import pungmul.pungmul.domain.member.instrument.Instrument;
-import pungmul.pungmul.domain.member.instrument.InstrumentAbility;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.dto.member.*;
-import pungmul.pungmul.service.member.CreateMemberService;
-import pungmul.pungmul.service.member.LoginService;
 import pungmul.pungmul.core.response.BaseResponse;
-import pungmul.pungmul.service.member.MemberService;
+import pungmul.pungmul.service.member.authentication.LoginService;
+import pungmul.pungmul.service.member.membermanagement.*;
 
 import javax.naming.AuthenticationException;
+import javax.security.auth.login.AccountLockedException;
 import java.io.IOException;
 import java.util.List;
 
@@ -38,9 +36,12 @@ import java.util.List;
 public class MemberController {
 
     // 회원 생성과 로그인 처리 서비스
-    private final CreateMemberService createMemberService;
+    private final MemberManagementService memberManagementService;
     private final MemberService memberService;
     private final LoginService loginService;
+    private final AccountService accountService;
+    private final UserService userService;
+    private final InstrumentService instrumentService;
 
     /**
      * 사용자의 회원가입 요청을 처리하는 메서드
@@ -61,7 +62,7 @@ public class MemberController {
             @Validated @RequestPart("accountData") CreateMemberRequestDTO createMemberRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
-        CreateAccountResponseDTO accountResponseDto = createMemberService.createMember(createMemberRequestDto, profile);
+        CreateAccountResponseDTO accountResponseDto = memberManagementService.createMember(createMemberRequestDto, profile);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, accountResponseDto));
     }
@@ -72,7 +73,7 @@ public class MemberController {
             @AuthenticationPrincipal UserDetails userDetails,
             @Validated @RequestPart("accountData") UpdateMemberRequestDTO updateMemberRequestDTO,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
-        UpdateMemberResponseDTO updateMemberResponseDTO = createMemberService.updateMember(userDetails,updateMemberRequestDTO, profile);
+        UpdateMemberResponseDTO updateMemberResponseDTO = memberManagementService.updateMember(userDetails,updateMemberRequestDTO, profile);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, updateMemberResponseDTO));
     }
 
@@ -83,7 +84,7 @@ public class MemberController {
             @Validated @RequestBody List<InstrumentStatus> instrumentStatusList, HttpServletRequest request){
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createMemberService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
+                .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, memberManagementService.createInstrument(userDetails.getAccountId(), instrumentStatusList)));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -92,7 +93,7 @@ public class MemberController {
             @AuthenticationPrincipal UserDetails userDetail,
             @RequestBody UpdateInstrumentRequestDTO updateInstrumentRequestDTO
             ){
-        UpdateInstrumentResponseDTO updateInstrumentResponseDTO = createMemberService.updateInstrumentStatus(userDetail,updateInstrumentRequestDTO);
+        UpdateInstrumentResponseDTO updateInstrumentResponseDTO = memberManagementService.updateInstrumentStatus(userDetail,updateInstrumentRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, updateInstrumentResponseDTO));
     }
 
@@ -116,18 +117,31 @@ public class MemberController {
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("")
     public ResponseEntity<BaseResponse<Void>> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        createMemberService.deleteUser(userDetails);
+        memberManagementService.deleteMember(userDetails);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/ban")
+    public ResponseEntity<BaseResponse<BanMemberResponseDTO>> banMember(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody BanMemberRequestDTO banMemberRequestDTO
+            ) {
+        BanMemberResponseDTO banMemberResponseDTO = memberManagementService.banMember(banMemberRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, banMemberResponseDTO));
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
+    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> loginJwt(@Validated @RequestBody LoginDTO loginDTO) {
         log.info("loginDTO {}", loginDTO);
         loginService.isValidCredentials(loginDTO);
         AuthenticationResponseDTO response = loginService.authenticate(loginDTO.getLoginId());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));
+
     }
+
+
 
 }

@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.member.loginvalidation.user;
+package pungmul.pungmul.service.member.authentication.user;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

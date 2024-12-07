@@ -21,4 +21,6 @@ public interface UserRepository {
     void updateUser(User updateUser);
 
     void deleteUser(String email);
+
+    void banUser(String username);
 }

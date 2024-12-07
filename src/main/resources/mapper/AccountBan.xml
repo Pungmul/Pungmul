@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.member.mapper.AccountBanMapper">
+
+    <!-- ResultMap for AccountBan -->
+    <resultMap id="AccountBanResultMap" type="pungmul.pungmul.domain.member.auth.AccountBan">
+        <id property="id" column="id" />
+        <result property="username" column="username" />
+        <result property="banReason" column="ban_reason" />
+        <result property="banStartTime" column="ban_start_time" />
+        <result property="banEndTime" column="ban_end_time" />
+        <result property="isActive" column="is_active" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!-- Insert a new ban record -->
+    <insert id="insertAccountBan" parameterType="pungmul.pungmul.domain.member.auth.AccountBan" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO account_ban (username, ban_reason, ban_end_time, is_active)
+        VALUES (#{username}, #{banReason}, #{banEndTime}, #{isActive})
+    </insert>
+
+    <!-- Select a ban by ID -->
+    <select id="getAccountBanById" parameterType="long" resultMap="AccountBanResultMap">
+        SELECT *
+        FROM account_ban
+        WHERE id = #{id}
+    </select>
+
+    <!-- Select a ban by AccountId -->
+    <select id="getAccountBanByUsername" parameterType="java.lang.String" resultMap="AccountBanResultMap">
+        SELECT *
+        FROM account_ban
+        WHERE username = #{username}
+    </select>
+
+    <!-- Select all active bans -->
+    <select id="getActiveAccountBans" resultMap="AccountBanResultMap">
+        SELECT *
+        FROM account_ban
+        WHERE is_active = TRUE
+    </select>
+
+    <!-- Select all bans for a specific user -->
+    <select id="getAccountBansByUserId" parameterType="long" resultMap="AccountBanResultMap">
+        SELECT *
+        FROM account_ban
+        WHERE username = #{username}
+        ORDER BY ban_start_time DESC
+    </select>
+
+    <!-- Update a ban record -->
+    <update id="updateAccountBan" parameterType="pungmul.pungmul.domain.member.auth.AccountBan">
+        UPDATE account_ban
+        SET
+            ban_reason = #{banReason},
+            ban_start_time = #{banStartTime},
+            ban_end_time = #{banEndTime},
+            is_active = #{isActive}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Deactivate expired bans -->
+    <update id="deactivateExpiredAccountBans" parameterType="java.time.LocalDateTime">
+        UPDATE account_ban
+        SET is_active = FALSE
+        WHERE ban_end_time &lt;= #{now} AND is_active = TRUE
+    </update>
+
+    <!-- Deactivate AccountBan by id -->
+    <update id="deActivateAccountBan" parameterType="long">
+        UPDATE account_ban
+        SET is_active = FALSE
+        WHERE id = #{id}
+    </update>
+
+    <!-- Delete a ban record by ID -->
+    <delete id="deleteAccountBanById" parameterType="long">
+        DELETE FROM account_ban
+        WHERE id = #{id}
+    </delete>
+
+</mapper>
