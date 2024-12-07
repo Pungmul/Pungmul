@@ -17,6 +17,7 @@ import pungmul.pungmul.service.member.authentication.JwtTokenService;
 import pungmul.pungmul.service.member.authentication.kakao.KakaoLoginService;
 
 import javax.naming.AuthenticationException;
+import javax.security.auth.login.AccountLockedException;
 import java.io.IOException;
 
 @Slf4j
@@ -34,7 +35,7 @@ public class KakaoController {
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>>kakaoCallback(@RequestParam String code, HttpServletRequest request){
+    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>>kakaoCallback(@RequestParam String code, HttpServletRequest request) throws AccountLockedException {
 
         String accessToken = kakaoLoginService.getAccessTokenFromKakao(code); // 인가 코드로 액세스 토큰 받기
         log.info("kakao access token : {}",accessToken);
@@ -45,7 +46,7 @@ public class KakaoController {
     }
 
     @GetMapping("/callback/postman")
-    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> kakaoCallbackPostman(HttpServletRequest request){
+    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> kakaoCallbackPostman(HttpServletRequest request) throws AccountLockedException {
         String accessToken = jwtTokenService.getJwtFromRequest(request);
         AuthenticationResponseDTO authenticationResponseDTO = kakaoLoginService.kakaoLogin(accessToken);
 

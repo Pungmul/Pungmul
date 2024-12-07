@@ -20,4 +20,10 @@ public interface AccountRepository {
     void updatePassword(Long accountId, String password);
 
     void deleteAccount(String loginId);
+
+    void banAccount(String username);
+
+    void updateAccount(Account account);
+
+    void unlockAccount(Long id);
 }

@@ -70,4 +70,8 @@ public class UserService {
         return userRepository.getUserByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
     }
+
+    public void banUser(String username) {
+        userRepository.banUser(username);
+    }
 }

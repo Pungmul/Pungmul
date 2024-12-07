@@ -11,8 +11,6 @@ public interface UserMapper {
 
     User getUserByUserId(Long id);
 
-//    User getUserByLoginId(String loginId);
-
     User getUserByAccountId(Long accountId);
 
     User getUserByEmail(String email);
@@ -22,6 +20,6 @@ public interface UserMapper {
     void updateUser(User updateUser);
 
     void deleteUser(String email);
-//    Long selectLastInsertId();
 
+    void banUser(String username);
 }

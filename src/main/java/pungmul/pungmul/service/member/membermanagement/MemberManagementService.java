@@ -22,6 +22,7 @@ public class MemberManagementService {
     private final InstrumentService instrumentService;
     private final UserImageService userImageService;
 
+
     /**
      * 회원 생성
      */
@@ -90,8 +91,18 @@ public class MemberManagementService {
      * 회원 삭제
      */
     @Transactional
-    public void deleteUser(UserDetails userDetails) {
+    public void deleteMember(UserDetails userDetails) {
         accountService.deleteAccount(userDetails.getUsername());
         userService.deleteUser(userDetails.getUsername());
+    }
+
+    @Transactional
+    public BanMemberResponseDTO banMember(BanMemberRequestDTO banMemberRequestDTO) {
+        accountService.banAccount(banMemberRequestDTO);
+        return BanMemberResponseDTO.builder()
+                .name(userService.getUserByEmail(banMemberRequestDTO.getUsername()).getName())
+                .banReason(banMemberRequestDTO.getBanReason())
+                .banUntil(banMemberRequestDTO.getBanUntil())
+                .build();
     }
 }

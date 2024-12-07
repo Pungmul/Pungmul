@@ -15,6 +15,7 @@ import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.core.exception.custom.member.AccountEmailNotVerifiedException;
 import pungmul.pungmul.core.exception.custom.member.AccountWithdrawnException;
+import pungmul.pungmul.core.exception.custom.member.CustomAccountLockedException;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.auth.SessionUser;
 import pungmul.pungmul.domain.member.user.User;
@@ -25,8 +26,10 @@ import pungmul.pungmul.dto.member.LoginDTO;
 import pungmul.pungmul.dto.member.LoginResponseDTO;
 import pungmul.pungmul.config.member.SessionConst;
 import pungmul.pungmul.service.member.authorization.UserDetailsServiceImpl;
+import pungmul.pungmul.service.member.membermanagement.AccountService;
 
 import javax.naming.AuthenticationException;
+import javax.security.auth.login.AccountLockedException;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
@@ -34,6 +37,7 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class LoginService {
+    private final AccountService accountService;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -83,6 +87,10 @@ public class LoginService {
 
         if (enabledAccount.isWithdraw())
             throw new AccountWithdrawnException("삭제된 계정입니다.");
+
+        if (enabledAccount.isAccountLocked()) {
+            accountService.unlockAccount(enabledAccount);
+        }
 
         //jwt, refresh token 발급
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -138,13 +146,6 @@ public class LoginService {
     }
 
         public LoginResponseDTO getLoginResponseDTO (SessionUser sessionUser){
-//            return LoginResponseDTO.builder()
-//                    .accessToken(generateAccessToken(sessionUser))
-//                    .refreshToken(generateRefreshToken(sessionUser))
-//                    .tokenExpiresIn(getTokenExpiryTime())
-//                    .accountId(sessionUser.getAccountId())
-//                    .userName(sessionUser.getUsername())
-//                    .build();
             return LoginResponseDTO.builder()
                     .accountId(sessionUser.getAccountId())
                     .userName(sessionUser.getUsername())
@@ -152,31 +153,6 @@ public class LoginService {
                     .message("로그인 성공")
                     .build();
         }
-
-//    private String generateAccessToken(SessionUser sessionUser) {
-//        Date now = new Date();
-//        Date expirtDate = new Date(now.getTime() + ACCESS_TOKEN_VALIDITY_SECONDS * 1000);
-//
-//        return Jwts.builder()
-//                .setSubject(String.valueOf(sessionUser.getAccountId()))
-//                .setIssuedAt(now)
-//                .setExpiration(expirtDate)
-//                .claim("username", sessionUser.getUsername())
-//                .signWith(SECRET_KEY)
-//                .compact();
-//    }
-//
-//    private String generateRefreshToken(SessionUser sessionUser) {
-//        Date now = new Date();
-//        Date expiryDate = new Date(now.getTime() + REFRESH_TOKEN_VALIDITY_SECONDS * 1000);
-//
-//        return Jwts.builder()
-//                .setSubject(String.valueOf(sessionUser.getAccountId()))
-//                .setIssuedAt(now)
-//                .setExpiration(expiryDate)
-//                .signWith(SECRET_KEY)
-//                .compact();
-//    }
 
     private long getTokenExpiryTime(String tokenType) {
         LocalDateTime now = LocalDateTime.now();

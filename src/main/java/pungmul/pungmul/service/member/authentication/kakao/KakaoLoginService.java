@@ -15,6 +15,8 @@ import pungmul.pungmul.dto.member.KakaoUserInfoResponseDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.service.member.authentication.LoginService;
 
+import javax.security.auth.login.AccountLockedException;
+
 
 @Slf4j
 @RequiredArgsConstructor

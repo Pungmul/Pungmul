@@ -21,6 +21,7 @@ import pungmul.pungmul.service.member.authentication.LoginService;
 import pungmul.pungmul.service.member.membermanagement.*;
 
 import javax.naming.AuthenticationException;
+import javax.security.auth.login.AccountLockedException;
 import java.io.IOException;
 import java.util.List;
 
@@ -116,18 +117,31 @@ public class MemberController {
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("")
     public ResponseEntity<BaseResponse<Void>> deleteMember(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        memberManagementService.deleteUser(userDetails);
+        memberManagementService.deleteMember(userDetails);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/ban")
+    public ResponseEntity<BaseResponse<BanMemberResponseDTO>> banMember(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody BanMemberRequestDTO banMemberRequestDTO
+            ) {
+        BanMemberResponseDTO banMemberResponseDTO = memberManagementService.banMember(banMemberRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, banMemberResponseDTO));
+    }
+
     @PostMapping("/login")
-    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> loginJwt(@Validated @RequestBody LoginDTO loginDTO) throws AuthenticationException {
+    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> loginJwt(@Validated @RequestBody LoginDTO loginDTO) {
         log.info("loginDTO {}", loginDTO);
         loginService.isValidCredentials(loginDTO);
         AuthenticationResponseDTO response = loginService.authenticate(loginDTO.getLoginId());
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));
+
     }
+
+
 
 }

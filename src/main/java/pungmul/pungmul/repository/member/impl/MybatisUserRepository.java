@@ -56,4 +56,9 @@ public class MybatisUserRepository implements UserRepository {
     public void deleteUser(String email) {
         userMapper.deleteUser(email);
     }
+
+    @Override
+    public void banUser(String username) {
+        userMapper.banUser(username);
+    }
 }

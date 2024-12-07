@@ -53,4 +53,19 @@ public class MybatisAccountRepository implements AccountRepository {
     public void deleteAccount(String loginId) {
         accountMapper.deleteAccount(loginId);
     }
+
+    @Override
+    public void banAccount(String username) {
+        accountMapper.banAccount(username);
+    }
+
+    @Override
+    public void updateAccount(Account account) {
+        accountMapper.updateAccount(account);
+    }
+
+    @Override
+    public void unlockAccount(Long id) {
+        accountMapper.unlockAccount(id);
+    }
 }
