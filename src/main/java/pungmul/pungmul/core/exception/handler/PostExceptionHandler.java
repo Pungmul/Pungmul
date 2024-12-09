@@ -9,6 +9,7 @@ import pungmul.pungmul.core.exception.custom.member.UsernameAlreadyExistsExcepti
 import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
 import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
 import pungmul.pungmul.core.exception.custom.post.NoMoreDataException;
+import pungmul.pungmul.core.exception.custom.post.NotPostAuthorException;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.core.response.code.PostResponseCode;
@@ -34,6 +35,13 @@ public class PostExceptionHandler {
     public ResponseEntity<BaseResponse<String>> ForbiddenPostingUserException(ForbiddenPostingUserException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(PostResponseCode.FORBIDDEN_POSTING_USER));
+    }
+
+    @ExceptionHandler(NotPostAuthorException.class)
+    public ResponseEntity<BaseResponse<String>> NotPostAuthorException(NotPostAuthorException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(BaseResponse.ofFail(PostResponseCode.FORBIDDEN_POSTING_USER));
     }
 }

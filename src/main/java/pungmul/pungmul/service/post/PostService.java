@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
 import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
+import pungmul.pungmul.core.exception.custom.post.HotPostModificationException;
+import pungmul.pungmul.core.exception.custom.post.NotPostAuthorException;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.account.Account;
@@ -88,6 +90,24 @@ public class PostService {
         return CreatePostResponseDTO.builder()
                 .postId(postId)
                 .build();
+    }
+
+    @Transactional
+    public UpdatePostResponseDTO updatePost(UserDetailsImpl userDetails, Long postId, UpdatePostRequestDTO updatePostRequestDTO, List<MultipartFile> files) {
+        if (!isAuthor(userDetails))
+            throw new NotPostAuthorException("자신이 작성한 게시물이 아닙니다.");
+        if (isHotPost(postId))
+            throw new HotPostModificationException("인기 게시물은 내용을 수정할 수 없습니다.");
+
+        updateContent(postId, updatePostRequestDTO, files);
+//        contentRepository.updateContentById(postId, updatePostRequestDTO.getText());
+        return UpdatePostResponseDTO.builder().build();
+    }
+
+    private void updateContent(Long postId, UpdatePostRequestDTO updatePostRequestDTO, List<MultipartFile> files) {
+        Long contentId = contentRepository.getContentByPostId(postId).getId();
+        contentRepository.updateContentById(contentId, updatePostRequestDTO.getText());
+
     }
 
     private void isPostingAllowed(Long userId) throws ExceededPostingNumException, ForbiddenPostingUserException {
@@ -336,15 +356,22 @@ public class PostService {
                 .author("")
                 .build();
     }
-
     private boolean isHiddenPost(Post post) {
         return post.getHidden() || post.getDeleted();
     }
+
     private boolean isNotAdminUser(UserDetailsImpl userDetails) {
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         boolean isAdmin = authorities.stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
         return !isAdmin;
+    }
+
+    private boolean isAuthor(UserDetailsImpl userDetails) {
+        return false;
+    }
+
+    private boolean isHotPost(Long postId) {
     }
 }

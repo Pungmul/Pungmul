@@ -7,6 +7,8 @@ import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.repository.post.mapper.ContentMapper;
 import pungmul.pungmul.repository.post.repository.ContentRepository;
 
+import java.util.Optional;
+
 @Slf4j
 @RequiredArgsConstructor
 @Repository
@@ -19,7 +21,12 @@ public class MybatisContentRepository implements ContentRepository {
     }
 
     @Override
-    public Content getContentByPostId(Long postId) {
+    public Optional<Content> getContentByPostId(Long postId) {
         return contentMapper.getContentByPostId(postId);
+    }
+
+    @Override
+    public void updateContentById(Long contentId, String text) {
+        contentMapper.updateContentByPostId(contentId, text);
     }
 }

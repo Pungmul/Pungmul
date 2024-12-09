@@ -1,6 +1,7 @@
 package pungmul.pungmul.repository.post.repository;
 
 import pungmul.pungmul.domain.post.Post;
+import pungmul.pungmul.dto.post.post.UpdatePostRequestDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,4 +29,6 @@ public interface PostRepository {
     Optional<Post> getPostById(Long postId);
 
     void hidePost(Long postId);
+
+    void updatePost(UpdatePostRequestDTO updatePostRequestDTO);
 }

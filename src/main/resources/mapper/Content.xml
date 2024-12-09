@@ -32,4 +32,11 @@
         SELECT * FROM content WHERE post_id = #{postId}
     </select>
 
+    <!-- Update Content By Id -->
+    <update id="updateContentById" parameterType="map">
+        UPDATE content
+        SET text = #{text}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
 </mapper>
