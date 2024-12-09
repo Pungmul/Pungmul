@@ -16,4 +16,5 @@ import java.util.List;
 public class UpdatePostRequestDTO {
     private String text;
     private boolean anonymity;
+    private List<Long> deleteImageIdList;
 }

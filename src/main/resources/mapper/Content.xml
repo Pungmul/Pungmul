@@ -33,10 +33,10 @@
     </select>
 
     <!-- Update Content By Id -->
-    <update id="updateContentById" parameterType="map">
+    <update id="updateContentByPostId" parameterType="pungmul.pungmul.dto.post.post.ContentUpdateDTO">
         UPDATE content
-        SET text = #{text}, updated_at = CURRENT_TIMESTAMP
-        WHERE id = #{id}
+        SET text = #{text}, updated_at = CURRENT_TIMESTAMP, anonymity = #{anonymity}
+        WHERE id = #{contentId}
     </update>
 
 </mapper>

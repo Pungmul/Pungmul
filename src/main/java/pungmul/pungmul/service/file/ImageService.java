@@ -42,6 +42,7 @@ public class ImageService {
     }
 
     private void saveImageToRepo(Long domainId, DomainType domainType, Image image, Long userId) {
+        log.info("imageService domainId : {}",domainId);
         imageRepository.save(image);
         domainImageService.saveDomainImage(domainType, domainId, image.getId(), userId);
     }

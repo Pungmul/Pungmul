@@ -17,4 +17,5 @@ public interface DomainImageRepository {
 
     void activatePrimaryImage(DomainType domainType, Long domainId, Long imageId);
 
+    void deleteDomainImage(List<Long> deleteImageIdList);
 }

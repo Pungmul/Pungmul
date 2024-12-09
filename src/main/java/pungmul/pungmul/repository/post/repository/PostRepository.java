@@ -30,5 +30,5 @@ public interface PostRepository {
 
     void hidePost(Long postId);
 
-    void updatePost(UpdatePostRequestDTO updatePostRequestDTO);
+//    void updatePost(UpdatePostRequestDTO updatePostRequestDTO);
 }

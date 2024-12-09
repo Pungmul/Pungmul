@@ -49,10 +49,11 @@ public class PostController {
     @PatchMapping("/{postId}")
     public ResponseEntity<BaseResponse<UpdatePostResponseDTO>> updatePost(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam Long postId,
-            @RequestBody UpdatePostRequestDTO updatePostRequestDTO,
+            @PathVariable Long postId,
+            @RequestPart("postData") UpdatePostRequestDTO updatePostRequestDTO,
             @RequestPart(value = "files", required = false) List<MultipartFile> files
-    ){
+    ) throws IOException {
+        log.info("call updatePost Controller method");
         UpdatePostResponseDTO updatePostResponseDTO = postService.updatePost(userDetails, postId,updatePostRequestDTO, files);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, updatePostResponseDTO));

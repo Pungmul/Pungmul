@@ -2,6 +2,7 @@ package pungmul.pungmul.repository.post.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import pungmul.pungmul.domain.post.Content;
+import pungmul.pungmul.dto.post.post.ContentUpdateDTO;
 
 import java.util.Optional;
 
@@ -11,5 +12,5 @@ public interface ContentMapper {
 
     Optional<Content> getContentByPostId(Long postId);
 
-    void updateContentByPostId(Long id, String text);
+    void updateContentByPostId(ContentUpdateDTO contentUpdateDTO);
 }
