@@ -40,4 +40,9 @@ public class MybatisDomainImageRepository implements DomainImageRepository {
     public void activatePrimaryImage(DomainType domainType, Long domainId, Long imageId) {
         domainImageMapper.activatePrimaryImage(domainType, domainId, imageId);
     }
+
+    @Override
+    public void deleteDomainImage(List<Long> deleteImageIdList) {
+        domainImageMapper.deleteDomainImage(deleteImageIdList);
+    }
 }

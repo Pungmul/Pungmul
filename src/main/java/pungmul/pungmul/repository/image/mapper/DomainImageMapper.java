@@ -18,4 +18,6 @@ public interface DomainImageMapper {
     void deactivateAllPrimaryImages(DomainType domainType, Long domainId);
 
     void activatePrimaryImage(DomainType domainType, Long domainId, Long imageId);
+
+    void deleteDomainImage(List<Long> deleteImageIdList);
 }

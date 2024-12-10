@@ -38,11 +38,11 @@
         SET post_count = 0, last_reset_time = CURRENT_TIMESTAMP
     </update>
 
-    <update id="updatePostLimit" parameterType="map">
+    <update id="updatePostLimit" parameterType="long">
         UPDATE post_limit
         SET
             post_count = 0,
             last_reset_time = CURRENT_TIMESTAMP
-        WHERE id = #{postLimitId}
+        WHERE user_id = #{id}
     </update>
 </mapper>

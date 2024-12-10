@@ -49,4 +49,13 @@
           AND is_primary = TRUE
     </update>
 
+    <!-- Delete Domain Images -->
+    <delete id="deleteDomainImage" parameterType="list">
+        DELETE FROM domain_image
+        WHERE id IN
+        <foreach collection="deleteImageIdList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

@@ -14,14 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
 import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
+import pungmul.pungmul.core.exception.custom.post.HotPostModificationException;
+import pungmul.pungmul.core.exception.custom.post.NotPostAuthorException;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.user.User;
-import pungmul.pungmul.domain.post.Content;
-import pungmul.pungmul.domain.post.Post;
-import pungmul.pungmul.domain.post.PostLimit;
-import pungmul.pungmul.domain.post.ReportPost;
+import pungmul.pungmul.domain.post.*;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
@@ -29,6 +28,7 @@ import pungmul.pungmul.dto.post.post.*;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.*;
+import pungmul.pungmul.service.file.DomainImageService;
 import pungmul.pungmul.service.file.ImageService;
 
 import java.io.IOException;
@@ -51,6 +51,8 @@ public class PostService {
     private final AccountRepository accountRepository;
     private final ReportPostRepository reportPostRepository;
     private final PostLimitRepository postLimitRepository;
+    private final DomainImageService domainImageService;
+    private final PostBanRepository postBanRepository;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
@@ -69,7 +71,7 @@ public class PostService {
     }
 
     public Content getContentByPostId(Long postId) {
-        Content contentByPostId = contentRepository.getContentByPostId(postId);
+        Content contentByPostId = contentRepository.getContentByPostId(postId).orElseThrow(NoSuchElementException::new);
         List<Image> imagesByDomainId = imageService.getImagesByDomainId(DomainType.CONTENT, contentByPostId.getId());
         log.info("images by domainId: {}", imagesByDomainId);
         contentByPostId.setImageList(imagesByDomainId);
@@ -85,9 +87,48 @@ public class PostService {
         Long postId = savePost(categoryId, userId);
         saveContent(userId, postId, postRequestDTO, files);
 
+        log.info("postId : {}", postId);
+        log.info("content Id : {}", contentRepository.getContentByPostId(postId).map(Content::getId));
+
         return CreatePostResponseDTO.builder()
                 .postId(postId)
                 .build();
+    }
+
+    @Transactional
+    public UpdatePostResponseDTO updatePost(UserDetailsImpl userDetails, Long postId, UpdatePostRequestDTO updatePostRequestDTO, List<MultipartFile> files) throws IOException {
+        log.info("call update Post method");
+        if (!isAuthor(userDetails, postId))
+            throw new NotPostAuthorException("자신이 작성한 게시물이 아닙니다.");
+        if (isHotPost(postId))
+            throw new HotPostModificationException("인기 게시물은 내용을 수정할 수 없습니다.");
+        log.info("pass update post exception trigger");
+
+        updateContent(userDetails, postId, updatePostRequestDTO, files);
+        log.info("update content done");
+        return UpdatePostResponseDTO.builder()
+                .postId(postId)
+                .build();
+    }
+
+    private void updateContent(UserDetailsImpl userDetails, Long postId, UpdatePostRequestDTO updatePostRequestDTO, List<MultipartFile> files) throws IOException {
+        Long contentId = contentRepository.getContentByPostId(postId).map(Content::getId).orElseThrow(NoSuchElementException::new);
+        contentRepository.updateContentById(ContentUpdateDTO.builder()
+                        .contentId(contentId)
+                        .anonymity(updatePostRequestDTO.isAnonymity())
+                        .text(updatePostRequestDTO.getText())
+                            .build());
+        if (!updatePostRequestDTO.getDeleteImageIdList().isEmpty())
+            deleteContentImage(updatePostRequestDTO.getDeleteImageIdList());
+
+        if (!files.isEmpty()) {
+            Long userId = userRepository.getUserIdByAccountId(userDetails.getAccountId());
+            saveImageList(userId, contentId, files);
+        }
+    }
+
+    private void deleteContentImage(List<Long> deleteImageIdList) {
+        domainImageService.deleteDomainImage(deleteImageIdList);
     }
 
     private void isPostingAllowed(Long userId) throws ExceededPostingNumException, ForbiddenPostingUserException {
@@ -98,8 +139,18 @@ public class PostService {
     }
 
     private boolean isForbiddenUser(Long userId) {
-        //  추후 정지 계정 정책 구현
-        return false;
+        Optional<PostBan> activeBan = postBanRepository.getActiveBanByUserId(userId);
+
+        if (activeBan.isPresent()) {
+            PostBan ban = activeBan.get();
+            // 금지 종료 시간이 현재 시간을 지났다면 금지 해제
+            if (ban.getBanEndTime() != null && ban.getBanEndTime().isBefore(LocalDateTime.now())) {
+                postBanRepository.deactivateBan(ban.getId());
+                return false; // 금지가 해제되었으므로 작성 가능
+            }
+            return true; // 여전히 금지 상태
+        }
+        return false; // 금지 상태가 아님
     }
 
     private boolean isExceededPostingNum(Long userId) {
@@ -178,7 +229,7 @@ public class PostService {
 
         return ReportPostResponseDTO.builder()
                 .postId(postId)
-                .postName(contentRepository.getContentByPostId(postId).getTitle())
+                .postName(contentRepository.getContentByPostId(postId).map(Content::getTitle).orElseThrow(NoSuchElementException::new))
                 .reportReason(reportPost.getReportReason())
                 .reportTime(reportPostRepository.getReportPost(reportPost.getId()).getReportTime())
                 .build();
@@ -231,7 +282,7 @@ public class PostService {
         Content content = getContent(userId, postId, postRequestDTO);
         contentRepository.save(content);
 
-        if (files.isEmpty())
+        if (!files.isEmpty())
             saveImageList(userId, content.getId(),files);
     }
 
@@ -284,7 +335,7 @@ public class PostService {
     }
 
     public SimplePostDTO getSimplePostDTO(Post post) {
-        Content contentByPostId = contentRepository.getContentByPostId(post.getId());
+        Content contentByPostId = contentRepository.getContentByPostId(post.getId()).orElseThrow(NoSuchElementException::new);
         return SimplePostDTO.builder()
                 .postId(post.getId())
                 .title(contentByPostId.getTitle())
@@ -336,15 +387,29 @@ public class PostService {
                 .author("")
                 .build();
     }
-
     private boolean isHiddenPost(Post post) {
         return post.getHidden() || post.getDeleted();
     }
+
     private boolean isNotAdminUser(UserDetailsImpl userDetails) {
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
         boolean isAdmin = authorities.stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
 
         return !isAdmin;
+    }
+
+    //  추후 구현
+    private boolean isAuthor(UserDetailsImpl userDetails, Long postId) {
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).map(User::getId).orElseThrow(NoSuchElementException::new);
+        Long writerId = contentRepository.getContentByPostId(postId).map(Content::getWriterId).orElseThrow(NoSuchElementException::new);
+        return userId.equals(writerId);
+    }
+
+    //  추후 구현
+    private boolean isHotPost(Long postId) {
+        Long categoryId = postRepository.getPostById(postId).map(Post::getCategoryId).orElseThrow(NoSuchElementException::new);
+        SimplePostDTO hotPost = getHotPost(categoryId);
+        return hotPost != null && hotPost.getPostId().equals(postId);
     }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.domain.post.Post;
+import pungmul.pungmul.dto.post.post.UpdatePostRequestDTO;
 import pungmul.pungmul.repository.post.mapper.PostMapper;
 import pungmul.pungmul.repository.post.repository.PostRepository;
 
@@ -38,6 +39,12 @@ public class MybatisPostRepository implements PostRepository {
     public void hidePost(Long postId) {
         postMapper.hidePost(postId);
     }
+//
+//    @Override
+//    public void updatePost(UpdatePostRequestDTO updatePostRequestDTO) {
+//
+//
+//    }
 
     @Override
     public void save(Post post) {

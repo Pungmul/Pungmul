@@ -6,9 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pungmul.pungmul.core.exception.custom.member.UsernameAlreadyExistsException;
-import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
-import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
-import pungmul.pungmul.core.exception.custom.post.NoMoreDataException;
+import pungmul.pungmul.core.exception.custom.post.*;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.core.response.code.PostResponseCode;
@@ -36,4 +34,18 @@ public class PostExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(BaseResponse.ofFail(PostResponseCode.FORBIDDEN_POSTING_USER));
     }
+
+    @ExceptionHandler(NotPostAuthorException.class)
+    public ResponseEntity<BaseResponse<String>> NotPostAuthorException(NotPostAuthorException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(BaseResponse.ofFail(PostResponseCode.FORBIDDEN_POSTING_USER));
+    }
+    @ExceptionHandler(HotPostModificationException.class)
+    public ResponseEntity<BaseResponse<String>> HotPostModificationException(HotPostModificationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(PostResponseCode.HOT_POST_MODIFICATION));
+    }
+
 }

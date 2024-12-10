@@ -22,6 +22,8 @@ public class DomainImageService {
         domainImageRepository.save(domainImage);
     }
 
+
+
     private DomainImage getDomainImage(DomainType domainType, Long domainId, Long imageId, Long userId) {
         return DomainImage.builder()
                     .domainId(domainId)
@@ -53,5 +55,10 @@ public class DomainImageService {
     public void updatePrimaryImage(DomainType domainType, Long domainId, Long imageId) {
         domainImageRepository.deactivateAllPrimaryImages(domainType, domainId);
         domainImageRepository.activatePrimaryImage(domainType, domainId, imageId);
+    }
+
+    public void deleteDomainImage(List<Long> deleteImageIdList) {
+        if (deleteImageIdList != null && !deleteImageIdList.isEmpty())
+            domainImageRepository.deleteDomainImage(deleteImageIdList);
     }
 }

@@ -347,4 +347,17 @@ CREATE TABLE IF NOT EXISTS account_ban (
 
 );
 
+CREATE TABLE IF NOT EXISTS post_ban (
+                            id BIGINT AUTO_INCREMENT PRIMARY KEY,        -- 고유 ID
+                            user_id BIGINT NOT NULL,                     -- 금지된 사용자 ID (FK)
+                            ban_reason TEXT NOT NULL,                    -- 금지 이유
+                            ban_start_time DATETIME NOT NULL,            -- 금지 시작 시간
+                            ban_end_time DATETIME,                       -- 금지 종료 시간 (NULL일 경우 무기한)
+                            is_active BOOLEAN DEFAULT TRUE,              -- 금지 활성화 여부
+                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+
 
