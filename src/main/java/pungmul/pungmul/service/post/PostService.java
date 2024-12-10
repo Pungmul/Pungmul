@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
-import pungmul.pungmul.core.exception.custom.member.NoSuchUsernameException;
 import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
 import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
 import pungmul.pungmul.core.exception.custom.post.HotPostModificationException;
@@ -21,10 +20,7 @@ import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.user.User;
-import pungmul.pungmul.domain.post.Content;
-import pungmul.pungmul.domain.post.Post;
-import pungmul.pungmul.domain.post.PostLimit;
-import pungmul.pungmul.domain.post.ReportPost;
+import pungmul.pungmul.domain.post.*;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
@@ -56,6 +52,7 @@ public class PostService {
     private final ReportPostRepository reportPostRepository;
     private final PostLimitRepository postLimitRepository;
     private final DomainImageService domainImageService;
+    private final PostBanRepository postBanRepository;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
@@ -101,7 +98,7 @@ public class PostService {
     @Transactional
     public UpdatePostResponseDTO updatePost(UserDetailsImpl userDetails, Long postId, UpdatePostRequestDTO updatePostRequestDTO, List<MultipartFile> files) throws IOException {
         log.info("call update Post method");
-        if (!isAuthor(userDetails))
+        if (!isAuthor(userDetails, postId))
             throw new NotPostAuthorException("자신이 작성한 게시물이 아닙니다.");
         if (isHotPost(postId))
             throw new HotPostModificationException("인기 게시물은 내용을 수정할 수 없습니다.");
@@ -142,8 +139,18 @@ public class PostService {
     }
 
     private boolean isForbiddenUser(Long userId) {
-        //  추후 정지 계정 정책 구현
-        return false;
+        Optional<PostBan> activeBan = postBanRepository.getActiveBanByUserId(userId);
+
+        if (activeBan.isPresent()) {
+            PostBan ban = activeBan.get();
+            // 금지 종료 시간이 현재 시간을 지났다면 금지 해제
+            if (ban.getBanEndTime() != null && ban.getBanEndTime().isBefore(LocalDateTime.now())) {
+                postBanRepository.deactivateBan(ban.getId());
+                return false; // 금지가 해제되었으므로 작성 가능
+            }
+            return true; // 여전히 금지 상태
+        }
+        return false; // 금지 상태가 아님
     }
 
     private boolean isExceededPostingNum(Long userId) {
@@ -308,7 +315,6 @@ public class PostService {
     }
 
     private void saveContentImage(Long contentId, MultipartFile image, Long userId) throws IOException {
-        log.info("content Id : {}", contentId);
         imageService.saveImage(getRequestContentImageDTO(contentId, image, userId));
     }
 
@@ -394,12 +400,16 @@ public class PostService {
     }
 
     //  추후 구현
-    private boolean isAuthor(UserDetailsImpl userDetails) {
-        return true;
+    private boolean isAuthor(UserDetailsImpl userDetails, Long postId) {
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).map(User::getId).orElseThrow(NoSuchElementException::new);
+        Long writerId = contentRepository.getContentByPostId(postId).map(Content::getWriterId).orElseThrow(NoSuchElementException::new);
+        return userId.equals(writerId);
     }
 
     //  추후 구현
     private boolean isHotPost(Long postId) {
-        return false;
+        Long categoryId = postRepository.getPostById(postId).map(Post::getCategoryId).orElseThrow(NoSuchElementException::new);
+        SimplePostDTO hotPost = getHotPost(categoryId);
+        return hotPost != null && hotPost.getPostId().equals(postId);
     }
 }

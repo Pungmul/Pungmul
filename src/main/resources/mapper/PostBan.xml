@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.post.mapper.PostBanMapper">
+
+    <!-- ResultMap for PostBan -->
+    <resultMap id="PostBanResultMap" type="pungmul.pungmul.domain.post.PostBan">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="banReason" column="ban_reason" />
+        <result property="banStartTime" column="ban_start_time" />
+        <result property="banEndTime" column="ban_end_time" />
+        <result property="isActive" column="is_active" />
+    </resultMap>
+
+    <!-- Active Ban By User ID -->
+    <select id="getActiveBanByUserId" parameterType="long" resultMap="PostBanResultMap">
+        SELECT *
+        FROM post_ban
+        WHERE user_id = #{userId}
+          AND is_active = TRUE
+    </select>
+
+    <!-- Insert New Post Ban -->
+    <insert id="insertPostBan" parameterType="pungmul.pungmul.domain.post.PostBan" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO post_ban (user_id, ban_reason, ban_start_time, ban_end_time, is_active)
+        VALUES (#{userId}, #{banReason}, #{banStartTime}, #{banEndTime}, #{isActive})
+    </insert>
+
+    <!-- Deactivate Ban -->
+    <update id="deactivateBan" parameterType="long">
+        UPDATE post_ban
+        SET is_active = FALSE
+        WHERE id = #{banId}
+    </update>
+
+    <!-- Get All Bans By User ID -->
+    <select id="getAllBansByUserId" parameterType="long" resultMap="PostBanResultMap">
+        SELECT *
+        FROM post_ban
+        WHERE user_id = #{userId}
+        ORDER BY ban_start_time DESC
+    </select>
+
+</mapper>
