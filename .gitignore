@@ -27,6 +27,7 @@ out/
 !**/src/test/**/out/
 src/main/resources/.env
 src/main/resources/keystore.p12
+src/main/resources/pungmulsomething-01992001fcf6.json
 
 ### NetBeans ###
 /nbproject/private/

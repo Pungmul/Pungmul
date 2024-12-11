@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.message.mapper.FCMMapper">
+
+    <!-- ResultMap for FCMToken -->
+    <resultMap id="FCMTokenResultMap" type="pungmul.pungmul.domain.message.FCMToken">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="token" column="token" />
+        <result property="deviceInfo" column="device_info" />
+        <result property="isValid" column="is_valid" />
+        <result property="createdAt" column="created_at" />
+        <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <!-- Insert Token -->
+    <insert id="insertToken" parameterType="pungmul.pungmul.domain.message.FCMToken" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO fcm_token (user_id, token, device_info, is_valid)
+        VALUES (#{userId}, #{token}, #{deviceInfo}, #{isValid})
+    </insert>
+
+    <!-- Update Token Validity -->
+    <update id="updateTokenValidity" parameterType="pungmul.pungmul.dto.message.UpdateFCMTokenDTO">
+        UPDATE fcm_token
+        SET is_valid = #{isValid}, updated_at = CURRENT_TIMESTAMP
+        WHERE token = #{token}
+    </update>
+
+    <!-- Select Tokens by User ID -->
+    <select id="selectTokensByUserId" parameterType="long" resultMap="FCMTokenResultMap">
+        SELECT * FROM fcm_token
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- Select All Valid Tokens -->
+    <select id="selectValidTokens" resultMap="FCMTokenResultMap">
+        SELECT * FROM fcm_token
+        WHERE is_valid = TRUE
+    </select>
+</mapper>

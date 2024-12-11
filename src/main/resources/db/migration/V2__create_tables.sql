@@ -359,5 +359,16 @@ CREATE TABLE IF NOT EXISTS post_ban (
                             FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS fcm_token (
+                           id BIGINT AUTO_INCREMENT PRIMARY KEY,  -- 고유 ID
+                           user_id BIGINT NOT NULL,               -- 사용자 ID (FK)
+                           token TEXT NOT NULL,                   -- FCM 토큰
+                           device_info VARCHAR(255),              -- 디바이스 정보 (예: Android, iOS, Browser 등)
+                           is_valid BOOLEAN DEFAULT TRUE,         -- 토큰 유효 여부
+                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 토큰 등록 시각
+                           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 마지막 수정 시각
+                           FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
 
 

@@ -26,12 +26,23 @@ public class CommentService {
     private final UserRepository userRepository;
     private final TimeSincePosted timeSincePosted;
     private final ImageService imageService;
+    private final PostNotificationTrigger postNotificationTrigger;
 
     public CommentResponseDTO addComment(Long accountId, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
+        Long userId = userRepository.getUserIdByAccountId(accountId);
 
         log.info(requestCommentDTO.toString());
         Comment comment = getComment(getUserIdByAccountId(accountId), postId, parentId, requestCommentDTO);
         commentRepository.save(comment);
+
+        // 댓글인지 대댓글인지 확인 후 알림 트리거 호출
+        if (parentId == null) {
+            // 댓글 알림
+            postNotificationTrigger.triggerCommentNotification(postId, userId, comment.getContent());
+        } else {
+            // 대댓글(답글) 알림
+            postNotificationTrigger.triggerReplyNotification(parentId, userId, comment.getContent());
+        }
 
         return getCommentResponseDTO(commentRepository.getCommentByCommentId(comment.getId()));
     }
