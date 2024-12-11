@@ -53,6 +53,7 @@ public class PostService {
     private final PostLimitRepository postLimitRepository;
     private final DomainImageService domainImageService;
     private final PostBanRepository postBanRepository;
+    private final PostNotificationTrigger postNotificationTrigger;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
@@ -201,6 +202,9 @@ public class PostService {
             // 3. 좋아요가 눌려 있지 않으면 좋아요 추가 (데이터 삽입) 및 좋아요 수 증가
             postRepository.likePost(userId, postId);   // 좋아요 추가
             postRepository.plusPostLikeNum(postId);  // 좋아요 수 증가
+
+            //  좋아요 알림 트리거
+            postNotificationTrigger.triggerLikeNotification(postId, userId);
         }
 
         // 4. 게시물의 최신 좋아요 수를 가져옴

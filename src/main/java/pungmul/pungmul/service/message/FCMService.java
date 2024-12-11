@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.message.FCMToken;
+import pungmul.pungmul.domain.message.NotificationContent;
 import pungmul.pungmul.dto.message.FCMTokenRequestDTO;
 import pungmul.pungmul.dto.message.UpdateFCMTokenDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
@@ -36,6 +37,9 @@ public class FCMService {
     @Value("${firebase.config.path}")
     private String firebaseAccount;
 
+    @Value("${firebase.config.project-id}")
+    private String firebaseProjectId;
+
     // Access Token 생성
     private String getAccessToken() throws IOException {
         GoogleCredentials googleCredentials = GoogleCredentials
@@ -47,8 +51,8 @@ public class FCMService {
     }
 
     // FCM 메시지 전송
-    public void sendNotification(String token, String title, String body) throws IOException {
-        String message = createMessage(token, title, body);
+    public void sendNotification(String token, NotificationContent notificationContent) throws IOException {
+        String message = createMessage(token, notificationContent.getTitle(), notificationContent.getBody());
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -57,11 +61,10 @@ public class FCMService {
 
         HttpEntity<String> request = new HttpEntity<>(message, headers);
         String response = restTemplate.postForObject(
-                FCM_API_URL.replace("{project_id}", "your-project-id"),
+                FCM_API_URL.replace("{project_id}", firebaseProjectId),
                 request,
                 String.class
         );
-
         System.out.println("Response from FCM: " + response);
     }
 
