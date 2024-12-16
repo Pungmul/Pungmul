@@ -1,6 +1,7 @@
 package pungmul.pungmul.config;
 
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Slf4j
 @Configuration
 public class S3Config {
 
@@ -32,14 +34,13 @@ public class S3Config {
     @Value("${aws.s3.key-path}")
     private String keyPath;
 
-//    private final Path keystorePath = Paths.get(System.getProperty("java.io.tmpdir"), "keystore.p12");
-
     @Bean
     public S3Client s3Client() {
         AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(
                 awsAccessKey,
                 awsSecretKey
         );
+        log.info("region : {}", region);
 
         return S3Client.builder()
                 .region(Region.of(region))  // AWS 리전 설정
@@ -47,28 +48,4 @@ public class S3Config {
                 .build();
     }
 
-//    @PostConstruct
-//    public void downloadKeystore() {
-//        try {
-//            if (Files.notExists(keystorePath)) {
-//                // S3에서 인증서를 다운로드
-//                s3Client().getObject(
-//                        GetObjectRequest.builder()
-//                                .bucket(bucketName)
-//                                .key(keyPath)
-//                                .build(),
-//                        keystorePath
-//                );
-//                System.out.println("Keystore downloaded to: " + keystorePath.toString());
-//            }
-//        } catch (Exception e) {
-//            System.err.println("Failed to download keystore from S3: " + e.getMessage());
-//            e.printStackTrace();
-//        }
-//    }
-
-//    @Bean
-//    public Path keystorePath() {
-//        return keystorePath;
-//    }
 }
