@@ -54,7 +54,7 @@
     </insert>
 
     <!-- 특정 LightningMeeting 조회 -->
-    <select id="findLightningMeetingById" parameterType="long" resultMap="LightningMeetingResultMap">
+    <select id="getMeetingById" parameterType="long" resultMap="LightningMeetingResultMap">
         SELECT
             id,
             meeting_name,

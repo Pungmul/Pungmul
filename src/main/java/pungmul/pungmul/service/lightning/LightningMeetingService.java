@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.geo.LatLong;
 import pungmul.pungmul.domain.lightning.*;
 import pungmul.pungmul.domain.member.instrument.Instrument;
@@ -35,6 +36,7 @@ public class LightningMeetingService {
     private final LightningMeetingInstrumentAssignmentRepository lightningMeetingInstrumentAssignmentRepository;
     private final InstrumentStatusRepository instrumentStatusRepository;
     private final UserRepository userRepository;
+    private final LightningMeetingNotificationTrigger lightningMeetingNotificationTrigger;
 
     /**
      * 번개 모임 생성 로직.
@@ -47,7 +49,7 @@ public class LightningMeetingService {
      */
     @Transactional
     public CreateLightningMeetingResponseDTO createLightningMeeting(CreateLightningMeetingRequestDTO createLightningMeetingRequestDTO,
-                                                                    UserDetails userDetails) {
+                                                                    UserDetailsImpl userDetails) {
 
         // 1. 주최자 ID 조회
         Long organizerId = userRepository.getUserByEmail(userDetails.getUsername())
@@ -79,7 +81,7 @@ public class LightningMeetingService {
      * 3. 추가된 참여자 정보를 포함한 응답 DTO 반환.
      */
     @Transactional
-    public AddLightningMeetingParticipantResponseDTO addLightningMeetingParticipant(UserDetails userDetails, AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO, Boolean isOrganizer) {
+    public AddLightningMeetingParticipantResponseDTO addLightningMeetingParticipant(UserDetailsImpl userDetails, AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO, Boolean isOrganizer) {
         // 1. 참여자 정보 생성
         LightningMeetingParticipant lightningMeetingParticipant = getLightningMeetingParticipant(userDetails, addLightningMeetingRequestDTO, isOrganizer);
 
@@ -89,6 +91,8 @@ public class LightningMeetingService {
         lightningMeetingInstrumentAssignmentRepository
                 .increaseAssignment(lightningMeetingParticipant.getMeetingId(),
                         lightningMeetingParticipant.getInstrumentAssigned());
+
+        lightningMeetingNotificationTrigger.triggerAddParticipant(addLightningMeetingRequestDTO.getMeetingId(), userDetails);
 
         // 3. 참여자 정보 반환
         return AddLightningMeetingParticipantResponseDTO.builder()
@@ -252,7 +256,7 @@ public class LightningMeetingService {
      * 1. 사용자 이메일(userDetails)로 사용자 정보를 조회.
      * 2. 주 악기를 포함한 LightningMeetingParticipant 객체 생성.
      */
-    public LightningMeetingParticipant getLightningMeetingParticipant(UserDetails userDetails, AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO, Boolean isOrganizer) {
+    public LightningMeetingParticipant getLightningMeetingParticipant(UserDetailsImpl userDetails, AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO, Boolean isOrganizer) {
         // 1. 사용자 정보 조회
         User user = userRepository.getUserByEmail(userDetails.getUsername()).orElseThrow(NoSuchElementException::new);
 

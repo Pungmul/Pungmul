@@ -19,8 +19,11 @@ import pungmul.pungmul.dto.message.UpdateFCMTokenDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.message.repository.FCMRepository;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -40,14 +43,36 @@ public class FCMService {
     @Value("${firebase.config.project-id}")
     private String firebaseProjectId;
 
+    private static final String LOCAL_FCM_CONFIG_PATH =
+            "src/main/resources/pungmulsomething-01992001fcf6.json";
+
     // Access Token 생성
     private String getAccessToken() throws IOException {
+        String effectivePath = resolveFirebaseAccountPath();
+
         GoogleCredentials googleCredentials = GoogleCredentials
-                .fromStream(new FileInputStream(firebaseAccount))
+                .fromStream(new FileInputStream(effectivePath))
                 .createScoped(Collections.singletonList("https://www.googleapis.com/auth/firebase.messaging"));
 
         googleCredentials.refreshIfExpired();
         return googleCredentials.getAccessToken().getTokenValue();
+    }
+
+    /**
+     * 파일 경로를 확인해 AWS 경로 또는 로컬 경로를 사용
+     */
+    private String resolveFirebaseAccountPath() {
+        File awsFile = new File(firebaseAccount);
+        if (awsFile.exists()) {
+            return firebaseAccount; // AWS 서버 경로 사용
+        } else {
+            // 로컬 경로 확인
+            if (Files.exists(Paths.get(LOCAL_FCM_CONFIG_PATH))) {
+                return LOCAL_FCM_CONFIG_PATH;
+            } else {
+                throw new RuntimeException("Firebase account file not found in both AWS and Local paths");
+            }
+        }
     }
 
     // FCM 메시지 전송

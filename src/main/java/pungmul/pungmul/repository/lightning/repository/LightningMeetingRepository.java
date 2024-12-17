@@ -4,6 +4,7 @@ import pungmul.pungmul.domain.lightning.LightningMeeting;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface LightningMeetingRepository {
     void createLightningMeeting(LightningMeeting lightningMeeting);
@@ -12,4 +13,5 @@ public interface LightningMeetingRepository {
 
     List<LightningMeeting> findAllByDeadline(LocalDateTime now);
 
+    Optional<LightningMeeting> getMeetingById(Long meetingId);
 }
