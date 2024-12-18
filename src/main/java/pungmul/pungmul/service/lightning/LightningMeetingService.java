@@ -3,7 +3,6 @@ package pungmul.pungmul.service.lightning;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.security.UserDetailsImpl;
@@ -11,16 +10,20 @@ import pungmul.pungmul.core.geo.LatLong;
 import pungmul.pungmul.domain.lightning.*;
 import pungmul.pungmul.domain.member.instrument.Instrument;
 import pungmul.pungmul.domain.member.user.User;
+import pungmul.pungmul.domain.message.NotificationContent;
 import pungmul.pungmul.dto.lightning.*;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingInstrumentAssignmentRepository;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingParticipantRepository;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingRepository;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.domain.message.FCMToken;
+import pungmul.pungmul.repository.message.repository.FCMRepository;
+import pungmul.pungmul.service.message.FCMService;
+import pungmul.pungmul.service.message.template.LightningMeetingNotificationTemplateFactory;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -37,6 +40,8 @@ public class LightningMeetingService {
     private final InstrumentStatusRepository instrumentStatusRepository;
     private final UserRepository userRepository;
     private final LightningMeetingNotificationTrigger lightningMeetingNotificationTrigger;
+    private final FCMService fcmService;
+    private final FCMRepository fcmRepository;
 
     /**
      * 번개 모임 생성 로직.
@@ -154,27 +159,66 @@ public class LightningMeetingService {
                 .build();
     }
 
-    @Scheduled(fixedRate = 60000)
-    public void checkMeetingDeadline(){
-        //  모집 시간이 지난 번개 미팅 리스트 반환
-        List<LightningMeeting> allByDeadline = lightningMeetingRepository.findAllByDeadline(LocalDateTime.now());
+    @Scheduled(fixedRate = 60000) // 1분마다 실행
+    @Transactional
+    public void processExpiredMeetingsAndCheckDeadline() throws IOException {
+        // 모집 기간이 지난 상태의 OPEN 모임만 조회
+        List<LightningMeeting> expiredMeetings = lightningMeetingRepository.findAllByDeadlineAndStatus(
+                LocalDateTime.now(), LightningMeetingStatus.OPEN);
+        log.info("Expired meetings to process: {}", expiredMeetings.size());
 
-        for (LightningMeeting meeting : allByDeadline) {
-            //  정식 판굿인 경우
+        for (LightningMeeting meeting : expiredMeetings) {
+            // 모임 성사 여부 판단
+            boolean isMeetingSuccessful;
             if (meeting.getMeetingType() == MeetingType.CLASSICPAN) {
-                if (checkClassicParticipant(meeting))
-                    startLightningMeeting(meeting);
-                else
-                    cancelLightningMeeting(meeting);
+                isMeetingSuccessful = checkClassicParticipant(meeting);
+            } else {
+                isMeetingSuccessful = meeting.getMinPersonNum() <= getMeetingParticipantNum(meeting);
             }
-            //  정식 판굿이 아닌 경우
-            else {
-                if (meeting.getMinPersonNum() > getMeetingParticipantNum(meeting))
-                    startLightningMeeting(meeting);
-                else
-                    cancelLightningMeeting(meeting);
+
+            // 모임 상태 업데이트 및 알림 전송
+            if (isMeetingSuccessful) {
+                startLightningMeeting(meeting);
+//                meeting.setStatus(MeetingStatus.SUCCESS); // 상태 변경
+                lightningMeetingRepository.setStatus(meeting.getId(), LightningMeetingStatus.SUCCESS);
+                sendMeetingSuccessNotification(meeting);
+            } else {
+                cancelLightningMeeting(meeting);
+                lightningMeetingRepository.setStatus(meeting.getId(), LightningMeetingStatus.CANCELLED);
+                sendMeetingCancelNotification(meeting);
             }
+
+            lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId()); // 참가자 비활성화
         }
+    }
+
+    private void sendMeetingSuccessNotification(LightningMeeting meeting) throws IOException {
+        List<String> participantTokens = getParticipantTokens(meeting.getId());
+
+        for (String token : participantTokens) {
+            NotificationContent successNotification = LightningMeetingNotificationTemplateFactory.createMeetingSuccessNotification(meeting);
+            fcmService.sendNotification(token, successNotification);
+        }
+        log.info("모임 성사 알림 전송 완료: MeetingId={}", meeting.getId());
+    }
+
+    private void sendMeetingCancelNotification(LightningMeeting meeting) throws IOException {
+        List<String> participantTokens = getParticipantTokens(meeting.getId());
+
+        for (String token : participantTokens) {
+            NotificationContent cancelNotification = LightningMeetingNotificationTemplateFactory.createMeetingFailedNotification(meeting);
+            fcmService.sendNotification(token, cancelNotification);
+        }
+        log.info("모임 취소 알림 전송 완료: MeetingId={}", meeting.getId());
+    }
+
+    private List<String> getParticipantTokens(Long meetingId) {
+        return lightningMeetingParticipantRepository.findAllParticipantsByMeetingId(meetingId).stream()
+                .map(participant -> fcmRepository.findTokensByUserId(participant.getUserId()))
+                .flatMap(List::stream)
+                .filter(FCMToken::isValid)
+                .map(FCMToken::getToken)
+                .toList();
     }
 
     private Integer getMeetingParticipantNum(LightningMeeting meeting) {
@@ -207,15 +251,15 @@ public class LightningMeetingService {
 
     }
 
-    @Scheduled(fixedRate = 60000) // 1분마다 실행
-    @Transactional
-    public void processExpiredMeetings() {
-        List<LightningMeeting> expiredMeetings = lightningMeetingRepository.findAllByDeadline(LocalDateTime.now());
-
-        // 모든 참가자의 status를 INACTIVE로 변경
-        expiredMeetings.stream().map(LightningMeeting::getId)
-                .forEach(lightningMeetingParticipantRepository::inactivateMeetingParticipants);
-    }
+//    @Scheduled(fixedRate = 60000) // 1분마다 실행
+//    @Transactional
+//    public void processExpiredMeetings() {
+//        List<LightningMeeting> expiredMeetings = lightningMeetingRepository.findAllByDeadline(LocalDateTime.now());
+//
+//        // 모든 참가자의 status를 INACTIVE로 변경
+//        expiredMeetings.stream().map(LightningMeeting::getId)
+//                .forEach(lightningMeetingParticipantRepository::inactivateMeetingParticipants);
+//    }
 
 
     /**
@@ -264,6 +308,7 @@ public class LightningMeetingService {
                 ? addLightningMeetingRequestDTO.getInstrument()
                 : instrumentStatusRepository.getMajorInstrumentByUserId(user.getId());
 
+        log.info("lat : {}", addLightningMeetingRequestDTO.getLatitude());
         // 2. LightningMeetingParticipant 객체 생성
         return LightningMeetingParticipant.builder()
                 .meetingId(addLightningMeetingRequestDTO.getMeetingId())

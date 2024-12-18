@@ -90,7 +90,7 @@ public class FCMService {
                 request,
                 String.class
         );
-        System.out.println("Response from FCM: " + response);
+//        System.out.println("Response from FCM: " + response);
     }
 
     // 메시지 생성

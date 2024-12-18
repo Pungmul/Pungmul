@@ -1,6 +1,7 @@
 package pungmul.pungmul.repository.lightning.repository;
 
 import pungmul.pungmul.domain.lightning.LightningMeeting;
+import pungmul.pungmul.domain.lightning.LightningMeetingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +12,9 @@ public interface LightningMeetingRepository {
 
     List<LightningMeeting> getAllLightningMeeting();
 
-    List<LightningMeeting> findAllByDeadline(LocalDateTime now);
+    List<LightningMeeting> findAllByDeadlineAndStatus(LocalDateTime now, LightningMeetingStatus status);
 
     Optional<LightningMeeting> getMeetingById(Long meetingId);
+
+    void setStatus(Long meetingId, LightningMeetingStatus lightningMeetingStatus);
 }

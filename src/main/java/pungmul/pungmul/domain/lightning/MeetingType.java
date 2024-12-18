@@ -3,7 +3,6 @@ package pungmul.pungmul.domain.lightning;
 import lombok.Getter;
 
 @Getter
-
 public enum MeetingType {
     CLASSICPAN("정식 판굿"),
     FREEPAN("악기 자율 판굿"),

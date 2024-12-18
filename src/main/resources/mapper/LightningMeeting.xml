@@ -19,6 +19,7 @@
         <result property="meetingType" column="meeting_type" />
         <result property="latitude" column="latitude" />
         <result property="longitude" column="longitude" />
+        <result property="status" column="status" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
     </resultMap>
@@ -55,21 +56,7 @@
 
     <!-- 특정 LightningMeeting 조회 -->
     <select id="getMeetingById" parameterType="long" resultMap="LightningMeetingResultMap">
-        SELECT
-            id,
-            meeting_name,
-            meeting_description,
-            recruitment_end_time,
-            start_time,
-            end_time,
-            min_person_num,
-            max_person_num,
-            organizer_id,
-            meeting_type,
-            latitude,
-            longitude,
-            created_at,
-            updated_at
+        SELECT *
         FROM lightning_meeting
         WHERE id = #{id}
     </select>
@@ -87,6 +74,7 @@
             max_person_num = #{maxPersonNum},
             organizer_id = #{organizerId},
             meeting_type = #{meetingType},
+            status = #{status},
             latitude = #{latitude},
             longitude = #{longitude}
         WHERE id = #{id}
@@ -105,45 +93,23 @@
         WHERE id = #{meetingId}
     </update>
 
+    <!-- 번개 모임 상태 변경 -->
+    <update id="setStatus" parameterType="pungmul.pungmul.dto.lightning.SetMeetingStatusDTO">
+        UPDATE lightning_meeting
+        SET status = #{status}
+        WHERE id = #{meetingId}
+    </update>
+
     <!-- 모든 LightningMeeting 조회 -->
     <select id="getAllLightningMeeting" resultMap="LightningMeetingResultMap">
-        SELECT
-            id,
-            meeting_name,
-            meeting_description,
-            recruitment_end_time,
-            start_time,
-            end_time,
-            min_person_num,
-            max_person_num,
-            organizer_id,
-            meeting_type,
-            latitude,
-            longitude,
-            created_at,
-            updated_at
+        SELECT *
         FROM lightning_meeting
     </select>
 
-    <!-- Find all LightningMeetings by deadline -->
-    <select id="findAllByDeadline" parameterType="java.time.LocalDateTime" resultMap="LightningMeetingResultMap">
-        SELECT
-        id,
-        meeting_name,
-        meeting_description,
-        recruitment_end_time,
-        start_time,
-        end_time,
-        min_person_num,
-        max_person_num,
-        organizer_id,
-        meeting_type,
-        latitude,
-        longitude,
-        created_at,
-        updated_at
-        FROM lightning_meeting
-        WHERE end_time &lt;= #{now}
+    <select id="findAllByDeadlineAndStatus" parameterType="pungmul.pungmul.dto.lightning.TimeAndStatusDTO" resultMap="LightningMeetingResultMap">
+        SELECT * FROM lightning_meeting
+        WHERE recruitment_end_time &lt;= #{now}
+        AND status = #{status};
     </select>
 
 </mapper>

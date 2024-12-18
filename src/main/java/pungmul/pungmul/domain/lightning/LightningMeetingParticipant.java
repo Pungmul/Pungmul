@@ -19,4 +19,5 @@ public class LightningMeetingParticipant {
     private Instrument instrumentAssigned; // 배정된 악기 (없으면 null)
     private boolean organizer; // 모임 주최자 여부
     private LatLong location;
+    private Status status;
 }
