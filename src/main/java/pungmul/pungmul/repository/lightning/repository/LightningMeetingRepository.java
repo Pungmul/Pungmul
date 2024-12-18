@@ -17,4 +17,6 @@ public interface LightningMeetingRepository {
     Optional<LightningMeeting> getMeetingById(Long meetingId);
 
     void setStatus(Long meetingId, LightningMeetingStatus lightningMeetingStatus);
+
+    List<LightningMeeting> findAllMeetingWithEnoughParticipants(LocalDateTime now, LightningMeetingStatus lightningMeetingStatus);
 }

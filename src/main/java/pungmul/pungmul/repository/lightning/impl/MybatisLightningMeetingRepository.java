@@ -52,4 +52,12 @@ public class MybatisLightningMeetingRepository implements LightningMeetingReposi
          );
     }
 
+    @Override
+    public List<LightningMeeting> findAllMeetingWithEnoughParticipants(LocalDateTime now, LightningMeetingStatus lightningMeetingStatus) {
+        return lightningMeetingMapper.findAllMeetingWithEnoughParticipants(TimeAndStatusDTO.builder()
+                .now(now)
+                .status(lightningMeetingStatus)
+                .build());
+    }
+
 }

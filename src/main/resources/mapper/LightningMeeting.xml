@@ -112,4 +112,17 @@
         AND status = #{status};
     </select>
 
+    <!-- 모집 기간 중 성사 조건을 만족하는 모임 조회 -->
+    <select id="findAllMeetingWithEnoughParticipants" parameterType="pungmul.pungmul.dto.lightning.TimeAndStatusDTO" resultType="pungmul.pungmul.domain.lightning.LightningMeeting">
+        SELECT *
+        FROM lightning_meeting
+        WHERE recruitment_end_time > #{now}
+        AND status = #{status}
+        AND min_person_num &lt;= (
+        SELECT COUNT(*)
+        FROM lightning_meeting_participant
+        WHERE meeting_id = lightning_meeting.id
+        )
+    </select>
+
 </mapper>
