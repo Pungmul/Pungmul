@@ -60,4 +60,9 @@ public class MybatisLightningMeetingRepository implements LightningMeetingReposi
                 .build());
     }
 
+    @Override
+    public List<LightningMeeting> findMeetingsStartingInThirtyMinutes(LocalDateTime now, LocalDateTime thirtyMinutesLater) {
+        return lightningMeetingMapper.findMeetingsStartingInThirtyMinutes(now, thirtyMinutesLater);
+    }
+
 }

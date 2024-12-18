@@ -204,7 +204,7 @@ public class LightningMeetingService {
 
     // 모임장에게 승인 요청 전송
     private void askOrganizerForMeetingApproval(LightningMeeting meeting) {
-        log.info("Requesting organizer's approval for meeting: {}", meeting.getId());
+//        log.info("Requesting organizer's approval for meeting: {}", meeting.getId());
 
         // 메시지 전송 (예: WebSocket 사용)
 //        sendMeetingApprovalRequestToOrganizer(meeting);
@@ -258,6 +258,30 @@ public class LightningMeetingService {
                 .filter(FCMToken::isValid)
                 .map(FCMToken::getToken)
                 .toList();
+    }
+
+    @Scheduled(fixedRate = 60000) // 1분 간격으로 실행
+    public void sendMeetingReminders() throws IOException {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime thirtyMinutesLater = now.plusMinutes(30);
+
+        // 30분 내에 시작하는 SUCCESS 상태의 모임 조회
+        List<LightningMeeting> meetings = lightningMeetingRepository.findMeetingsStartingInThirtyMinutes(now, thirtyMinutesLater);
+
+        for (LightningMeeting meeting : meetings) {
+            sendRemindersForMeeting(meeting);
+        }
+    }
+
+    private void sendRemindersForMeeting(LightningMeeting meeting) throws IOException {
+        // 해당 모임의 참여자 조회
+        List<LightningMeetingParticipant> participants = lightningMeetingParticipantRepository.findAllParticipantsByMeetingId(meeting.getId());
+        List<String> participantTokens = getParticipantTokens(meeting.getId());
+
+        NotificationContent notificationContent = LightningMeetingNotificationTemplateFactory.remindMeetingNotification(meeting);
+        for (String token : participantTokens) {
+            fcmService.sendNotification(token, notificationContent);
+        }
     }
 
     private Integer getMeetingParticipantNum(LightningMeeting meeting) {

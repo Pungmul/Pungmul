@@ -106,6 +106,13 @@
         FROM lightning_meeting
     </select>
 
+    <select id="findMeetingsStartingInThirtyMinutes" resultType="pungmul.pungmul.domain.lightning.LightningMeeting">
+        SELECT *
+        FROM lightning_meeting
+        WHERE status = 'SUCCESS'
+          AND start_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 MINUTE)
+    </select>
+
     <select id="findAllByDeadlineAndStatus" parameterType="pungmul.pungmul.dto.lightning.TimeAndStatusDTO" resultMap="LightningMeetingResultMap">
         SELECT * FROM lightning_meeting
         WHERE recruitment_end_time &lt;= #{now}

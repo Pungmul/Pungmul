@@ -19,4 +19,6 @@ public interface LightningMeetingRepository {
     void setStatus(Long meetingId, LightningMeetingStatus lightningMeetingStatus);
 
     List<LightningMeeting> findAllMeetingWithEnoughParticipants(LocalDateTime now, LightningMeetingStatus lightningMeetingStatus);
+
+    List<LightningMeeting> findMeetingsStartingInThirtyMinutes(LocalDateTime now, LocalDateTime thirtyMinutesLater);
 }

@@ -23,4 +23,11 @@ public class LightningMeetingNotificationTemplateFactory {
                 .body(meeting.getMeetingName() + " 번개 모임이 취소되었습니다.")
                 .build();
     }
+
+    public static NotificationContent remindMeetingNotification(LightningMeeting meeting) {
+        return NotificationContent.builder()
+                .title(meeting.getMeetingName() + " 30분 전! ")
+                .body("잊지 않으셨죠?")
+                .build();
+    }
 }

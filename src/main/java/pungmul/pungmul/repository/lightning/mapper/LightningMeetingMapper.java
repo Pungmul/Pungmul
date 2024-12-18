@@ -25,4 +25,6 @@ public interface LightningMeetingMapper {
     void setStatus(SetMeetingStatusDTO meetingStatusDTO);
 
     List<LightningMeeting> findAllMeetingWithEnoughParticipants(TimeAndStatusDTO timeAndStatusDTO);
+
+    List<LightningMeeting> findMeetingsStartingInThirtyMinutes(LocalDateTime now, LocalDateTime thirtyMinutesLater);
 }
