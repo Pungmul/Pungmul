@@ -47,4 +47,11 @@
         DELETE FROM meeting_participant WHERE id = #{id}
     </delete>
 
+    <!-- Select All Participants by Meeting ID -->
+    <select id="findAllParticipantsByMeetingId" resultMap="MeetingParticipantResultMap">
+        SELECT *
+        FROM meeting_participant
+        WHERE meeting_id = #{meetingId}
+    </select>
+
 </mapper>

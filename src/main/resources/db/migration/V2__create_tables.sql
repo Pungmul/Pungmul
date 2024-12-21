@@ -285,6 +285,7 @@ CREATE TABLE IF NOT EXISTS lightning_meeting (
                         meeting_type ENUM('CLASSICPAN', 'FREEPAN', 'PRACTICE', 'PLAY') NOT NULL, -- 모임 유형
                         latitude DOUBLE NOT NULL, -- 위도
                         longitude DOUBLE NOT NULL, -- 경도
+                        status ENUM('OPEN', 'SUCCESS','CANCELLED') DEFAULT 'OPEN',
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 생성 시간
                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 수정 시간
 
@@ -303,7 +304,7 @@ CREATE TABLE IF NOT EXISTS lightning_meeting_participant (
                         organizer BOOLEAN DEFAULT FALSE, -- Is this participant the organizer
                         latitude DOUBLE,
                         longitude DOUBLE,
-                        status ENUM('ACTIVE', 'INACTIVE'),
+                        status ENUM('ACTIVE', 'INACTIVE') NOT NULL DEFAULT 'ACTIVE',
                         FOREIGN KEY (meeting_id) REFERENCES lightning_meeting (id) ON DELETE CASCADE
 );
 

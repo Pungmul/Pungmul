@@ -7,9 +7,11 @@ import org.geolatte.geom.Point;
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.core.geo.LatLong;
 import pungmul.pungmul.domain.lightning.LightningMeetingParticipant;
+import pungmul.pungmul.domain.meeting.MeetingParticipant;
 import pungmul.pungmul.repository.lightning.mapper.LightningMeetingParticipantMapper;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingParticipantRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -19,6 +21,7 @@ public class MybatisLightningMeetingParticipantRepository implements LightningMe
     private final LightningMeetingParticipantMapper lightningMeetingParticipantMapper;
     @Override
     public void addLightningMeetingParticipant(LightningMeetingParticipant lightningMeetingParticipant) {
+        log.info("lat : {}, log : {}", lightningMeetingParticipant.getLocation().getLatitude(), lightningMeetingParticipant.getLocation().getLongitude());
         lightningMeetingParticipantMapper.addLightningMeetingParticipant(lightningMeetingParticipant);
     }
 
@@ -35,5 +38,10 @@ public class MybatisLightningMeetingParticipantRepository implements LightningMe
     @Override
     public void inactivateMeetingParticipants(Long meetingId) {
         lightningMeetingParticipantMapper.inactivateMeetingParticipants(meetingId);
+    }
+
+    @Override
+    public List<LightningMeetingParticipant> findAllParticipantsByMeetingId(Long meetingId) {
+        return lightningMeetingParticipantMapper.findAllParticipantsByMeetingId(meetingId);
     }
 }

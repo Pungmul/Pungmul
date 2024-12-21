@@ -11,22 +11,24 @@
         <result property="username" column="username" />
         <result property="instrumentAssigned" column="instrument_assigned" javaType="pungmul.pungmul.domain.member.instrument.Instrument" />
         <result property="organizer" column="organizer" />
-        <result property="latitude" column="latitude" />
-        <result property="longitude" column="longitude" />
         <result property="status" column="status" />
+        <association property="location" javaType="pungmul.pungmul.core.geo.LatLong">
+            <result property="latitude" column="latitude" />
+            <result property="longitude" column="longitude" />
+        </association>
 
     </resultMap>
 
     <!-- Insert Participant -->
     <insert id="addLightningMeetingParticipant" useGeneratedKeys="true" keyProperty="id" parameterType="pungmul.pungmul.domain.lightning.LightningMeetingParticipant">
         INSERT INTO lightning_meeting_participant
-            (meeting_id, user_id, username, instrument_assigned, organizer)
+            (meeting_id, user_id, username, instrument_assigned, organizer, latitude, longitude, status )
         VALUES
-            (#{meetingId}, #{userId}, #{username}, #{instrumentAssigned}, #{organizer});
+            (#{meetingId}, #{userId}, #{username}, #{instrumentAssigned}, #{organizer}, #{location.latitude}, #{location.longitude}, 'ACTIVE');
     </insert>
 
     <!-- Select Participants By Meeting ID -->
-    <select id="selectParticipantsByMeetingId" parameterType="java.lang.Long" resultMap="LightningMeetingParticipantResultMap">
+    <select id="findAllParticipantsByMeetingId" parameterType="java.lang.Long" resultMap="LightningMeetingParticipantResultMap">
         SELECT *
         FROM lightning_meeting_participant
         WHERE meeting_id = #{meetingId};
@@ -53,4 +55,6 @@
         SET status = 'INACTIVE'
         WHERE meeting_id = #{meetingId};
     </update>
+
+
 </mapper>

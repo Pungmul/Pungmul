@@ -30,7 +30,7 @@ public class LightningMeeting {
     private List<LightningMeetingParticipant> lightningMeetingParticipantList = new ArrayList<>();
     @Builder.Default
     private List<InstrumentAssignment> instrumentAssignmentList = new ArrayList<>();
+    private LightningMeetingStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

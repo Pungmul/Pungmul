@@ -10,7 +10,7 @@
         <result property="meetingName" column="meeting_name" />
         <result property="meetingDescription" column="meeting_description" />
         <result property="isPublic" column="is_public" />
-        <result property="meetingStatus" column="meeting_status" />
+        <result property="lightningMeetingStatus" column="meeting_status" />
         <result property="founderUserId" column="founder_user_id" />
         <result property="memberNum" column="member_num" />
         <result property="createdAt" column="created_at" />
@@ -20,7 +20,7 @@
     <!-- Insert Meeting -->
     <insert id="createMeeting" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO meeting (meeting_name, meeting_description, is_public, meeting_status, founder_user_id)
-        VALUES (#{meetingName}, #{meetingDescription}, #{isPublic}, #{meetingStatus}, #{founderUserId})
+        VALUES (#{meetingName}, #{meetingDescription}, #{isPublic}, #{lightningMeetingStatus}, #{founderUserId})
     </insert>
 
     <select id="existsByMeetingName" resultType="boolean" parameterType="String">
@@ -44,7 +44,7 @@
         SET meeting_name = #{meetingName},
             meeting_description = #{meetingDescription},
             is_public = #{isPublic},
-            meeting_status = #{meetingStatus},
+            meeting_status = #{lightningMeetingStatus},
             member_num = #{memberNum},
             updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id}

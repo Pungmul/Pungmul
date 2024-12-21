@@ -56,12 +56,12 @@ public class MemberController {
      * @throws IOException 프로필 이미지 업로드 중 발생할 수 있는 IO 예외를 처리
      */
 
-
     @PostMapping(value = "/signup", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<BaseResponse<CreateAccountResponseDTO>> createMember(
             @Validated @RequestPart("accountData") CreateMemberRequestDTO createMemberRequestDto,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
+        log.info("signup controller method");
         CreateAccountResponseDTO accountResponseDto = memberManagementService.createMember(createMemberRequestDto, profile);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, accountResponseDto));

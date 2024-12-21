@@ -54,7 +54,6 @@ public class PostNotificationTrigger {
     // 좋아요 알림
     public void triggerLikeNotification(Long postId, Long likerId) {
         try {
-//            Post post = postService.getPostEntityById(postId);
             Content content = contentRepository.getContentByPostId(postId).orElseThrow(NoSuchElementException::new);
             Long postAuthorId = content.getWriterId();
 

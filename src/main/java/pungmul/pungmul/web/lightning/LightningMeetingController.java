@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.lightning.*;
@@ -41,7 +42,7 @@ public class LightningMeetingController {
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/meeting")
     public ResponseEntity<BaseResponse<CreateLightningMeetingResponseDTO>> createLightningMeeting(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody CreateLightningMeetingRequestDTO createLightningMeetingRequestDTO
     ){
         CreateLightningMeetingResponseDTO lightningMeetingResponseDTO = lightningMeetingService.createLightningMeeting(createLightningMeetingRequestDTO, userDetails);
@@ -51,7 +52,7 @@ public class LightningMeetingController {
     @PreAuthorize("hasRole('USER')")
     @PostMapping
     public ResponseEntity<BaseResponse<AddLightningMeetingParticipantResponseDTO>> addLightningMeetingParticipant(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO
     ){
         AddLightningMeetingParticipantResponseDTO addLightningMeetingParticipantResponseDTO = lightningMeetingService.addLightningMeetingParticipant(userDetails, addLightningMeetingRequestDTO, false);
