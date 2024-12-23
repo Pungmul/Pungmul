@@ -13,6 +13,7 @@ import pungmul.pungmul.dto.post.RequestCommentDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.CommentRepository;
 import pungmul.pungmul.service.file.ImageService;
+import pungmul.pungmul.service.post.post.PostNotificationTrigger;
 
 import java.util.List;
 import java.util.NoSuchElementException;

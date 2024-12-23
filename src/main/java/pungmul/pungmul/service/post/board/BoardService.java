@@ -12,7 +12,7 @@ import pungmul.pungmul.dto.post.board.BoardInfoDTO;
 import pungmul.pungmul.dto.post.board.CategoryDTO;
 import pungmul.pungmul.dto.post.post.SimplePostDTO;
 import pungmul.pungmul.repository.post.repository.CategoryRepository;
-import pungmul.pungmul.service.post.PostService;
+import pungmul.pungmul.service.post.post.PostService;
 
 import java.util.ArrayList;
 import java.util.List;

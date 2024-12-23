@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.post;
+package pungmul.pungmul.service.post.post;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -30,6 +30,8 @@ import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.*;
 import pungmul.pungmul.service.file.DomainImageService;
 import pungmul.pungmul.service.file.ImageService;
+import pungmul.pungmul.service.post.CommentService;
+import pungmul.pungmul.service.post.TimeSincePosted;
 
 import java.io.IOException;
 import java.time.Duration;

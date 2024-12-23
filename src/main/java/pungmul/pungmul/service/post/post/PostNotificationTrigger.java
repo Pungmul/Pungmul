@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.post;
+package pungmul.pungmul.service.post.post;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -14,7 +14,6 @@ import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.board.BoardDetailsResponseDTO;
 import pungmul.pungmul.dto.post.board.CategoryDTO;
 import pungmul.pungmul.dto.post.post.SimplePostDTO;
-import pungmul.pungmul.service.post.PostService;
 import pungmul.pungmul.service.post.board.BoardService;
 
 import java.util.List;
