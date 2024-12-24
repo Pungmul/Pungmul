@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.file.DomainType;
+import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
 import pungmul.pungmul.dto.file.RequestImageDTO;
@@ -30,18 +31,22 @@ public class PostContentService {
     private final UserService userService;
 
     public void saveContent(Long userId, Long postId, PostRequestDTO postRequestDTO, List<MultipartFile> files) throws IOException {
-        Content content = Content.builder()
-                .postId(postId)
-                .writerId(userId)
-                .title(postRequestDTO.getTitle())
-                .text(postRequestDTO.getText())
-                .anonymity(postRequestDTO.isAnonymity())
-                .build();
+        Content content = getContent(userId, postId, postRequestDTO);
         contentRepository.save(content);
 
         if (!files.isEmpty()) {
             saveImages(content.getId(), files, userId);
         }
+    }
+
+    private static Content getContent(Long userId, Long postId, PostRequestDTO postRequestDTO) {
+        return Content.builder()
+                .postId(postId)
+                .title(postRequestDTO.getTitle())
+                .text(postRequestDTO.getText())
+                .anonymity(postRequestDTO.isAnonymity())
+                .writerId(userId)
+                .build();
     }
 
     public PostResponseDTO getPostResponse(Post post) {
@@ -99,6 +104,10 @@ public class PostContentService {
     }
 
     public Content getContentByPostId(Long postId) {
-        return contentRepository.getContentByPostId(postId).orElseThrow(NoSuchElementException::new);
+        Content contentByPostId = contentRepository.getContentByPostId(postId).orElseThrow(NoSuchElementException::new);
+        List<Image> imagesByDomainId = imageService.getImagesByDomainId(DomainType.CONTENT, contentByPostId.getId());
+        contentByPostId.setImageList(imagesByDomainId);
+
+        return contentByPostId;
     }
 }

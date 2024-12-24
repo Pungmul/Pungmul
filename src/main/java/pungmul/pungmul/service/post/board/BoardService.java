@@ -12,7 +12,7 @@ import pungmul.pungmul.dto.post.board.BoardInfoDTO;
 import pungmul.pungmul.dto.post.board.CategoryDTO;
 import pungmul.pungmul.dto.post.post.SimplePostDTO;
 import pungmul.pungmul.repository.post.repository.CategoryRepository;
-import pungmul.pungmul.service.post.post.PostService;
+import pungmul.pungmul.service.post.post.PostManagementService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class BoardService {
     private final CategoryRepository categoryRepository;
-    private final PostService postService;
+    private final PostManagementService postManagementService;
 
     public List<CategoryDTO> getBoardList(Long categoryId) {
         List<Category> categoryList;
@@ -55,8 +55,8 @@ public class BoardService {
             throw new NoSuchElementException();
 
         BoardInfoDTO boardInfo = getBoardInfo(categoryId);
-        SimplePostDTO hotPost = postService.getHotPost(categoryId);
-        PageInfo<SimplePostDTO> recentPosts = postService.getPostsByCategory(categoryId, 1, 20, userDetails);
+        SimplePostDTO hotPost = postManagementService.getHotPost(categoryId);
+        PageInfo<SimplePostDTO> recentPosts = postManagementService.getPostsByCategory(categoryId, 1, 20, userDetails);
 
         return getBoardDetailsResponseDTO(boardInfo, hotPost, recentPosts);
     }
@@ -65,13 +65,13 @@ public class BoardService {
         if (!categoryRepository.isCategoryExistById(categoryId))
             throw new NoSuchElementException("해당 카테고리 없음");
 
-        PageInfo<SimplePostDTO> pageInfo = postService.getPostsByCategory(categoryId, page, size, userDetails);
+        PageInfo<SimplePostDTO> pageInfo = postManagementService.getPostsByCategory(categoryId, page, size, userDetails);
 
         // 더 이상 호출할 데이터가 없는 경우 예외 처리
         if (page > 1 && (pageInfo.getList().isEmpty() || pageInfo.isIsLastPage())) {
             throw new NoMoreDataException("더 이상 호출할 데이터가 없습니다.");
         }
-        return postService.getPostsByCategory(categoryId, page, size, userDetails);
+        return postManagementService.getPostsByCategory(categoryId, page, size, userDetails);
     }
 
     private BoardDetailsResponseDTO getBoardDetailsResponseDTO(

@@ -17,7 +17,8 @@ import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
 import pungmul.pungmul.dto.post.post.*;
-import pungmul.pungmul.service.post.post.PostService;
+import pungmul.pungmul.service.post.post.PostInteractionService;
+import pungmul.pungmul.service.post.post.PostManagementService;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,7 +28,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
 public class PostController {
-    private final PostService postService;
+    private final PostManagementService postManagementService;
+    private final PostInteractionService postInteractionService;
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("")
@@ -37,7 +39,7 @@ public class PostController {
             @Validated @RequestPart("postData") PostRequestDTO postRequestDTO,
             @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws IOException, ExceededPostingNumException, ForbiddenPostingUserException {
-        CreatePostResponseDTO createPostResponseDTO = postService.addPost(userDetails, categoryId, postRequestDTO, files);
+        CreatePostResponseDTO createPostResponseDTO = postManagementService.addPost(userDetails, categoryId, postRequestDTO, files);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createPostResponseDTO));
     }
@@ -51,7 +53,7 @@ public class PostController {
             @RequestPart(value = "files", required = false) List<MultipartFile> files
     ) throws IOException {
         log.info("call updatePost Controller method");
-        UpdatePostResponseDTO updatePostResponseDTO = postService.updatePost(userDetails, postId,updatePostRequestDTO, files);
+        UpdatePostResponseDTO updatePostResponseDTO = postManagementService.updatePost(userDetails, postId,updatePostRequestDTO, files);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, updatePostResponseDTO));
     }
@@ -61,7 +63,7 @@ public class PostController {
     public ResponseEntity<BaseResponse<PostResponseDTO>> getPostByPostId(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long postId) {
-        PostResponseDTO post = postService.getPostById(userDetails,postId);
+        PostResponseDTO post = postManagementService.getPostDTOById(userDetails,postId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, post));
     }
@@ -72,7 +74,7 @@ public class PostController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long postId
     ) {
-        PostLikeResponseDTO postLikeResponseDTO = postService.handlePostLike(userDetails.getAccountId(), postId);
+        PostLikeResponseDTO postLikeResponseDTO = postInteractionService.handlePostLike(userDetails, postId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, postLikeResponseDTO));
     }
@@ -84,7 +86,7 @@ public class PostController {
             @PathVariable Long postId,
             @RequestBody ReportPostRequestDTO reportPostRequestDTO
     ) {
-        ReportPostResponseDTO reportPostResponseDTO = postService.reportPostByPostId(userDetails, postId, reportPostRequestDTO);
+        ReportPostResponseDTO reportPostResponseDTO = postInteractionService.reportPostByPostId(userDetails, postId, reportPostRequestDTO);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reportPostResponseDTO));
     }
 

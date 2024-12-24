@@ -30,7 +30,7 @@ public class CommentController {
                                                                        @RequestParam Long postId,
                                                                        @RequestParam(required = false) Long parentId,
                                                                        @Validated @RequestBody RequestCommentDTO requestCommentDTO){
-        CommentResponseDTO commentResponseDTO = commentService.addComment(userDetails.getAccountId(), postId, parentId, requestCommentDTO);
+        CommentResponseDTO commentResponseDTO = commentService.addComment(userDetails, postId, parentId, requestCommentDTO);
 
         log.info("Comment added: {}", commentResponseDTO.getContent());
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -56,7 +56,7 @@ public class CommentController {
             @RequestParam Long postId,
             @RequestBody RequestCommentDTO requestCommentDTO
     ) {
-        CommentResponseDTO commentResponseDTO = commentService.addComment(userDetails.getAccountId(), postId, commentId, requestCommentDTO);
+        CommentResponseDTO commentResponseDTO = commentService.addComment(userDetails, postId, commentId, requestCommentDTO);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, commentResponseDTO));
     }

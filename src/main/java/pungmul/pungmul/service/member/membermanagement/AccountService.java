@@ -75,4 +75,8 @@ public class AccountService {
         }
         return account;
     }
+
+    public Account getAccountByEmail(String username) {
+        return accountRepository.getAccountByEmail(username).orElseThrow(NoSuchElementException::new);
+    }
 }

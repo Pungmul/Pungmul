@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Comment;
@@ -13,6 +14,7 @@ import pungmul.pungmul.dto.post.RequestCommentDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.CommentRepository;
 import pungmul.pungmul.service.file.ImageService;
+import pungmul.pungmul.service.member.membermanagement.UserService;
 import pungmul.pungmul.service.post.post.PostNotificationTrigger;
 
 import java.util.List;
@@ -28,12 +30,13 @@ public class CommentService {
     private final TimeSincePosted timeSincePosted;
     private final ImageService imageService;
     private final PostNotificationTrigger postNotificationTrigger;
+    private final UserService userService;
 
-    public CommentResponseDTO addComment(Long accountId, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
-        Long userId = userRepository.getUserIdByAccountId(accountId);
+    public CommentResponseDTO addComment(UserDetailsImpl userDetails, Long postId, Long parentId, RequestCommentDTO requestCommentDTO) {
+        Long userId = userService.getUserByEmail(userDetails.getUsername()).getId();
 
         log.info(requestCommentDTO.toString());
-        Comment comment = getComment(getUserIdByAccountId(accountId), postId, parentId, requestCommentDTO);
+        Comment comment = getComment(userId, postId, parentId, requestCommentDTO);
         commentRepository.save(comment);
 
         // 댓글인지 대댓글인지 확인 후 알림 트리거 호출

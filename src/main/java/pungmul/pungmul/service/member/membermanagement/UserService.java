@@ -68,7 +68,7 @@ public class UserService {
 
     public User getUserByEmail(String email) {
         return userRepository.getUserByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(NoSuchElementException::new);
     }
 
     public void banUser(String username) {
