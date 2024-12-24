@@ -20,12 +20,12 @@ public class UserService {
                 .accountId(accountId)
                 .name(createMemberRequestDTO.getName())
                 .clubName(createMemberRequestDTO.getClubName())
-                .birth(createMemberRequestDTO.getBirth())
+//                .birth(createMemberRequestDTO.getBirth())
                 .email(createMemberRequestDTO.getEmail())
                 .phoneNumber(createMemberRequestDTO.getPhoneNumber())
-                .clubAge(createMemberRequestDTO.getClubAge())
-                .gender(createMemberRequestDTO.getGender())
-                .area(createMemberRequestDTO.getArea())
+//                .clubAge(createMemberRequestDTO.getClubAge())
+//                .gender(createMemberRequestDTO.getGender())
+//                .area(createMemberRequestDTO.getArea())
                 .clubId(createMemberRequestDTO.getClubId())
                 .build();
         userRepository.saveUser(user);
@@ -40,7 +40,7 @@ public class UserService {
         User updatedUser = User.builder()
                 .id(userId)
                 .phoneNumber(updateMemberRequestDTO.getPhoneNumber())
-                .area(updateMemberRequestDTO.getArea())
+//                .area(updateMemberRequestDTO.getArea())
                 .clubId(updateMemberRequestDTO.getClubId())
                 .clubName(updateMemberRequestDTO.getClubName())
                 .build();
@@ -60,7 +60,7 @@ public class UserService {
                 .name(user.getName())
                 .clubName(user.getClubName())
                 .phoneNumber(user.getPhoneNumber())
-                .area(user.getArea())
+//                .area(user.getArea())
                 .clubId(user.getClubId())
                 .updateAt(user.getUpdatedAt())
                 .build();

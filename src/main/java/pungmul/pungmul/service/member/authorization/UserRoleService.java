@@ -29,7 +29,7 @@ public class UserRoleService {
         String username = setRoleRequestDTO.getUsername();
         String roleName = setRoleRequestDTO.getRoleName();
 
-        Long accountId = accountRepository.getAccountByLoginId(username)
+        Long accountId = accountRepository.getAccountByUsername(username)
                 .map(Account::getId)
                 .orElseThrow(() -> new IllegalArgumentException("Account not found for username: " + username));
         userRoleRepository.addRoleToAccount(accountId, roleName);

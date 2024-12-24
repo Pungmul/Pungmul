@@ -15,8 +15,6 @@ import pungmul.pungmul.dto.member.KakaoUserInfoResponseDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.service.member.authentication.LoginService;
 
-import javax.security.auth.login.AccountLockedException;
-
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,11 +41,11 @@ public class KakaoLoginService {
         KakaoUserInfoResponseDTO kakaoUserInfo = kakaoApiClient.getUserInfo(kakaoAccessToken);
 
         // 카카오 사용자 정보로 DB에서 해당 계정 조회 또는 신규 계정 생성
-        Account account = accountRepository.getAccountByLoginId(kakaoUserInfo.getKakaoAccount().email)
+        Account account = accountRepository.getAccountByUsername(kakaoUserInfo.getKakaoAccount().email)
                 .orElseThrow(() -> new NoSuchUsernameException("해당 사용자 없음"));
 
         // LoginService의 기존 로직 활용하여 JWT 토큰 발급 및 세션 처리
-        return loginService.authenticate(account.getLoginId());
+        return loginService.authenticate(account.getUsername());
     }
 
     public String getAccessTokenFromKakao(String code) {

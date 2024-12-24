@@ -62,15 +62,15 @@ public class MemberService {
 
     private static GetMemberResponseDTO getGetMemberResponseDTO(Account account, User user, List<InstrumentStatus> instrumentStatusList) {
         return GetMemberResponseDTO.builder()
-                .loginId(account.getLoginId())
+                .loginId(account.getUsername())
                 .name(user.getName())
                 .clubName(user.getClubName())
-                .birth(user.getBirth())
-                .clubAge(user.getClubAge())
-                .gender(user.getGender())
+//                .birth(user.getBirth())
+//                .clubAge(user.getClubAge())
+//                .gender(user.getGender())
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
-                .area(user.getArea())
+//                .area(user.getArea())
                 .instrumentStatusDTOList(
                         instrumentStatusList.stream()
                                 .map(instrumentStatus -> InstrumentStatusResponseDTO.builder()

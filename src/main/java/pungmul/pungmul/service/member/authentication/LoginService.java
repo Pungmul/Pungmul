@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.Local;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,7 +15,6 @@ import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.core.exception.custom.member.AccountEmailNotVerifiedException;
 import pungmul.pungmul.core.exception.custom.member.AccountWithdrawnException;
-import pungmul.pungmul.core.exception.custom.member.CustomAccountLockedException;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.auth.SessionUser;
 import pungmul.pungmul.domain.member.user.User;
@@ -30,7 +28,6 @@ import pungmul.pungmul.service.member.authorization.UserDetailsServiceImpl;
 import pungmul.pungmul.service.member.membermanagement.AccountService;
 
 import javax.naming.AuthenticationException;
-import javax.security.auth.login.AccountLockedException;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
@@ -70,7 +67,7 @@ public class LoginService {
         return getLoginResponseDTO(sessionUser);
     }
     public SessionUser login(LoginDTO loginDTO) throws AuthenticationException {
-        Account loginAccount = accountRepository.getAccountByLoginId(loginDTO.getLoginId())
+        Account loginAccount = accountRepository.getAccountByUsername(loginDTO.getLoginId())
                 .filter(account -> passwordEncoder.matches(loginDTO.getPassword(), account.getPassword()))
                 .orElseThrow(() -> new AuthenticationException("로그인 실패"));
 
@@ -80,7 +77,7 @@ public class LoginService {
     @Transactional
     public AuthenticationResponseDTO authenticate(String username) {
 
-        Account enabledAccount = accountRepository.getAccountByLoginIdForLogin(username)
+        Account enabledAccount = accountRepository.getAccountByUsernameForLogin(username)
                 .orElseThrow(NoSuchElementException::new);
 
         if (!enabledAccount.isEnabled())
@@ -103,7 +100,7 @@ public class LoginService {
 
 
         //이전 토큰 무효화 및 새 토큰 저장
-        Account account = accountRepository.getAccountByLoginId(username)
+        Account account = accountRepository.getAccountByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Account not found"));
 
         jwtTokenService.revokeUserAllTokens(account);
@@ -125,7 +122,7 @@ public class LoginService {
     }
 
     public void isValidCredentials(LoginDTO loginDTO) {
-        Account account = accountRepository.getAccountByLoginIdForLogin(loginDTO.getLoginId())
+        Account account = accountRepository.getAccountByUsernameForLogin(loginDTO.getLoginId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (account == null || !passwordEncoder.matches(loginDTO.getPassword(), account.getPassword())) {

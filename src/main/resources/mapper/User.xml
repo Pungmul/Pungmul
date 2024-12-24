@@ -10,13 +10,13 @@
         <result property="accountId" column="account_id" />
         <result property="name" column="name" />
         <result property="clubName" column="club_name" />
-        <result property="birth" column="birth" />
-        <result property="clubAge" column="club_age" />
-        <result property="gender" column="gender" />
+<!--        <result property="birth" column="birth" />-->
+<!--        <result property="clubAge" column="club_age" />-->
+<!--        <result property="gender" column="gender" />-->
         <result property="phoneNumber" column="phone_number" />
         <result property="email" column="email" />
         <result property="clubId" column="club_id" />
-        <result property="area" column="area" />
+<!--        <result property="area" column="area" />-->
         <result property="expired" column="expired" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
@@ -24,8 +24,8 @@
 
     <!-- Insert User -->
     <insert id="saveUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO user (account_id, name, club_name, birth, club_age, gender, phone_number, email, club_id, area)
-        VALUES (#{accountId}, #{name}, #{clubName}, #{birth}, #{clubAge}, #{gender}, #{phoneNumber}, #{email}, #{clubId}, #{area})
+        INSERT INTO user (account_id, name, club_name, phone_number, email, club_id)
+        VALUES (#{accountId}, #{name}, #{clubName}, #{phoneNumber}, #{email}, #{clubId})
     </insert>
 
     <!-- 소프트 삭제 - 사용자를 삭제된 상태로 설정 -->
@@ -65,7 +65,6 @@
         UPDATE user
         <set>
             <if test="phoneNumber != null">phone_number = #{phoneNumber}</if>
-            <if test="area != null">, area = #{area}</if>
             <if test="clubId != null">, club_id = #{clubId}</if>
             <if test="clubName != null">, club_name = #{clubName}</if>
             <if test="expired != null">, expired = #{expired}</if>

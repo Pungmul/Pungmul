@@ -9,9 +9,9 @@ public interface AccountRepository {
 
     public Optional<Account> getAccountByAccountId(Long accountId);
 
-    public Optional<Account> getAccountByLoginIdForLogin(String loginId);
+    public Optional<Account> getAccountByUsernameForLogin(String username);
 
-    public Optional<Account> getAccountByLoginId(String loginId);
+    public Optional<Account> getAccountByUsername(String username);
 
     public Optional<Account> getAccountByEmail(String email);
 
@@ -19,7 +19,7 @@ public interface AccountRepository {
 
     void updatePassword(Long accountId, String password);
 
-    void deleteAccount(String loginId);
+    void deleteAccount(String username);
 
     void banAccount(String username);
 

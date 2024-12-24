@@ -16,8 +16,8 @@ public class UpdateMemberResponseDTO {
     private String name;
     private String clubName;
     private String phoneNumber;
-    private Integer clubAge;
-    private String area;
+//    private Integer clubAge;
+//    private String area;
     private Long clubId;
     private LocalDate updateAt;
 }

@@ -6,7 +6,7 @@
 
     <resultMap id="AccountResultMap" type="pungmul.pungmul.domain.member.account.Account">
         <id property="id" column="account_id" />
-        <result property="loginId" column="login_id" />
+        <result property="username" column="username" />
         <result property="password" column="password" />
         <result property="withdraw" column="withdraw" />
         <result property="lastPasswordChanged" column="last_password_changed" />
@@ -22,8 +22,8 @@
 
     <!-- Insert Account -->
     <insert id="saveAccount" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO account (login_id, password)
-        VALUES (#{loginId}, #{password})
+        INSERT INTO account (username, password)
+        VALUES (#{username}, #{password})
     </insert>
 
     <!-- Update Password -->
@@ -36,7 +36,7 @@
     <select id="getAccountByAccountId" parameterType="java.lang.Long" resultMap="AccountResultMap">
         SELECT
             a.id AS account_id,
-            a.login_id,
+            a.username,
             a.password,
             a.withdraw,
             a.last_password_changed,
@@ -56,7 +56,7 @@
     <select id="getAccountByEmail" parameterType="java.lang.String" resultMap="AccountResultMap">
         SELECT
             a.id AS account_id,
-            a.login_id,
+            a.username,
             a.password,
             a.withdraw,
             a.last_password_changed,
@@ -69,15 +69,15 @@
         FROM account a
                  LEFT JOIN account_roles ar ON a.id = ar.account_id
                  LEFT JOIN roles r ON ar.role_id = r.id
-        WHERE a.login_id = #{email}
+        WHERE a.username = #{email}
           AND a.withdraw = FALSE;
     </select>
 
     <!-- Login ID로 Account 조회 (삭제된 계정 제외, roles 포함) -->
-    <select id="getAccountByLoginId" parameterType="java.lang.String" resultMap="AccountResultMap">
+    <select id="getAccountByUsername" parameterType="java.lang.String" resultMap="AccountResultMap">
         SELECT
             a.id AS account_id,
-            a.login_id,
+            a.username,
             a.password,
             a.withdraw,
             a.last_password_changed,
@@ -90,15 +90,15 @@
         FROM account a
                  LEFT JOIN account_roles ar ON a.id = ar.account_id
                  LEFT JOIN roles r ON ar.role_id = r.id
-        WHERE a.login_id = #{loginId}
+        WHERE a.username = #{username}
           AND a.withdraw = FALSE;
     </select>
 
     <!-- Login ID로 Account 조회 (로그인 용으로 삭제 여부 무시, roles 포함) -->
-    <select id="getAccountByLoginIdForLogin" parameterType="java.lang.String" resultMap="AccountResultMap">
+    <select id="getAccountByUsernameForLogin" parameterType="java.lang.String" resultMap="AccountResultMap">
         SELECT
             a.id AS account_id,
-            a.login_id,
+            a.username,
             a.password,
             a.withdraw,
             a.last_password_changed,
@@ -111,7 +111,7 @@
         FROM account a
                  LEFT JOIN account_roles ar ON a.id = ar.account_id
                  LEFT JOIN roles r ON ar.role_id = r.id
-        WHERE a.login_id = #{loginId};
+        WHERE a.username = #{username};
     </select>
 
     <!-- Enable Account -->
@@ -125,14 +125,14 @@
     <update id="deleteAccount" parameterType="java.lang.String">
         UPDATE account
         SET withdraw = TRUE
-        WHERE login_id = #{loginId}
+        WHERE username = #{username}
     </update>
 
     <!-- Ban Account -->
     <update id="banAccount" parameterType="java.lang.String">
         UPDATE account
         SET account_locked = TRUE
-        WHERE login_id = #{loginId}
+        WHERE username = #{username}
     </update>
 
     <!-- Update Account -->

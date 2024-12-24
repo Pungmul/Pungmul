@@ -10,9 +10,9 @@ public interface AccountMapper {
 
     Account getAccountByAccountId(Long accountId);
 
-    Account getAccountByLoginIdForLogin(String loginId);
+    Account getAccountByUsernameForLogin(String username);
 
-    Account getAccountByLoginId(String loginId);
+    Account getAccountByUsername(String username);
 
     Account getAccountByEmail(String email);
 
@@ -20,7 +20,7 @@ public interface AccountMapper {
 
     void updatePassword(Long accountId, String password);
 
-    void deleteAccount(String loginId);
+    void deleteAccount(String username);
 
     void banAccount(String username);
 

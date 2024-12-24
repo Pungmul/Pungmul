@@ -22,7 +22,6 @@ public class MemberManagementService {
     private final InstrumentService instrumentService;
     private final UserImageService userImageService;
 
-
     /**
      * 회원 생성
      */
@@ -43,8 +42,9 @@ public class MemberManagementService {
         accountService.enableAccount(accountId);
 
         return CreateAccountResponseDTO.builder()
-                .loginId(createMemberRequestDTO.getLoginId())
-                .userName(createMemberRequestDTO.getName())
+                .username(createMemberRequestDTO.getUsername())
+                .name(createMemberRequestDTO.getName())
+                .clubName(createMemberRequestDTO.getClubName())
                 .redirectUrl("/login-jwt")
                 .build();
     }

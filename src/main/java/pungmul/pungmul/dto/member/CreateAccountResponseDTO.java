@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateAccountResponseDTO {
-    private String loginId;      // 로그인 ID
-    private String userName;     // 사용자 이름
+    private String username;      // 로그인 ID
+    private String name;     // 사용자 이름
+    private String clubName;
     private String redirectUrl;  // 리다이렉트 URL
 }

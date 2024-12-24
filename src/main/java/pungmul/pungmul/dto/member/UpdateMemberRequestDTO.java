@@ -25,7 +25,5 @@ public class UpdateMemberRequestDTO {
     @Pattern(regexp = "^[0-9]{10,15}$", message = "숫자만 입력하세요.")
     private String phoneNumber;
 
-    private String area;
-
     private Long clubId;
 }
