@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pungmul.pungmul.repository.member.mapper.ClubMapper">
+
+    <!-- ResultMap 정의 -->
+    <resultMap id="ClubResultMap" type="pungmul.pungmul.domain.member.club.Club">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="school" column="school"/>
+        <result property="headId" column="head_id"/>
+        <result property="cratedAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- Club 리스트 가져오기 -->
+    <select id="getClubList" resultMap="ClubResultMap">
+        SELECT * FROM club
+    </select>
+
+</mapper>

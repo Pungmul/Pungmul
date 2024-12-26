@@ -6,11 +6,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import pungmul.pungmul.domain.member.club.Club;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.dto.member.*;
+import pungmul.pungmul.repository.member.impl.MybatisClubRepository;
+import pungmul.pungmul.repository.member.repository.ClubRepository;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,6 +25,7 @@ public class MemberManagementService {
     private final UserService userService;
     private final InstrumentService instrumentService;
     private final UserImageService userImageService;
+    private final ClubRepository clubRepository;
 
     /**
      * 회원 생성
@@ -103,6 +108,21 @@ public class MemberManagementService {
                 .name(userService.getUserByEmail(banMemberRequestDTO.getUsername()).getName())
                 .banReason(banMemberRequestDTO.getBanReason())
                 .banUntil(banMemberRequestDTO.getBanUntil())
+                .build();
+    }
+
+    public ClubListResponseDTO getClubList() {
+        List<Club> clubList = clubRepository.getClubList();
+
+        List<ClubInfo> clubInfoList = clubList.stream()
+                .map(club -> ClubInfo.builder()
+                        .clubId(club.getId())
+                        .clubName(club.getName())
+                        .build())
+                .toList();
+
+        return ClubListResponseDTO.builder()
+                .clubInfoList(clubInfoList)
                 .build();
     }
 }

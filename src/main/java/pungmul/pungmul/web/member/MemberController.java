@@ -39,9 +39,6 @@ public class MemberController {
     private final MemberManagementService memberManagementService;
     private final MemberService memberService;
     private final LoginService loginService;
-    private final AccountService accountService;
-    private final UserService userService;
-    private final InstrumentService instrumentService;
 
     /**
      * 사용자의 회원가입 요청을 처리하는 메서드
@@ -65,6 +62,12 @@ public class MemberController {
         CreateAccountResponseDTO accountResponseDto = memberManagementService.createMember(createMemberRequestDto, profile);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, accountResponseDto));
+    }
+
+    @GetMapping("/clubs")
+    public ResponseEntity<BaseResponse<ClubListResponseDTO>> getClubList(){
+        ClubListResponseDTO clubList = memberManagementService.getClubList();
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, clubList));
     }
 
     @PreAuthorize("hasRole('USER')")
