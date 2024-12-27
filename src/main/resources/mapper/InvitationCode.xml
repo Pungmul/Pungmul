@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.member.mapper.InvitationCodeMapper">
+    <resultMap id="InvitationCodeResultMap" type="pungmul.pungmul.domain.member.invitation.InvitationCode">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="issuedBy" column="issued_by"/>
+        <result property="maxUses" column="max_uses"/>
+        <result property="remainingUses" column="remaining_uses"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 초대 코드 조회 -->
+    <select id="getCodeValue" resultMap="InvitationCodeResultMap">
+        SELECT * FROM invitation_code WHERE code = #{code}
+    </select>
+
+    <!-- 초대 코드 생성 -->
+    <insert id="insertCode">
+        INSERT INTO invitation_code (code, issued_by, max_uses, remaining_uses)
+        VALUES (#{code}, #{issuedBy}, #{maxUses}, #{remainingUses})
+    </insert>
+
+    <!-- 남은 사용 횟수 감소 -->
+    <update id="decrementRemainingUses">
+        UPDATE invitation_code
+        SET remaining_uses = remaining_uses - 1
+        WHERE id = #{id} AND remaining_uses > 0
+    </update>
+
+    <!-- 코드 존재 여부 -->
+    <select id="existsByCode" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM invitation_code
+            WHERE code = #{code}
+        )
+    </select>
+</mapper>

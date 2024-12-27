@@ -39,9 +39,7 @@ public class MemberController {
     private final MemberManagementService memberManagementService;
     private final MemberService memberService;
     private final LoginService loginService;
-    private final AccountService accountService;
-    private final UserService userService;
-    private final InstrumentService instrumentService;
+    private final InvitationCodeService invitationCodeService;
 
     /**
      * 사용자의 회원가입 요청을 처리하는 메서드
@@ -65,6 +63,12 @@ public class MemberController {
         CreateAccountResponseDTO accountResponseDto = memberManagementService.createMember(createMemberRequestDto, profile);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, accountResponseDto));
+    }
+
+    @GetMapping("/clubs")
+    public ResponseEntity<BaseResponse<ClubListResponseDTO>> getClubList(){
+        ClubListResponseDTO clubList = memberManagementService.getClubList();
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, clubList));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -100,7 +104,7 @@ public class MemberController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("")
     public ResponseEntity<BaseResponse<GetMemberResponseDTO>> getMemberInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        GetMemberResponseDTO memberInfo = memberService.getMemberInfo(userDetails.getAccountId());
+        GetMemberResponseDTO memberInfo = memberService.getMemberInfo(userDetails.getUsername());
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, memberInfo));
     }
 
@@ -139,9 +143,16 @@ public class MemberController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));
-
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/code")
+    public ResponseEntity<BaseResponse<String>> getAdminInvitationCode(
+        @RequestBody AdminInvitationCodeRequestDTO adminInvitationCodeRequestDTO
+    ){
+        String adminInvitationCode = invitationCodeService.issueInvitationCode(adminInvitationCodeRequestDTO.getMaxUses());
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, adminInvitationCode));
+    }
 
 
 }

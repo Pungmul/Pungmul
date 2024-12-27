@@ -2,15 +2,24 @@ package pungmul.pungmul.service.member.membermanagement;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import pungmul.pungmul.core.exception.custom.member.ExpiredInvitationCodeException;
+import pungmul.pungmul.core.exception.custom.member.InvalidInvitationCodeException;
+import pungmul.pungmul.domain.member.club.Club;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
+import pungmul.pungmul.domain.member.invitation.InvitationCode;
 import pungmul.pungmul.dto.member.*;
+import pungmul.pungmul.repository.member.impl.MybatisClubRepository;
+import pungmul.pungmul.repository.member.repository.ClubRepository;
+import pungmul.pungmul.repository.member.repository.InvitationCodeRepository;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -21,13 +30,20 @@ public class MemberManagementService {
     private final UserService userService;
     private final InstrumentService instrumentService;
     private final UserImageService userImageService;
+    private final ClubRepository clubRepository;
+    private final InvitationCodeRepository invitationCodeRepository;
+    private final MemberService memberService;
+    private final InvitationCodeService invitationCodeService;
 
+    private final static int DEFAULT_INVITATION_CODE_MAX_USES = 3;
+    private final static String INVITATION_CODE = "sample";
 
     /**
      * 회원 생성
      */
     @Transactional
     public CreateAccountResponseDTO createMember(CreateMemberRequestDTO createMemberRequestDTO, MultipartFile profile) throws IOException {
+        invitationCodeService.checkInvitationCode(createMemberRequestDTO);
         // 1. 계정 생성
         Long accountId = accountService.createAccount(createMemberRequestDTO);
 
@@ -42,10 +58,12 @@ public class MemberManagementService {
         // 4. 계정 활성화
         accountService.enableAccount(accountId);
 
+        //  5. 초대 코드 발급
+        InvitationCode generatedInvitationCode = invitationCodeService.getInvitationCode(userId);
+
         return CreateAccountResponseDTO.builder()
-                .loginId(createMemberRequestDTO.getLoginId())
-                .userName(createMemberRequestDTO.getName())
-                .redirectUrl("/login-jwt")
+                .getMemberDTO(memberService.getMemberInfo(createMemberRequestDTO.getUsername()))
+                .invitationCode(generatedInvitationCode.getCode())
                 .build();
     }
 
@@ -103,6 +121,21 @@ public class MemberManagementService {
                 .name(userService.getUserByEmail(banMemberRequestDTO.getUsername()).getName())
                 .banReason(banMemberRequestDTO.getBanReason())
                 .banUntil(banMemberRequestDTO.getBanUntil())
+                .build();
+    }
+
+    public ClubListResponseDTO getClubList() {
+        List<Club> clubList = clubRepository.getClubList();
+
+        List<ClubInfo> clubInfoList = clubList.stream()
+                .map(club -> ClubInfo.builder()
+                        .clubId(club.getId())
+                        .clubName(club.getName())
+                        .build())
+                .toList();
+
+        return ClubListResponseDTO.builder()
+                .clubInfoList(clubInfoList)
                 .build();
     }
 }

@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS account (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                        login_id VARCHAR(50) UNIQUE NOT NULL,
+                        username VARCHAR(50) UNIQUE NOT NULL,
                         password VARCHAR(255) NOT NULL,
                         withdraw BOOLEAN DEFAULT FALSE,
                         last_password_changed TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -65,14 +65,10 @@ CREATE TABLE IF NOT EXISTS user (
                         account_id BIGINT NOT NULL,
                         name VARCHAR(20) NOT NULL,
                         club_name VARCHAR(50),
-                        birth DATE NOT NULL,
-                        club_age INT,
-                        gender ENUM('MALE', 'FEMALE') NOT NULL,
                         phone_number VARCHAR(20) NOT NULL,
                         email VARCHAR(255) UNIQUE NOT NULL,
                         club_id BIGINT,
                         profile_image BIGINT,
-                        area VARCHAR(255),
                         expired BOOLEAN DEFAULT FALSE,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -370,6 +366,17 @@ CREATE TABLE IF NOT EXISTS fcm_token (
                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- 마지막 수정 시각
                            FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS invitation_code (
+                            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            code VARCHAR(64) NOT NULL UNIQUE,        -- 초대 코드
+                            issued_by BIGINT,                        -- 코드 발급자 (NULL이면 운영자가 발급한 코드)
+                            max_uses INT NOT NULL DEFAULT 3,         -- 최대 사용 횟수
+                            remaining_uses INT NOT NULL,             -- 남은 사용 횟수
+                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 생성 시간
+                            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 
 
 

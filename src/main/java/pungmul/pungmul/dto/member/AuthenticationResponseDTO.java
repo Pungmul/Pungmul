@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 @Builder
 @AllArgsConstructor
 public class AuthenticationResponseDTO {
+    private GetMemberResponseDTO memberResponseDTO;
     private String tokenType;
     private String accessToken;
     private Long expiresIn;

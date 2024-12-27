@@ -175,7 +175,7 @@ public class PostManagementService {
     }
 
     public boolean isPostLikedByUser(UserDetails userDetails, Long postId) {
-        Account account = accountRepository.getAccountByLoginId(userDetails.getUsername())
+        Account account = accountRepository.getAccountByUsername(userDetails.getUsername())
                 .orElseThrow(NoSuchElementException::new);
         Long userId = userRepository.getUserIdByAccountId(account.getId());
         return postRepository.isPostLikedByUser(userId, postId);

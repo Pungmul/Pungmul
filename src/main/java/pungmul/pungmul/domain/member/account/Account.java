@@ -17,7 +17,7 @@ public class Account {
     private Long id;
 
     @NotEmpty   @Email
-    private String loginId;
+    private String username;
     @NotEmpty   @Size(min = 8, max = 20)
     private String password;
 

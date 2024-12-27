@@ -50,7 +50,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .httpBasic(AbstractHttpConfigurer::disable)     //  Http Basic 인증 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)     //  폼 기반 로그인 방식 비활성화
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/member/signup", "/member/login","/member/kakao/**","/ws/**").permitAll()
+                        .requestMatchers("/member/clubs","/member/signup", "/member/login","/member/kakao/**","/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  세션 관리 정책. 세션 사용 안함

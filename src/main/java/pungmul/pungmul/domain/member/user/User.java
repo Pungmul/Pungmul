@@ -13,12 +13,12 @@ public class User {
     private Long accountId;
     private String name;
     private String clubName;
-    private LocalDate birth;
+//    private LocalDate birth;
     private String email;
     private String phoneNumber;
-    private Integer clubAge;
-    private Gender gender;
-    private String area;
+//    private Integer clubAge;
+//    private Gender gender;
+//    private String area;
     private Boolean expired;
     private LocalDate createdAt;
     private LocalDate updatedAt;
@@ -35,12 +35,12 @@ public class User {
                 .accountId(this.accountId)
                 .name("탈퇴한 사용자") // 이름 마스킹
                 .clubName(null) // 클럽 이름 삭제
-                .birth(null) // 생년월일 삭제
+//                .birth(null) // 생년월일 삭제
                 .email(this.email) // 이메일은 그대로 유지 (ID 확인 목적)
                 .phoneNumber(null) // 전화번호 삭제
-                .clubAge(0) // 클럽 나이 초기화
-                .gender(null) // 성별 삭제
-                .area(null) // 지역 정보 삭제
+//                .clubAge(0) // 클럽 나이 초기화
+//                .gender(null) // 성별 삭제
+//                .area(null) // 지역 정보 삭제
                 .expired(this.expired)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
