@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClubInfo {
     private Long clubId;
+    private String school;
     private String clubName;
 }

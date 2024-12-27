@@ -25,11 +25,8 @@ public class CreateMemberRequestDTO {
     @NotEmpty @Pattern(regexp = "^[0-9]{10,15}$", message = "숫자만 입력하세요.")
     private String phoneNumber;
 
-    @NotEmpty @Email
-    private String email;
-
     private Long clubId;
 
-    private String code;
+    private String invitationCode;
 
 }

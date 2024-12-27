@@ -25,7 +25,6 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountBanRepository accountBanRepository;
-    private final InvitationCodeRepository invitationCodeRepository;
 
     public Long createAccount(CreateMemberRequestDTO createMemberRequestDTO) {
         Account account = Account.builder()

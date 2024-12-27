@@ -10,13 +10,9 @@
         <result property="accountId" column="account_id" />
         <result property="name" column="name" />
         <result property="clubName" column="club_name" />
-<!--        <result property="birth" column="birth" />-->
-<!--        <result property="clubAge" column="club_age" />-->
-<!--        <result property="gender" column="gender" />-->
         <result property="phoneNumber" column="phone_number" />
         <result property="email" column="email" />
         <result property="clubId" column="club_id" />
-<!--        <result property="area" column="area" />-->
         <result property="expired" column="expired" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />

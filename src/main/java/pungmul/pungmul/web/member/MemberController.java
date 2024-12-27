@@ -20,8 +20,6 @@ import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.service.member.authentication.LoginService;
 import pungmul.pungmul.service.member.membermanagement.*;
 
-import javax.naming.AuthenticationException;
-import javax.security.auth.login.AccountLockedException;
 import java.io.IOException;
 import java.util.List;
 
@@ -32,7 +30,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/member")
+@RequestMapping("/api/member")
 public class MemberController {
 
     // 회원 생성과 로그인 처리 서비스

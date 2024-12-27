@@ -11,6 +11,6 @@ import pungmul.pungmul.domain.member.invitation.InvitationCode;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateAccountResponseDTO {
-    private GetMemberResponseDTO getMemberDTO;
+    private GetMemberResponseDTO memberDTO;
     private String invitationCode;
 }

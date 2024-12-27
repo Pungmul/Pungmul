@@ -23,7 +23,7 @@ import java.io.IOException;
 @Slf4j
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/member/kakao")
+@RequestMapping("/api/member/kakao")
 public class KakaoController {
     private final KakaoLoginService kakaoLoginService;
     private final JwtTokenService jwtTokenService;

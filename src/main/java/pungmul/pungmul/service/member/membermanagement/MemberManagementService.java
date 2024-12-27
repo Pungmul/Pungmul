@@ -62,7 +62,7 @@ public class MemberManagementService {
         InvitationCode generatedInvitationCode = invitationCodeService.getInvitationCode(userId);
 
         return CreateAccountResponseDTO.builder()
-                .getMemberDTO(memberService.getMemberInfo(createMemberRequestDTO.getUsername()))
+                .memberDTO(memberService.getMemberInfo(createMemberRequestDTO.getUsername()))
                 .invitationCode(generatedInvitationCode.getCode())
                 .build();
     }
@@ -130,6 +130,7 @@ public class MemberManagementService {
         List<ClubInfo> clubInfoList = clubList.stream()
                 .map(club -> ClubInfo.builder()
                         .clubId(club.getId())
+                        .school(club.getSchool())
                         .clubName(club.getName())
                         .build())
                 .toList();
