@@ -212,15 +212,15 @@ public final class GlobalExceptionHandler {
                 HttpStatus.PAYLOAD_TOO_LARGE
         );
     }
-    // 4000 - 서버 내부 오류
-
-    @ExceptionHandler(RuntimeException.class)  // 포괄적인 예외 처리
-    public ResponseEntity<BaseResponse<Void>> handleInternalServerError(Exception ex) {
-        return new ResponseEntity<>(
-                BaseResponse.ofFail(BaseResponseCode.INTERNAL_SERVER_ERROR),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
-    }
+//    // 4000 - 서버 내부 오류
+//
+//    @ExceptionHandler(RuntimeException.class)  // 포괄적인 예외 처리
+//    public ResponseEntity<BaseResponse<Void>> handleInternalServerError(Exception ex) {
+//        return new ResponseEntity<>(
+//                BaseResponse.ofFail(BaseResponseCode.INTERNAL_SERVER_ERROR),
+//                HttpStatus.INTERNAL_SERVER_ERROR
+//        );
+//    }
     // 4001 - 구현되지 않은 기능 요청 시
 
     @ExceptionHandler(UnsupportedOperationException.class)
@@ -260,15 +260,15 @@ public final class GlobalExceptionHandler {
     // 6000 - 기타 예외 처리
     //  6000 - 모든 예외를 포괄적으로 처리 (개별적으로 처리되지 않은 예외들)
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<BaseResponse<String>> handleGlobalException(Exception ex) {
-        // 스택 트레이스와 함께 예외를 로그로 출력
-        log.error("Exception caught: ", ex);
-
-        // 예외 처리 및 응답 반환
-        return new ResponseEntity<>(
-                BaseResponse.ofFail(BaseResponseCode.INTERNAL_SERVER_ERROR),
-                HttpStatus.INTERNAL_SERVER_ERROR
-        );
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<BaseResponse<String>> handleGlobalException(Exception ex) {
+//        // 스택 트레이스와 함께 예외를 로그로 출력
+//        log.error("Exception caught: ", ex);
+//
+//        // 예외 처리 및 응답 반환
+//        return new ResponseEntity<>(
+//                BaseResponse.ofFail(BaseResponseCode.INTERNAL_SERVER_ERROR),
+//                HttpStatus.INTERNAL_SERVER_ERROR
+//        );
+//    }
 }
