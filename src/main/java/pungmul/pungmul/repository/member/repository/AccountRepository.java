@@ -9,6 +9,8 @@ public interface AccountRepository {
 
     public Optional<Account> getAccountByAccountId(Long accountId);
 
+    public Optional<Account> getAccountByAccountId(String username);
+
     public Optional<Account> getAccountByUsernameForLogin(String username);
 
     public Optional<Account> getAccountByUsername(String username);

@@ -14,16 +14,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetMemberResponseDTO {
-
-    private String loginId;
+    private String username;
     private String name;
     private String clubName;
-    private LocalDate birth;
-    private Integer clubAge;
-    private Gender gender;
+    private String groupName;
+//    private LocalDate birth;
+//    private Integer clubAge;
+//    private Gender gender;
     private String phoneNumber;
     private String email;
-    private String area;
+//    private String area;
     private List<InstrumentStatusResponseDTO> instrumentStatusDTOList;
 }
 

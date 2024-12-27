@@ -63,4 +63,21 @@ public class MemberExceptionHandler {
                 .body(BaseResponse.ofFail(MemberResponseCode.PAUSED_ACCOUNT));
 
     }
+
+    @ExceptionHandler(InvalidInvitationCodeException.class)
+    public ResponseEntity<BaseResponse<String>> handleInvalidInvitationCodeException(CustomAccountLockedException ex) {
+        log.info("Invalid Invitation Code: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(MemberResponseCode.INVALID_INVITATION_CODE));
+
+    }
+
+    @ExceptionHandler(ExpiredInvitationCodeException.class)
+    public ResponseEntity<BaseResponse<String>> handleExpiredInvitationCodeException(CustomAccountLockedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(MemberResponseCode.EXPIRED_INVITATION_CODE));
+
+    }
 }

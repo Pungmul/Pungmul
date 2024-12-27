@@ -25,6 +25,11 @@ public class MybatisAccountRepository implements AccountRepository {
     }
 
     @Override
+    public Optional<Account> getAccountByAccountId(String username) {
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<Account> getAccountByUsernameForLogin(String username) {
         return Optional.ofNullable(accountMapper.getAccountByUsernameForLogin(username));
     }

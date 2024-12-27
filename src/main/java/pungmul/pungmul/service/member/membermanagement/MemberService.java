@@ -49,20 +49,18 @@ public class MemberService {
                     .build();
     }
 
-    public GetMemberResponseDTO getMemberInfo(Long accountId) {
-        Account account = accountRepository.getAccountByAccountId(accountId)
+    public GetMemberResponseDTO getMemberInfo(String username) {
+        User user = userRepository.getUserByEmail(username)
                 .orElseThrow(NoSuchElementException::new);
-        User user = userRepository.getUserByAccountId(accountId)
-                .orElseThrow(NoSuchElementException::new);
-        List<InstrumentStatus> instrumentStatusList = instrumentStatusRepository.getAllInstrumentStatusByUserId(userRepository.getUserIdByAccountId(accountId))
-                .orElse(Collections.emptyList() );
+        List<InstrumentStatus> instrumentStatusList = instrumentStatusRepository.getAllInstrumentStatusByUserId(userRepository.getUserByEmail(username).map(User::getId).orElseThrow(NoSuchElementException::new))
+                .orElse(Collections.emptyList());
 
-        return getGetMemberResponseDTO(account, user, instrumentStatusList);
+        return getGetMemberResponseDTO(username, user, instrumentStatusList);
     }
 
-    private static GetMemberResponseDTO getGetMemberResponseDTO(Account account, User user, List<InstrumentStatus> instrumentStatusList) {
+    private static GetMemberResponseDTO getGetMemberResponseDTO(String username, User user, List<InstrumentStatus> instrumentStatusList) {
         return GetMemberResponseDTO.builder()
-                .loginId(account.getUsername())
+                .username(username)
                 .name(user.getName())
                 .clubName(user.getClubName())
 //                .birth(user.getBirth())

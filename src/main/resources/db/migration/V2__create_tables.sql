@@ -367,5 +367,16 @@ CREATE TABLE IF NOT EXISTS fcm_token (
                            FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS invitation_code (
+                            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            code VARCHAR(64) NOT NULL UNIQUE,        -- 초대 코드
+                            issued_by BIGINT,                        -- 코드 발급자 (NULL이면 운영자가 발급한 코드)
+                            max_uses INT NOT NULL DEFAULT 3,         -- 최대 사용 횟수
+                            remaining_uses INT NOT NULL,             -- 남은 사용 횟수
+                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP, -- 생성 시간
+                            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
 
 

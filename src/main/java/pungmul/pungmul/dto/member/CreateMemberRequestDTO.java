@@ -22,22 +22,14 @@ public class CreateMemberRequestDTO {
     @Size(min = 1, max = 10)
     private String clubName;
 
-//    @NotNull @Past
-//    private LocalDate birth;
-
-//    private Integer clubAge;
-
-//    @NotNull
-//    private Gender gender;
-
     @NotEmpty @Pattern(regexp = "^[0-9]{10,15}$", message = "숫자만 입력하세요.")
     private String phoneNumber;
 
     @NotEmpty @Email
     private String email;
 
-//    private String area;
-
     private Long clubId;
+
+    private String code;
 
 }

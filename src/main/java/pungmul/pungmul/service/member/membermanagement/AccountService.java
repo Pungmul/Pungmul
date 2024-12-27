@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pungmul.pungmul.core.exception.custom.member.CustomAccountLockedException;
+import pungmul.pungmul.core.exception.custom.member.InvalidInvitationCodeException;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.account.UserRole;
 import pungmul.pungmul.domain.member.auth.AccountBan;
+import pungmul.pungmul.domain.member.invitation.InvitationCode;
 import pungmul.pungmul.dto.member.BanMemberRequestDTO;
 import pungmul.pungmul.dto.member.CreateMemberRequestDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.AccountBanRepository;
+import pungmul.pungmul.repository.member.repository.InvitationCodeRepository;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
@@ -22,6 +25,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountBanRepository accountBanRepository;
+    private final InvitationCodeRepository invitationCodeRepository;
 
     public Long createAccount(CreateMemberRequestDTO createMemberRequestDTO) {
         Account account = Account.builder()

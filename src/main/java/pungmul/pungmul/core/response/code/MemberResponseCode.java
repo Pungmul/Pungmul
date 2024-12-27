@@ -13,7 +13,9 @@ public enum MemberResponseCode implements ResponseCode {
     INVALID_PASSWORD("MEMBER_002", "비밀번호는 8자 이상의 영문자와 숫자 조합입니다."),
     NOTFOUND_USERNAME("MEMBER_003", "존재하지 않는 사용자 아이디입니다."),
     DELETED_ACCOUNT("MEMBER_004", "삭제된 계정입니다."),
-    PAUSED_ACCOUNT("MEMBER_005", "정지된 계정입니다.");
+    PAUSED_ACCOUNT("MEMBER_005", "정지된 계정입니다."),
+    INVALID_INVITATION_CODE("MEMBER_006", "유효하지 않은 초대 코드입니다."),
+    EXPIRED_INVITATION_CODE("MEMBER_007", "만료된 초대 코드입니다.");
     private final String code;
     private final String message;
 
