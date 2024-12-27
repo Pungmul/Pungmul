@@ -16,4 +16,9 @@ public class MybatisClubRepository implements ClubRepository {
     public List<Club> getClubList() {
         return clubMapper.getClubList();
     }
+
+    @Override
+    public String getGroupName(Long clubId) {
+        return clubMapper.getGroupName(clubId);
+    }
 }

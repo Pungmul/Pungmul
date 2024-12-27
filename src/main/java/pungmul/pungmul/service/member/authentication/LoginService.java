@@ -19,6 +19,7 @@ import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.auth.SessionUser;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.member.AuthenticationResponseDTO;
+import pungmul.pungmul.dto.member.GetMemberResponseDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.dto.member.LoginDTO;
@@ -26,6 +27,7 @@ import pungmul.pungmul.dto.member.LoginResponseDTO;
 import pungmul.pungmul.config.member.SessionConst;
 import pungmul.pungmul.service.member.authorization.UserDetailsServiceImpl;
 import pungmul.pungmul.service.member.membermanagement.AccountService;
+import pungmul.pungmul.service.member.membermanagement.MemberService;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
@@ -42,6 +44,7 @@ public class LoginService {
     private final UserDetailsServiceImpl userDetailsService;
     private final TokenProvider tokenProvider;
     private final JwtTokenService jwtTokenService;
+    private final MemberService memberService;
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     String kakaoClientId;
@@ -76,7 +79,6 @@ public class LoginService {
 
     @Transactional
     public AuthenticationResponseDTO authenticate(String username) {
-
         Account enabledAccount = accountRepository.getAccountByUsernameForLogin(username)
                 .orElseThrow(NoSuchElementException::new);
 
@@ -108,11 +110,12 @@ public class LoginService {
         jwtTokenService.saveUserToken(account, accessToken, JwtConfig.ACCESS_TOKEN_TYPE);
         jwtTokenService.saveUserToken(account, refreshToken, JwtConfig.REFRESH_TOKEN_TYPE);
 
-        return getAuthenticationResponseDTO(accessToken, refreshToken);
+        return getAuthenticationResponseDTO(accessToken, refreshToken, username);
     }
 
-    private AuthenticationResponseDTO getAuthenticationResponseDTO(String accessToken, String refreshToken) {
+    private AuthenticationResponseDTO getAuthenticationResponseDTO(String accessToken, String refreshToken, String username) {
         return AuthenticationResponseDTO.builder()
+                .memberResponseDTO(memberService.getMemberInfo(username))
                 .tokenType(JwtConfig.BEARER_TYPE)
                 .accessToken(accessToken)
                 .expiresIn(getTokenExpiryTime(JwtConfig.ACCESS_TOKEN_TYPE))

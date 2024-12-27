@@ -18,4 +18,8 @@
         SELECT * FROM club
     </select>
 
+    <!-- 동아리명 가져오기 -->
+    <select id="getGroupName" resultType="String">
+        SELECT name FROM club where id = #{clubId}
+    </select>
 </mapper>

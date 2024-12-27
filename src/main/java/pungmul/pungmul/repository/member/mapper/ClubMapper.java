@@ -8,4 +8,7 @@ import java.util.List;
 @Mapper
 public interface ClubMapper {
     public List<Club> getClubList();
+
+    String getGroupName(Long clubId);
+
 }

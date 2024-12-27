@@ -12,6 +12,7 @@ import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.repository.image.repository.ImageRepository;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
+import pungmul.pungmul.repository.member.repository.ClubRepository;
 import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.file.ImageService;
@@ -24,11 +25,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class MemberService {
-    private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final InstrumentStatusRepository instrumentStatusRepository;
     private final ImageRepository imageRepository;
     private final ImageService imageService;
+    private final ClubRepository clubRepository;
 
     public SimpleUserDTO getSimpleUserDTO(Long userId){
         log.info("userId : {}", userId);
@@ -58,17 +59,14 @@ public class MemberService {
         return getGetMemberResponseDTO(username, user, instrumentStatusList);
     }
 
-    private static GetMemberResponseDTO getGetMemberResponseDTO(String username, User user, List<InstrumentStatus> instrumentStatusList) {
+    public GetMemberResponseDTO getGetMemberResponseDTO(String username, User user, List<InstrumentStatus> instrumentStatusList) {
         return GetMemberResponseDTO.builder()
                 .username(username)
                 .name(user.getName())
                 .clubName(user.getClubName())
-//                .birth(user.getBirth())
-//                .clubAge(user.getClubAge())
-//                .gender(user.getGender())
+                .groupName(clubRepository.getGroupName(user.getClubId()))
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
-//                .area(user.getArea())
                 .instrumentStatusDTOList(
                         instrumentStatusList.stream()
                                 .map(instrumentStatus -> InstrumentStatusResponseDTO.builder()
