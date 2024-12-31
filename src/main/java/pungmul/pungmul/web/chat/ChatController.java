@@ -1,7 +1,6 @@
 package pungmul.pungmul.web.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +12,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.core.response.BaseResponse;
+import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.domain.chat.ChatMessage;
 import pungmul.pungmul.dto.chat.ChatMessageRequestDTO;
 import pungmul.pungmul.dto.chat.CreateChatRoomRequestDTO;
 import pungmul.pungmul.dto.chat.CreateChatRoomResponseDTO;
+import pungmul.pungmul.dto.chat.ChatRoomListResponseDTO;
 import pungmul.pungmul.service.chat.ChatService;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 @Slf4j
 @RestController
@@ -36,6 +39,18 @@ public class ChatController {
         CreateChatRoomResponseDTO chatRoomWithRoomCheck = chatService.createChatRoomWithRoomCheck(userDetails.getLoginId(), createChatRoomRequestDTO.getReceiverName());
         return ResponseEntity.ok(chatRoomWithRoomCheck);
     }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("")
+    public ResponseEntity<BaseResponse<ChatRoomListResponseDTO>> getChatRoomList(
+            @RequestParam("page") Integer page,
+            @RequestParam("size") Integer size,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        ChatRoomListResponseDTO chatRoomList = chatService.getChatRoomList(userDetails, page, size);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, chatRoomList));
+    }
+
 
     //  메세지 전송
 //    @PreAuthorize("hasRole('USER')")

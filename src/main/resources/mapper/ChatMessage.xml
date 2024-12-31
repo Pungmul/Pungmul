@@ -49,4 +49,13 @@
         ORDER BY timestamp ASC
     </select>
 
+    <!-- 마지막 메세지 내용 조회 -->
+    <select id="getLastMessageByChatRoomUUID" resultType="java.lang.String">
+        SELECT content
+        FROM chat_messages
+        WHERE chat_room_uuid = #{chatRoomUUID}
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
 </mapper>

@@ -4,22 +4,26 @@
 
 <mapper namespace="pungmul.pungmul.repository.chat.mapper.ChatRoomMapper">
 
-    <!-- Result Map for ChatRoom -->
     <resultMap id="ChatRoomResultMap" type="pungmul.pungmul.domain.chat.ChatRoom">
         <id property="id" column="id" />
         <result property="roomUUID" column="room_uuid" />
         <result property="createdBy" column="created_by" />
+        <result property="isGroup" column="is_group" />
+        <result property="roomName" column="room_name" />
+        <result property="profileImage" column="profileImage" /> <!-- 수정된 프로필 이미지 -->
         <result property="lastMessageId" column="last_message_id" />
         <result property="lastMessageTime" column="last_message_time" />
         <result property="createdAt" column="created_at" />
-        <result property="senderId" column="senderId" /> <!-- 첫 번째 사용자 ID -->
-        <result property="receiverId" column="receiverId" /> <!-- 두 번째 사용자 ID -->
+        <result property="senderId" column="sender_id" />
+        <result property="receiverId" column="receiver_id" />
     </resultMap>
+
+
 
     <!-- Insert ChatRoom -->
     <insert id="createPersonalChatRoom" parameterType="pungmul.pungmul.domain.chat.ChatRoom" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO chat_room (room_uuid, created_by, last_message_id)
-        VALUES (#{roomUUID}, #{createdBy}, #{lastMessageId})
+        INSERT INTO chat_room (room_uuid, created_by, is_group, last_message_id, last_message_time, created_at)
+        VALUES (#{roomUUID}, #{createdBy}, #{isGroup}, #{lastMessageId}, #{lastMessageTime}, #{createdAt})
     </insert>
 
     <!-- Insert ChatRoom Members -->
@@ -31,29 +35,97 @@
         </foreach>
     </insert>
 
-
     <!-- Select ChatRoom by id -->
     <select id="selectChatRoomById" parameterType="long" resultMap="ChatRoomResultMap">
         SELECT *
         FROM chat_room cr
-                 LEFT JOIN chat_room_members crm ON cr.id = crm.chat_room_id
+                 LEFT JOIN chat_room_members crm ON cr.room_uuid = crm.chat_room_id
         WHERE cr.id = #{id}
     </select>
 
     <!-- Select members by chat room id -->
-    <select id="selectMembersByChatRoomId" parameterType="long" resultType="java.lang.Long">
+    <select id="selectMembersByChatRoomId" parameterType="string" resultType="java.lang.Long">
         SELECT user_id
         FROM chat_room_members
         WHERE chat_room_id = #{chatRoomId}
     </select>
 
     <select id="findChatRoomByUsers" resultMap="ChatRoomResultMap">
-        SELECT cr.*, crm1.user_id AS senderId, crm2.user_id AS receiverId
+        SELECT cr.*,
+               crm1.user_id AS senderId,
+               crm2.user_id AS receiverId
         FROM chat_room cr
                  JOIN chat_room_members crm1 ON cr.room_uuid = crm1.chat_room_id
                  JOIN chat_room_members crm2 ON cr.room_uuid = crm2.chat_room_id
-        WHERE crm1.user_id = (SELECT id FROM user WHERE email = #{senderUsername})
-          AND crm2.user_id = (SELECT id FROM user WHERE email = #{receiverUsername})
+                 JOIN user u1 ON crm1.user_id = u1.id
+                 JOIN user u2 ON crm2.user_id = u2.id
+        WHERE u1.email = #{senderUsername}
+          AND u2.email = #{receiverUsername}
+          AND cr.is_group = FALSE; -- 1:1 채팅방만 조회
     </select>
+
+<!--    <select id="findChatRoomsByUserId" resultMap="ChatRoomResultMap">-->
+<!--        SELECT-->
+<!--            cr.id AS id,-->
+<!--            cr.room_uuid AS roomUUID,-->
+<!--            MAX(cr.last_message_time) AS lastMessageTime,-->
+<!--            cr.is_group AS isGroup,-->
+<!--            CASE-->
+<!--                WHEN cr.is_group = TRUE THEN cr.room_name-->
+<!--                ELSE u.name-->
+<!--                END AS displayName,-->
+<!--            CASE-->
+<!--                WHEN cr.is_group = TRUE THEN cr.profile_image_url-->
+<!--                ELSE img.full_file_path-->
+<!--                END AS profileImage,-->
+<!--            m.content AS lastMessageContent,-->
+<!--            COUNT(CASE WHEN m.receiver_username = #{username} AND m.is_read = FALSE THEN 1 ELSE NULL END) AS unreadCount-->
+<!--        FROM chat_room cr-->
+<!--                 LEFT JOIN chat_room_members cm ON cr.room_uuid = cm.chat_room_id-->
+<!--                 LEFT JOIN user u ON cm.user_id = u.id AND cm.user_id != #{userId}-->
+<!--                 LEFT JOIN domain_image di ON di.domain_id = u.id AND di.domain_type = 'USER' AND di.is_primary = TRUE-->
+<!--                 LEFT JOIN image img ON di.image_id = img.id-->
+<!--                 LEFT JOIN chat_messages m ON m.id = cr.last_message_id-->
+<!--        WHERE cm.user_id = #{userId}-->
+<!--        GROUP BY cr.id, cr.room_uuid, cr.is_group, cr.room_name, u.name, img.full_file_path, m.content-->
+<!--        ORDER BY lastMessageTime DESC-->
+<!--        LIMIT #{limit} OFFSET #{offset};-->
+<!--    </select>-->
+
+    <select id="findChatRoomsByUserId" resultMap="ChatRoomResultMap">
+        SELECT
+            cr.id AS id,
+            cr.room_uuid AS roomUUID,
+            MAX(cr.last_message_time) AS lastMessageTime, -- 마지막 메시지 시간
+            cr.is_group AS isGroup, -- 단체 채팅 여부
+            CASE
+                WHEN cr.is_group = TRUE THEN cr.room_name
+                ELSE u.name
+                END AS displayName, -- 단체 채팅방 이름 또는 상대방 이름
+            CASE
+                WHEN cr.is_group = TRUE THEN cr.profile_image_url
+                ELSE img.full_file_path
+                END AS profileImage, -- 단체 채팅방 이미지 또는 상대방 프로필 이미지
+            m.content AS lastMessageContent, -- 마지막 메시지 내용
+            (
+                SELECT COUNT(*)
+                FROM chat_messages
+                WHERE chat_room_uuid = cr.room_uuid
+                  AND receiver_username = #{username}
+                  AND is_read = FALSE
+            ) AS unreadCount -- 읽지 않은 메시지 개수
+        FROM chat_room cr
+                 LEFT JOIN chat_room_members cm ON cr.room_uuid = cm.chat_room_id
+                 LEFT JOIN user u ON cm.user_id = u.id AND cm.user_id != #{userId}
+                 LEFT JOIN domain_image di ON di.domain_id = u.id AND di.domain_type = 'USER' AND di.is_primary = TRUE
+                 LEFT JOIN image img ON di.image_id = img.id
+                 LEFT JOIN chat_messages m ON m.id = cr.last_message_id -- 마지막 메시지 ID로 메시지 내용 조회
+        WHERE cm.user_id = #{userId}
+        GROUP BY cr.id, cr.room_uuid, cr.is_group, cr.room_name, cr.profile_image_url, u.name, img.full_file_path, m.content
+        ORDER BY lastMessageTime DESC
+        LIMIT #{limit} OFFSET #{offset};
+    </select>
+
+
 
 </mapper>
