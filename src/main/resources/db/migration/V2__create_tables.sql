@@ -208,7 +208,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
                                 deleted_at TIMESTAMP NULL,
                                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                 chat_room_uuid VARCHAR(36) NOT NULL ,
-                                message_type VARCHAR(50),
+                                chat_type ENUM('CHAT','JOIN','LEAVE','IMAGE'),
                                 image_url VARCHAR(255),
                                 FOREIGN KEY (chat_room_uuid) REFERENCES chat_room(room_uuid) ON DELETE CASCADE -- 채팅방 삭제 시 메시지 삭제
 );

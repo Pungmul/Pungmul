@@ -11,15 +11,15 @@
         <result property="receiverUsername" column="receiver_username" />
         <result property="content" column="content" />
         <result property="chatRoomUUID" column="chat_room_uuid" />
-        <result property="messageType" column="message_type" />
+        <result property="chatType" column="chat_type" /> <!-- 필드 변경 -->
         <result property="imageUrl" column="image_url" />
         <result property="timestamp" column="timestamp" />
     </resultMap>
 
     <!-- 채팅 메시지 삽입 -->
     <insert id="save" parameterType="pungmul.pungmul.domain.chat.ChatMessage">
-        INSERT INTO chat_messages (sender_username, receiver_username, content, chat_room_uuid, message_type, image_url)
-        VALUES (#{senderUsername}, #{receiverUsername}, #{content}, #{chatRoomUUID}, #{messageType}, #{imageUrl})
+        INSERT INTO chat_messages (sender_username, receiver_username, content, chat_room_uuid, chat_type, image_url)
+        VALUES (#{senderUsername}, #{receiverUsername}, #{content}, #{chatRoomUUID}, #{chatType}, #{imageUrl})
     </insert>
 
     <!-- 특정 채팅방의 메시지 조회 -->
@@ -42,7 +42,7 @@
         WHERE id = #{id}
     </select>
 
-    <!-- 사용자가 보낸 또는 받은 메시지 조회 (같은 기능의 메서드와 중복, 필요시 삭제 가능) -->
+    <!-- 사용자가 보낸 또는 받은 메시지 조회 -->
     <select id="findBySenderOrRecipient" parameterType="string" resultMap="ChatMessageResultMap">
         SELECT * FROM chat_messages
         WHERE sender_username = #{username} OR receiver_username = #{username}

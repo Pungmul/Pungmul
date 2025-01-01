@@ -18,8 +18,6 @@
         <result property="receiverId" column="receiver_id" />
     </resultMap>
 
-
-
     <!-- Insert ChatRoom -->
     <insert id="createPersonalChatRoom" parameterType="pungmul.pungmul.domain.chat.ChatRoom" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO chat_room (room_uuid, created_by, is_group, last_message_id, last_message_time, created_at)

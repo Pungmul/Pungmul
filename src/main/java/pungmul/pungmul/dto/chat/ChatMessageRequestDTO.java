@@ -12,5 +12,6 @@ public class ChatMessageRequestDTO {
     private String receiverUsername;
     private String content;
     private ChatType chatType;
+    private String chatRoomUUID;
     private String imageUrl;
 }
