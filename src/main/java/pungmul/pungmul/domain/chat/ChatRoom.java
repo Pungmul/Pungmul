@@ -20,16 +20,6 @@ public class ChatRoom {
     private boolean isGroup;             // 단체 채팅 여부
     private String roomName;             // 단체 채팅방 이름 (단체 채팅일 경우)
     private String profileImageUrl;      // 단체 채팅방 이미지 (단체 채팅일 경우)
-    private Long lastMessageId;          // 마지막 메시지 ID
-    private LocalDateTime lastMessageTime; // 마지막 메시지 시간
     private LocalDateTime createdAt;     // 방 생성 시간
     private Integer unreadCount;
-
-    // 1:1 채팅에서만 사용
-    private Long senderId;               // 메시지 보낸 사용자 ID
-    private Long receiverId;             // 메시지 받은 사용자 ID
-
-    // 단체 채팅에서 사용
-    @Builder.Default
-    private List<Long> chatRoomMemberIds = new ArrayList<>();
 }

@@ -11,47 +11,43 @@
         <result property="receiverUsername" column="receiver_username" />
         <result property="content" column="content" />
         <result property="chatRoomUUID" column="chat_room_uuid" />
-        <result property="chatType" column="chat_type" /> <!-- 필드 변경 -->
+        <result property="chatType" column="chat_type" />
         <result property="imageUrl" column="image_url" />
         <result property="timestamp" column="timestamp" />
     </resultMap>
 
-    <!-- 채팅 메시지 삽입 -->
-    <insert id="save" parameterType="pungmul.pungmul.domain.chat.ChatMessage">
+    <!-- Save ChatMessage -->
+    <insert id="save" parameterType="pungmul.pungmul.domain.chat.ChatMessage" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO chat_messages (sender_username, receiver_username, content, chat_room_uuid, chat_type, image_url)
         VALUES (#{senderUsername}, #{receiverUsername}, #{content}, #{chatRoomUUID}, #{chatType}, #{imageUrl})
     </insert>
 
-    <!-- 특정 채팅방의 메시지 조회 -->
-    <select id="selectChatMessagesByRoom" parameterType="long" resultMap="ChatMessageResultMap">
-        SELECT * FROM chat_messages
-        WHERE chat_room_uuid = #{chatRoomUUID}
+    <!-- Find ChatMessage by ChatRoom ID -->
+    <select id="findByChatRoomId" parameterType="long" resultMap="ChatMessageResultMap">
+        SELECT *
+        FROM chat_messages
+        WHERE chat_room_uuid = #{chatRoomId}
         ORDER BY timestamp ASC
     </select>
 
-    <!-- 특정 사용자가 보낸/받은 메시지 조회 -->
-    <select id="selectChatMessagesByUser" parameterType="string" resultMap="ChatMessageResultMap">
-        SELECT * FROM chat_messages
-        WHERE sender_username = #{username} OR receiver_username = #{username}
+    <!-- Find ChatMessages by Sender or Recipient -->
+    <select id="findBySenderOrRecipient" parameterType="string" resultMap="ChatMessageResultMap">
+        SELECT *
+        FROM chat_messages
+        WHERE sender_username = #{userId} OR receiver_username = #{userId}
         ORDER BY timestamp ASC
     </select>
 
-    <!-- 메시지 ID로 특정 메시지 조회 -->
+    <!-- Find ChatMessage by ID -->
     <select id="selectChatMessageById" parameterType="long" resultMap="ChatMessageResultMap">
-        SELECT * FROM chat_messages
+        SELECT *
+        FROM chat_messages
         WHERE id = #{id}
     </select>
 
-    <!-- 사용자가 보낸 또는 받은 메시지 조회 -->
-    <select id="findBySenderOrRecipient" parameterType="string" resultMap="ChatMessageResultMap">
-        SELECT * FROM chat_messages
-        WHERE sender_username = #{username} OR receiver_username = #{username}
-        ORDER BY timestamp ASC
-    </select>
-
-    <!-- 마지막 메세지 내용 조회 -->
-    <select id="getLastMessageByChatRoomUUID" resultType="java.lang.String">
-        SELECT content
+    <!-- Get Last Message by ChatRoom UUID -->
+    <select id="getLastMessageByChatRoomUUID" resultMap="ChatMessageResultMap" parameterType="string">
+        SELECT *
         FROM chat_messages
         WHERE chat_room_uuid = #{chatRoomUUID}
         ORDER BY id DESC

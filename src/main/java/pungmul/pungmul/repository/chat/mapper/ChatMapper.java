@@ -15,7 +15,7 @@ public interface ChatMapper {
 
     List<ChatMessage> findBySenderOrRecipient(String userId);
 
-    ChatMessage selectChatMessageById(Long saveId);
+//    ChatMessage selectChatMessageById(Long saveId);
 
-    String getLastMessageByChatRoomUUID(String chatRoomUUID);
+    ChatMessage getLastMessageByChatRoomUUID(String chatRoomUUID);
 }

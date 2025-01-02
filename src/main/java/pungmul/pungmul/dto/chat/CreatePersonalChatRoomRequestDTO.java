@@ -6,6 +6,6 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateChatRoomRequestDTO {
+public class CreatePersonalChatRoomRequestDTO {
     private String receiverName;
 }

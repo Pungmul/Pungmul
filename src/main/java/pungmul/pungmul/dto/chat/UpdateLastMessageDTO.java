@@ -2,15 +2,14 @@ package pungmul.pungmul.dto.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
-@Data
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChatRoomListResponseDTO {
-    private List<ChatRoomDTO> chatRoomDTOList;
+public class UpdateLastMessageDTO {
+    private Long messageId;
+    private String chatRoomUUID;
 }

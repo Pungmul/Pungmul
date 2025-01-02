@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepository {
-    String createPersonalChatRoom(ChatRoom chatRoom);
+    String createChatRoom(ChatRoom chatRoom);
 
     void addChatRoomMembers(String chatRoomId, List<Long> memberIds);
 
@@ -15,4 +15,9 @@ public interface ChatRoomRepository {
 
     List<ChatRoom> findChatRoomsByUserId(Long id, String username, Integer limit, Integer offset);
 
+    void updateLastMessage(String chatRoomUUID, Long messageId);
+
+    ChatRoom findChatRoomByUUID(String chatRoomUUID);
+
+    List<Long> findChatRoomMemberList(String chatRoomUUID);
 }

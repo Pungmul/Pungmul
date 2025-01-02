@@ -12,5 +12,7 @@ public interface ChatRepository {
 
     List<ChatMessage> findBySenderOrRecipient(String userId);
 
-    String getLastMessageByChatRoomUUID(String chatRoomUUID);
+    ChatMessage getLastMessageByChatRoomUUID(String chatRoomUUID);
+
+//    ChatMessage getLastMessageByRoomUUID(String chatRoomUUID);
 }

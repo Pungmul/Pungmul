@@ -67,6 +67,10 @@ public class UserService {
                 .orElseThrow(NoSuchElementException::new);
     }
 
+    public User getUserById(Long id){
+        return userRepository.getUserByUserId(id).orElseThrow(NoSuchElementException::new);
+    }
+
     public void banUser(String username) {
         userRepository.banUser(username);
     }
