@@ -138,9 +138,9 @@ public class ChatService {
         ChatRoomDTO.ChatRoomDTOBuilder builder = ChatRoomDTO.builder()
                 .chatRoomUUID(chatRoomUUID)
                 .isGroup(chatRoom.isGroup())
-                .lastMessageTime(lastMessage.getTimestamp())
-                .lastMessageContent(lastMessage.getContent())
-                .unreadCount(chatRoom.getUnreadCount())
+                .lastMessageTime(lastMessage != null ? lastMessage.getTimestamp() : null)
+                .lastMessageContent(lastMessage != null ? lastMessage.getContent() : null)
+                .unreadCount(chatRoom.getUnreadCount() != null ? chatRoom.getUnreadCount() : 0)
                 .roomName(chatRoom.getRoomName())
                 .profileImageUrl(chatRoom.getProfileImageUrl());
 
