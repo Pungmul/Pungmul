@@ -34,7 +34,7 @@ public class InvitationCodeService {
     }
 
     public void checkInvitationCode(CreateMemberRequestDTO createMemberRequestDTO) {
-        InvitationCode invitationCode = invitationCodeRepository.getCodeByValue(createMemberRequestDTO.getCode()).orElseThrow(InvalidInvitationCodeException::new);
+        InvitationCode invitationCode = invitationCodeRepository.getCodeByValue(createMemberRequestDTO.getInvitationCode()).orElseThrow(InvalidInvitationCodeException::new);
         if (invitationCode.canBeUsed()){
             invitationCodeRepository.decrementRemainingUses(invitationCode.getId());
         } else {

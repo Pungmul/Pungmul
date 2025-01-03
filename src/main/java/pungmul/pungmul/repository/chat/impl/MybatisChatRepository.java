@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import pungmul.pungmul.domain.chat.ChatMessage;
+import pungmul.pungmul.dto.chat.ChatRoomListResponseDTO;
 import pungmul.pungmul.repository.chat.mapper.ChatMapper;
 import pungmul.pungmul.repository.chat.repository.ChatRepository;
 
@@ -31,4 +32,15 @@ public class MybatisChatRepository implements ChatRepository {
     public List<ChatMessage> findBySenderOrRecipient(String userId) {
         return chatMapper.findBySenderOrRecipient(userId);
     }
+
+    @Override
+    public ChatMessage getLastMessageByChatRoomUUID(String chatRoomUUID) {
+        return chatMapper.getLastMessageByChatRoomUUID(chatRoomUUID);
+    }
+
+    @Override
+    public List<ChatMessage> getMessagesByChatRoom(String chatRoomUUID, int limit, int offset) {
+        return chatMapper.getMessagesByChatRoom(chatRoomUUID, limit, offset);
+    }
+
 }

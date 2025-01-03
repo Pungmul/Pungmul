@@ -13,12 +13,8 @@ public class User {
     private Long accountId;
     private String name;
     private String clubName;
-//    private LocalDate birth;
     private String email;
     private String phoneNumber;
-//    private Integer clubAge;
-//    private Gender gender;
-//    private String area;
     private Boolean expired;
     private LocalDate createdAt;
     private LocalDate updatedAt;

@@ -20,12 +20,8 @@ public class UserService {
                 .accountId(accountId)
                 .name(createMemberRequestDTO.getName())
                 .clubName(createMemberRequestDTO.getClubName())
-//                .birth(createMemberRequestDTO.getBirth())
-                .email(createMemberRequestDTO.getEmail())
                 .phoneNumber(createMemberRequestDTO.getPhoneNumber())
-//                .clubAge(createMemberRequestDTO.getClubAge())
-//                .gender(createMemberRequestDTO.getGender())
-//                .area(createMemberRequestDTO.getArea())
+                .email(createMemberRequestDTO.getUsername())
                 .clubId(createMemberRequestDTO.getClubId())
                 .build();
         userRepository.saveUser(user);
@@ -69,6 +65,10 @@ public class UserService {
     public User getUserByEmail(String email) {
         return userRepository.getUserByEmail(email)
                 .orElseThrow(NoSuchElementException::new);
+    }
+
+    public User getUserById(Long id){
+        return userRepository.getUserByUserId(id).orElseThrow(NoSuchElementException::new);
     }
 
     public void banUser(String username) {

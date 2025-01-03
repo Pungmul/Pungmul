@@ -67,6 +67,7 @@ public class MemberService {
                 .groupName(clubRepository.getGroupName(user.getClubId()))
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
+                .profile(imageService.getImagesByDomainId(DomainType.PROFILE, user.getId()).get(0))
                 .instrumentStatusDTOList(
                         instrumentStatusList.stream()
                                 .map(instrumentStatus -> InstrumentStatusResponseDTO.builder()

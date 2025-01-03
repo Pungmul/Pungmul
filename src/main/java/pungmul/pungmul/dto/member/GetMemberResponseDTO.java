@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.user.Gender;
 
 import java.time.LocalDate;
@@ -18,12 +19,9 @@ public class GetMemberResponseDTO {
     private String name;
     private String clubName;
     private String groupName;
-//    private LocalDate birth;
-//    private Integer clubAge;
-//    private Gender gender;
     private String phoneNumber;
     private String email;
-//    private String area;
+    private Image profile;
     private List<InstrumentStatusResponseDTO> instrumentStatusDTOList;
 }
 

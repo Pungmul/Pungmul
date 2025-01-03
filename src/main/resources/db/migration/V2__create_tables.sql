@@ -179,12 +179,16 @@ CREATE TABLE IF NOT EXISTS comment_likes (
 );
 
 CREATE TABLE IF NOT EXISTS chat_room (
-                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                room_uuid varchar(36) UNIQUE NOT NULL,
-                                created_by varchar(36) NOT NULL,
-                                last_message_id BIGINT,  -- 마지막 메시지 ID
-                                last_message_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 마지막 메시지 시간
-                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- 방 생성 시간
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY, -- 채팅방 고유 ID
+                                room_uuid VARCHAR(36) UNIQUE NOT NULL, -- 채팅방 UUID
+                                created_by BIGINT NOT NULL, -- 생성한 사용자 ID
+                                is_group BOOLEAN DEFAULT FALSE, -- 단체 채팅 여부
+                                room_name VARCHAR(255) DEFAULT NULL, -- 단체 채팅방 이름 (단체 채팅일 경우만 사용)
+                                profile_image_url VARCHAR(255) DEFAULT NULL, -- 단체 채팅방 이미지 (단체 채팅일 경우만 사용)
+                                last_message_id BIGINT, -- 마지막 메시지 ID
+                                last_message_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 마지막 메시지 시간
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 방 생성 시간
+                                FOREIGN KEY (created_by) REFERENCES user(id) ON DELETE CASCADE -- 생성자와 사용자 테이블 연관
 );
 
 CREATE TABLE IF NOT EXISTS chat_room_members (
@@ -195,16 +199,18 @@ CREATE TABLE IF NOT EXISTS chat_room_members (
                                  FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
-
 CREATE TABLE IF NOT EXISTS chat_messages (
                                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                 sender_username VARCHAR(255) NOT NULL,
                                 receiver_username VARCHAR(255) NOT NULL,
                                 content TEXT NOT NULL,
+                                is_read BOOLEAN DEFAULT FALSE,
+                                deleted_at TIMESTAMP NULL,
                                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                 chat_room_uuid VARCHAR(36) NOT NULL ,
-                                message_type VARCHAR(50),
-                                image_url VARCHAR(255)
+                                chat_type ENUM('CHAT','JOIN','LEAVE','IMAGE'),
+                                image_url VARCHAR(255),
+                                FOREIGN KEY (chat_room_uuid) REFERENCES chat_room(room_uuid) ON DELETE CASCADE -- 채팅방 삭제 시 메시지 삭제
 );
 CREATE TABLE IF NOT EXISTS friends (
                             id BIGINT AUTO_INCREMENT PRIMARY KEY,
