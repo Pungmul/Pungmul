@@ -2,6 +2,7 @@ package pungmul.pungmul.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -32,13 +33,21 @@ import java.nio.file.AccessDeniedException;
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CustomHandshakeInterceptor handshakeInterceptor;
 
+    @Value("${app.url}")
+    private String appUrl;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/chat").setAllowedOrigins("*")
-            .addInterceptors(handshakeInterceptor);
+            .setAllowedOrigins(appUrl)
+            .addInterceptors(handshakeInterceptor)
+            .withSockJS();
+
         registry.addEndpoint("/ws/alarm").setAllowedOrigins("*")
+                .setAllowedOrigins(appUrl)
                 .addInterceptors(handshakeInterceptor);
         registry.addEndpoint("/ws/invitation").setAllowedOrigins("*")
+                .setAllowedOrigins(appUrl)
                 .addInterceptors(handshakeInterceptor);
     }
 
