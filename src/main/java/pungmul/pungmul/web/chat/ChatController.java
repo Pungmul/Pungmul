@@ -18,6 +18,8 @@ import pungmul.pungmul.domain.chat.ChatMessage;
 import pungmul.pungmul.dto.chat.*;
 import pungmul.pungmul.service.chat.ChatService;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class ChatController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
     }
 
-    // 개인 DM 방 생성
+    // 단체 채팅방 생성
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/multi")
     public ResponseEntity<BaseResponse<ChatRoomDTO>> createMultiChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -55,6 +57,16 @@ public class ChatController {
         ChatRoomListResponseDTO chatRoomList = chatService.getChatRoomList(userDetails, page, size);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, chatRoomList));
     }
+
+    @GetMapping("/{chatRoomUUID}")
+    public ResponseEntity<BaseResponse<GetMessagesByChatRoomResponseDTO>> getMessagesByChatRoom(
+            @PathVariable String chatRoomUUID,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        GetMessagesByChatRoomResponseDTO messagesByChatRoom = chatService.getMessagesByChatRoom(chatRoomUUID, page, size);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, messagesByChatRoom));
+    }
+
     /*
         url : ws://localhost:8080/ws/chat
         sub dest : /sub/channel/567b5a78-6541-4dd0-9dc9-9e28239c420d

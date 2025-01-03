@@ -18,4 +18,8 @@ public interface ChatMapper {
 //    ChatMessage selectChatMessageById(Long saveId);
 
     ChatMessage getLastMessageByChatRoomUUID(String chatRoomUUID);
+
+    List<ChatMessage> getMessagesByChatRoom(@Param("chatRoomUUID") String chatRoomUUID,
+                                            @Param("limit") int limit,
+                                            @Param("offset") int offset);
 }
