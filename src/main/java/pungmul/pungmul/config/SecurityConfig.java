@@ -40,6 +40,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Value("${app.url}")
     private String appUrl;
 
+    @Value("${stomp.test}")
+    private String stompTestUrl;
+
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -50,7 +53,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .httpBasic(AbstractHttpConfigurer::disable)     //  Http Basic 인증 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)     //  폼 기반 로그인 방식 비활성화
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/member/clubs","/api/member/signup", "/api/member/login","/api/member/kakao/**","/ws/**").permitAll()
+                        .requestMatchers("/api/member/clubs","/api/member/signup", "/api/member/login","/api/member/kakao/**","/ws/**", stompTestUrl).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  세션 관리 정책. 세션 사용 안함
@@ -96,7 +99,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(appUrl)
+                .allowedOrigins(appUrl, stompTestUrl)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
                 .allowCredentials(true);
     }

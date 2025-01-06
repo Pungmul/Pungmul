@@ -36,18 +36,21 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${app.url}")
     private String appUrl;
 
+    @Value("${stomp.test}")
+    private String testUrl;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/chat").setAllowedOrigins("*")
-            .setAllowedOrigins(appUrl)
-            .addInterceptors(handshakeInterceptor)
-            .withSockJS();
+            .setAllowedOrigins(appUrl, testUrl)
+            .addInterceptors(handshakeInterceptor);
+//            .withSockJS();
 
         registry.addEndpoint("/ws/alarm").setAllowedOrigins("*")
-                .setAllowedOrigins(appUrl)
+                .setAllowedOrigins(appUrl, testUrl)
                 .addInterceptors(handshakeInterceptor);
         registry.addEndpoint("/ws/invitation").setAllowedOrigins("*")
-                .setAllowedOrigins(appUrl)
+                .setAllowedOrigins(appUrl, testUrl)
                 .addInterceptors(handshakeInterceptor);
     }
 
