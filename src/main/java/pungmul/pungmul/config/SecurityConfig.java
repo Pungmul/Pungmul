@@ -40,6 +40,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Value("${app.url}")
     private String appUrl;
 
+    @Value("${stomp.test}")
+    private String stompTestUrl;
+
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -60,15 +63,6 @@ public class SecurityConfig implements WebMvcConfigurer {
 
         return http.build();
     }
-//    private AuthenticationEntryPoint customAuthenticationEntryPoint() {
-//        return (HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) -> {
-//            try {
-//                throw authException; // Spring Security의 AuthenticationException을 직접 던짐
-//            } catch (AuthenticationException e) {
-//                throw new RuntimeException(e);
-//            }
-//        };
-//    }
 
     @Bean
     public RoleHierarchy roleHierarchy() {
@@ -96,7 +90,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(appUrl)
+                .allowedOrigins(appUrl, stompTestUrl)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
                 .allowCredentials(true);
     }
