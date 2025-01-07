@@ -53,7 +53,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .httpBasic(AbstractHttpConfigurer::disable)     //  Http Basic 인증 비활성화
                 .formLogin(AbstractHttpConfigurer::disable)     //  폼 기반 로그인 방식 비활성화
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/api/member/clubs","/api/member/signup", "/api/member/login","/api/member/kakao/**","/ws/**", stompTestUrl).permitAll()
+                        .requestMatchers("/api/member/clubs","/api/member/signup", "/api/member/login","/api/member/kakao/**","/ws/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //  세션 관리 정책. 세션 사용 안함
@@ -63,15 +63,6 @@ public class SecurityConfig implements WebMvcConfigurer {
 
         return http.build();
     }
-//    private AuthenticationEntryPoint customAuthenticationEntryPoint() {
-//        return (HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) -> {
-//            try {
-//                throw authException; // Spring Security의 AuthenticationException을 직접 던짐
-//            } catch (AuthenticationException e) {
-//                throw new RuntimeException(e);
-//            }
-//        };
-//    }
 
     @Bean
     public RoleHierarchy roleHierarchy() {

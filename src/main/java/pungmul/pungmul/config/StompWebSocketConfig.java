@@ -42,7 +42,7 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/chat").setAllowedOrigins("*")
-            .setAllowedOrigins(appUrl, testUrl)
+//            .setAllowedOrigins(appUrl, testUrl)
             .addInterceptors(handshakeInterceptor);
 //            .withSockJS();
 
