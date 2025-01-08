@@ -15,7 +15,8 @@ public enum MemberResponseCode implements ResponseCode {
     DELETED_ACCOUNT("MEMBER_004", "삭제된 계정입니다."),
     PAUSED_ACCOUNT("MEMBER_005", "정지된 계정입니다."),
     INVALID_INVITATION_CODE("MEMBER_006", "유효하지 않은 초대 코드입니다."),
-    EXPIRED_INVITATION_CODE("MEMBER_007", "만료된 초대 코드입니다.");
+    EXPIRED_INVITATION_CODE("MEMBER_007", "만료된 초대 코드입니다."),
+    INVALID_REFRESH_TOKEN_CODE("MEMBER_008", "유효하지 않은 refresh token입니다.");
     private final String code;
     private final String message;
 

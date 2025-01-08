@@ -143,6 +143,12 @@ public class MemberController {
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> refreshAccessToken(@RequestHeader("refreshToken") String refreshToken) {
+        AuthenticationResponseDTO response = loginService.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(response));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/code")
     public ResponseEntity<BaseResponse<String>> getAdminInvitationCode(
@@ -151,6 +157,8 @@ public class MemberController {
         String adminInvitationCode = invitationCodeService.issueInvitationCode(adminInvitationCodeRequestDTO.getMaxUses());
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, adminInvitationCode));
     }
+
+
 
 
 }

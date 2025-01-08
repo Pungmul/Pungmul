@@ -65,7 +65,7 @@ public class MemberExceptionHandler {
     }
 
     @ExceptionHandler(InvalidInvitationCodeException.class)
-    public ResponseEntity<BaseResponse<String>> handleInvalidInvitationCodeException(CustomAccountLockedException ex) {
+    public ResponseEntity<BaseResponse<String>> handleInvalidInvitationCodeException(InvalidInvitationCodeException ex) {
         log.info("Invalid Invitation Code: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -74,10 +74,18 @@ public class MemberExceptionHandler {
     }
 
     @ExceptionHandler(ExpiredInvitationCodeException.class)
-    public ResponseEntity<BaseResponse<String>> handleExpiredInvitationCodeException(CustomAccountLockedException ex) {
+    public ResponseEntity<BaseResponse<String>> handleExpiredInvitationCodeException(ExpiredInvitationCodeException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(BaseResponse.ofFail(MemberResponseCode.EXPIRED_INVITATION_CODE));
+
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<BaseResponse<String>> handleInvalidRefreshTokenException(InvalidRefreshTokenException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(MemberResponseCode.INVALID_REFRESH_TOKEN_CODE));
 
     }
 }
