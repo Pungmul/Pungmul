@@ -15,6 +15,7 @@ import pungmul.pungmul.config.JwtConfig;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.core.exception.custom.member.AccountEmailNotVerifiedException;
 import pungmul.pungmul.core.exception.custom.member.AccountWithdrawnException;
+import pungmul.pungmul.core.exception.custom.member.InvalidRefreshTokenException;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.auth.SessionUser;
 import pungmul.pungmul.domain.member.user.User;
@@ -111,6 +112,45 @@ public class LoginService {
         jwtTokenService.saveUserToken(account, refreshToken, JwtConfig.REFRESH_TOKEN_TYPE);
 
         return getAuthenticationResponseDTO(accessToken, refreshToken, username);
+    }
+
+    // Refresh Token을 사용해 Access Token 재발급
+    @Transactional
+    public AuthenticationResponseDTO refreshAccessToken(String refreshToken) {
+        if (!tokenProvider.validateToken(refreshToken)) {
+            log.warn("Invalid or expired Refresh Token: {}", refreshToken);
+            throw new InvalidRefreshTokenException("Invalid or expired Refresh Token");
+        }
+
+        try {
+            // Refresh Token에서 사용자 정보 추출
+            String username = tokenProvider.getUsernameFromToken(refreshToken);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            // 새로운 Access Token 발급
+            String newAccessToken = tokenProvider.generateToken(userDetails);
+            log.info("New Access Token generated for user: {}", username);
+
+            // 저장된 Refresh Token 확인
+            Account account = accountRepository.getAccountByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("Account not found"));
+
+            // 이전 Access Token을 무효화하고 새로운 Access Token 저장
+            jwtTokenService.revokeUserAllTokens(account);
+            jwtTokenService.saveUserToken(account, newAccessToken, JwtConfig.ACCESS_TOKEN_TYPE);
+
+            return AuthenticationResponseDTO.builder()
+                    .memberResponseDTO(memberService.getMemberInfo(username))
+                    .tokenType(JwtConfig.BEARER_TYPE)
+                    .accessToken(newAccessToken)
+                    .expiresIn(getTokenExpiryTime(JwtConfig.ACCESS_TOKEN_TYPE))
+                    .refreshToken(refreshToken) // 기존 Refresh Token 반환
+                    .refreshTokenExpiresIn(getTokenExpiryTime(JwtConfig.REFRESH_TOKEN_TYPE))
+                    .build();
+        } catch (Exception e) {
+            log.error("Error while refreshing access token", e);
+            throw new RuntimeException("Unable to refresh access token");
+        }
     }
 
     private AuthenticationResponseDTO getAuthenticationResponseDTO(String accessToken, String refreshToken, String username) {
