@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pungmul.pungmul.domain.file.Image;
+import pungmul.pungmul.domain.member.account.UserRole;
 import pungmul.pungmul.domain.member.user.Gender;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ public class GetMemberResponseDTO {
     private String phoneNumber;
     private String email;
     private Image profile;
+    private UserRole userRole;
     private List<InstrumentStatusResponseDTO> instrumentStatusDTOList;
 }
 
