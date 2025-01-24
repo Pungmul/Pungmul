@@ -4,15 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pungmul.pungmul.dto.message.DomainMessage;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MeetingInvitationMessageDTO implements DomainMessage {
+public class MeetingInvitationMessageDTO {
     private Long meetingId;           // 모임 ID
     private Long invitationId;
     private String meetingName;       // 모임 이름

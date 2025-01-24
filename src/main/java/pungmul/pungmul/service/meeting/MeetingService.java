@@ -12,7 +12,8 @@ import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.meeting.*;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.message.MessageDomainType;
-import pungmul.pungmul.domain.message.MessageType;
+import pungmul.pungmul.domain.message.domain.FriendBusinessIdentifier;
+import pungmul.pungmul.domain.message.domain.MeetingBusinessIdentifier;
 import pungmul.pungmul.dto.friend.FriendRequestDTO;
 import pungmul.pungmul.dto.meeting.*;
 import pungmul.pungmul.dto.member.SimpleUserDTO;
@@ -101,8 +102,8 @@ public class MeetingService {
 
         // MessageService를 사용하여 메시지 전송
         messageService.sendMessage(
-                MessageType.INVITATION,
                 MessageDomainType.MEETING,
+                MeetingBusinessIdentifier.INVITATION,
                 receiver.getEmail(), // 수신자 identifier로 이메일 사용
                 invitationMessage // 초대 메시지 내용
         );
@@ -248,7 +249,7 @@ public class MeetingService {
             log.info("Processing meeting invitation for user: {}", username);
 
             // MessageService를 통해 메시지를 전송
-            messageService.sendMessage(MessageType.INVITATION, MessageDomainType.MEETING, username, message);
+            messageService.sendMessage(MessageDomainType.MEETING, FriendBusinessIdentifier.FRIENDS, username, message);
 
             log.info("Meeting invitation sent for user: {}", username);
         }

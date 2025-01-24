@@ -3,6 +3,9 @@ package pungmul.pungmul.web.lightning;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,14 +24,24 @@ public class LightningMeetingController {
     private final LightningMeetingService lightningMeetingService;
 
 
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/nearby")
-    public ResponseEntity<BaseResponse<GetNearLightningMeetingResponseDTO>> getNearLightningMeeting(
-            @RequestBody GetNearLightningMeetingRequestDTO getNearLightningMeetingRequestDTO
-    ){
-        GetNearLightningMeetingResponseDTO nearLightningMeeting = lightningMeetingService.getNearLightningMeetings(getNearLightningMeetingRequestDTO);
-        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, nearLightningMeeting));
-    }
+//    @PreAuthorize("hasRole('USER')")
+//    @GetMapping("/nearby")
+//    public ResponseEntity<BaseResponse<GetNearLightningMeetingResponseDTO>> getNearLightningMeeting(
+//            @RequestBody GetNearLightningMeetingRequestDTO getNearLightningMeetingRequestDTO
+//    ){
+//        GetNearLightningMeetingResponseDTO nearLightningMeeting = lightningMeetingService.getNearLightningMeetings(getNearLightningMeetingRequestDTO);
+//        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, nearLightningMeeting));
+//    }
+
+//    @PreAuthorize("hasRole('USER')")
+//    @MessageMapping("/nearby")
+//    public void getNearLightningMeeting(
+//            @Payload GetNearLightningMeetingRequestDTO getNearLightningMeetingRequestDTO,
+//            @Header("Authorization") String authorizationToken
+//    ){
+//        lightningMeetingService.getNearLightningMeetings(getNearLightningMeetingRequestDTO);
+//    }
+
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/participants")
