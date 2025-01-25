@@ -20,7 +20,6 @@ import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.auth.SessionUser;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.member.AuthenticationResponseDTO;
-import pungmul.pungmul.dto.member.GetMemberResponseDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.dto.member.LoginDTO;

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pungmul.pungmul.domain.message.MessageType;
+import pungmul.pungmul.domain.message.MessageDomainType;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageDTO {
-    private MessageType messageType;  // 메시지 타입을 enum으로 변경
-    private DomainMessage content;                // 메시지 내용
-    private LocalDateTime timestamp;  // 메시지 생성 시간
+//    private MessageType messageType;          // 메시지 유형
+    private MessageDomainType domainType;     // 메시지 도메인
+    private String identifier;                // 메시지 식별자 (e.g., 모임 ID, 채팅방 ID)
+    private Object content;                   // 메시지 내용 (도메인별로 다를 수 있음)
+    private LocalDateTime timestamp;          // 메시지 생성 시간
 }

@@ -30,6 +30,7 @@ public class MemberService {
     private final ImageRepository imageRepository;
     private final ImageService imageService;
     private final ClubRepository clubRepository;
+    private final AccountService accountService;
 
     public SimpleUserDTO getSimpleUserDTO(Long userId){
         log.info("userId : {}", userId);
@@ -67,6 +68,7 @@ public class MemberService {
                 .groupName(clubRepository.getGroupName(user.getClubId()))
                 .phoneNumber(user.getPhoneNumber())
                 .email(user.getEmail())
+                .userRole(accountService.getAccountByEmail(username).getRoles().stream().findFirst().orElse(null))
                 .profile(imageService.getImagesByDomainId(DomainType.PROFILE, user.getId()).get(0))
                 .instrumentStatusDTOList(
                         instrumentStatusList.stream()

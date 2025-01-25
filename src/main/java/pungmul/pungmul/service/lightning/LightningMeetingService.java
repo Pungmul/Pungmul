@@ -10,7 +10,9 @@ import pungmul.pungmul.core.geo.LatLong;
 import pungmul.pungmul.domain.lightning.*;
 import pungmul.pungmul.domain.member.instrument.Instrument;
 import pungmul.pungmul.domain.member.user.User;
+import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.NotificationContent;
+import pungmul.pungmul.domain.message.domain.LightningMeetingBusinessIdentifier;
 import pungmul.pungmul.dto.lightning.*;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingInstrumentAssignmentRepository;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingParticipantRepository;
@@ -26,7 +28,9 @@ import pungmul.pungmul.service.message.template.LightningMeetingNotificationTemp
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static pungmul.pungmul.core.geo.DistanceCalculator.calculateDistance;
@@ -44,6 +48,9 @@ public class LightningMeetingService {
     private final FCMService fcmService;
     private final FCMRepository fcmRepository;
     private final MessageService messageService;
+    private final LightningMeetingEventListener eventListener;
+
+    private final Map<String, GetNearLightningMeetingRequestDTO> userRequestData = new ConcurrentHashMap<>();
 
     /**
      * 번개 모임 생성 로직.
@@ -68,6 +75,9 @@ public class LightningMeetingService {
 
         // 3. DB에 LightningMeeting 저장
         lightningMeetingRepository.createLightningMeeting(lightningMeeting);
+
+        //  미팅 생성 이벤트 발생
+        notifyAllUsers();
 
         // 4. CLASSICPAN 모임일 경우 악기 구성 정보 추가
         if (lightningMeeting.getMeetingType().equals(MeetingType.CLASSICPAN)) {
@@ -124,7 +134,12 @@ public class LightningMeetingService {
      *    - 거리 값이 설정된 검색 반경 이내일 경우 결과에 포함합니다.
      * 5. 필터링된 번개 모임 리스트를 응답 DTO에 담아 반환합니다.
      */
-    public GetNearLightningMeetingResponseDTO getNearLightningMeetings(GetNearLightningMeetingRequestDTO requestDTO) {
+    public void getNearLightningMeetings(GetNearLightningMeetingRequestDTO requestDTO, String username) {
+        log.info("username : {}", username);
+        if (requestDTO instanceof GetNearLightningMeetingRequestDTO) {
+            log.info("nearLightningMeeting :{}", requestDTO);
+        }
+        userRequestData.put(username, requestDTO);
 
         Double userLatitude = requestDTO.getLatitude();
         Double userLongitude = requestDTO.getLongitude();
@@ -136,29 +151,44 @@ public class LightningMeetingService {
         int distanceThreshold = MapLevelDistance.getDistanceByLevel(mapLevel) * 2;
 
         // 번개 모임 필터링
-        return GetNearLightningMeetingResponseDTO.builder()
-                        .lightningMeetingList(allMeetings.stream()
-                            .filter(meeting -> {
-                                // 사용자 위치와 모임 위치 간 거리 계산
-                                double distance = calculateDistance(
-                                        userLatitude,
-                                        userLongitude,
-                                        meeting.getLatitude(),
-                                        meeting.getLongitude()
-                                );
-                                return distance <= distanceThreshold;
-                                })
-                            .collect(Collectors.toList()))
-                        .build();
+        GetNearLightningMeetingResponseDTO lightningMeetingResponse = GetNearLightningMeetingResponseDTO.builder()
+                .lightningMeetingList(allMeetings.stream()
+                        .filter(meeting -> {
+                            // 사용자 위치와 모임 위치 간 거리 계산
+                            double distance = calculateDistance(
+                                    userLatitude,
+                                    userLongitude,
+                                    meeting.getLatitude(),
+                                    meeting.getLongitude()
+                            );
+                            return distance <= distanceThreshold;
+                        })
+                        .collect(Collectors.toList()))
+                .build();
+
+        messageService.sendMessage(MessageDomainType.LIGHTNING_MEETING,
+                LightningMeetingBusinessIdentifier.NEARBY,
+                username,
+                lightningMeetingResponse);
     }
 
-    public GetMeetingParticipantsResponseDTO getMeetingParticipants(GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO) {
+    private void notifyAllUsers() {
+        log.info("call lightningmeeting update notification");
+        userRequestData.forEach((username, requestDTO) -> getNearLightningMeetings(requestDTO, username));
+    }
+
+    public void getMeetingParticipants(GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO) {
         Long meetingId = getMeetingParticipantsRequestDTO.getMeetingId();
+        log.info("meetingId : {}", meetingId);
         List<LatLong> meetingParticipants = lightningMeetingParticipantRepository.getMeetingParticipantLocations(meetingId);
         log.info(meetingParticipants.toString());
-        return GetMeetingParticipantsResponseDTO.builder()
-                .locations(meetingParticipants)
-                .build();
+
+        messageService.sendMessage(
+                MessageDomainType.LIGHTNING_MEETING,
+                LightningMeetingBusinessIdentifier.PARTICIPANTS,
+                meetingId.toString(),
+                meetingParticipants
+        );
     }
 
     @Scheduled(fixedRate = 60000) // 1분마다 실행
@@ -307,6 +337,8 @@ public class LightningMeetingService {
 
         //  해당 모임의 모든 사용자 INACTIVE
         lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
+
+        eventListener.notifyMeetingDeleted(meeting.getId());
     }
 
     private void startLightningMeeting(LightningMeeting meeting) {

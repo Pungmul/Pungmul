@@ -12,7 +12,7 @@ import pungmul.pungmul.domain.friend.FriendRequestFrom;
 import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.message.MessageDomainType;
-import pungmul.pungmul.domain.message.MessageType;
+import pungmul.pungmul.domain.message.domain.FriendBusinessIdentifier;
 import pungmul.pungmul.dto.friend.AvailableFriendDTO;
 import pungmul.pungmul.dto.friend.FriendListResponseDTO;
 import pungmul.pungmul.dto.friend.FriendReqResponseDTO;
@@ -73,28 +73,76 @@ public class FriendService {
                 .build();
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)  // 트랜잭션이 직렬화되어 동시에 실행되는 트랜잭션 충돌을 방지
+//    @Transactional(isolation = Isolation.READ_COMMITTED)  // 트랜잭션이 직렬화되어 동시에 실행되는 트랜잭션 충돌을 방지
+//    public FriendReqResponseDTO sendFriendRequest(UserDetails userDetails, String receiverUserName) {
+//        isReqToSelfCheck(userDetails, receiverUserName);
+//
+//        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
+//                .map(User::getId)
+//                .orElseThrow(NoSuchElementException::new);
+//
+//        Long receiverId = userRepository.getUserByEmail(receiverUserName)
+//                .map(User::getId)
+//                .orElseThrow(NoSuchElementException::new);
+//
+//        Friend friend = getFriend(userId, receiverId);
+//        friendRepository.sendFriendRequest(friend);
+//
+//        // 알림 메시지 생성 및 전송
+//        FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, friend.getId(), userId);
+//        messageService.sendMessage(MessageType.INVITATION, MessageDomainType.FRIEND, receiverUserName, invitationMessage);
+//
+//        return FriendReqResponseDTO.builder()
+//                .friendId(friend.getId())
+//                .build();
+//    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public FriendReqResponseDTO sendFriendRequest(UserDetails userDetails, String receiverUserName) {
+        // 요청이 자기 자신에게 보내졌는지 확인
         isReqToSelfCheck(userDetails, receiverUserName);
 
+        // 요청자와 수신자의 ID 가져오기
         Long userId = userRepository.getUserByEmail(userDetails.getUsername())
                 .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new NoSuchElementException("User not found: " + userDetails.getUsername()));
 
         Long receiverId = userRepository.getUserByEmail(receiverUserName)
                 .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new NoSuchElementException("User not found: " + receiverUserName));
 
+        // 기존 친구 요청 확인
         Friend friend = getFriend(userId, receiverId);
+
+        // 친구 요청 저장
         friendRepository.sendFriendRequest(friend);
 
-        // 알림 메시지 생성 및 전송
-        FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, friend.getId(), userId);
-        messageService.sendMessage(MessageType.INVITATION, MessageDomainType.FRIEND, receiverUserName, invitationMessage);
+        // 메시지 생성 및 전송
+        sendFriendRequestNotification(userDetails, receiverUserName, friend);
 
+        // 응답 생성
         return FriendReqResponseDTO.builder()
                 .friendId(friend.getId())
                 .build();
+    }
+
+    private void sendFriendRequestNotification(UserDetails userDetails, String receiverUserName, Friend friend) {
+        // 알림 메시지 생성
+//        FriendRequestInvitationMessageDTO invitationMessage = FriendRequestInvitationMessageDTO.builder()
+//                .friendRequestId(friend.getId())
+//                .senderUsername(userDetails.getUsername())
+//                .receiverUsername(receiverUserName)
+//                .content(getInvitationMessage(userDetails, friend.getId()))
+//                .build();
+        FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, friend.getId());
+
+        // 메시지 전송
+        messageService.sendMessage(
+                MessageDomainType.FRIEND,
+                FriendBusinessIdentifier.REQUEST, // 메시지 도메인
+                receiverUserName,               // 수신자 식별자
+                invitationMessage               // 메시지 내용
+        );
     }
 
     private static Friend getFriend(Long userId, Long receiverId) {
@@ -104,12 +152,11 @@ public class FriendService {
                 .build();
     }
 
-    public FriendRequestInvitationMessageDTO getInvitationMessage(UserDetails userDetails,Long friendRequestId, Long userId) {
+    public FriendRequestInvitationMessageDTO getInvitationMessage(UserDetails userDetails,Long friendRequestId) {
         String senderName = userRepository.getUserByEmail(userDetails.getUsername()).orElseThrow(NoSuchElementException::new).getName();
         return FriendRequestInvitationMessageDTO.builder()
                 .friendRequestId(friendRequestId)
-                .senderId(userId)
-                .senderName(senderName)  // 실제 이름이 필요하다면 User 엔티티에서 가져올 수 있음
+                .senderUsername(userDetails.getUsername())  // 실제 이름이 필요하다면 User 엔티티에서 가져올 수 있음
                 .content(senderName + "님이 친구 요청을 보냈습니다.")
 //                .sentAt(LocalDateTime.now())
                 .build();

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import pungmul.pungmul.config.JwtConfig;
 
@@ -24,6 +25,7 @@ public class TokenProvider {
     private long refreshExpirationTime;
 
     private final JwtConfig jwtConfig;
+    private final UserDetailsService userDetailsService;
 
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
@@ -53,6 +55,11 @@ public class TokenProvider {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public UserDetailsImpl getUserDetailsFromToken(String token) {
+        String username = getUsernameFromToken(token); // 이미 구현된 메서드로 가정
+        return (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
     }
 
     public boolean validateTokenWithUserDetails(String token, UserDetails userDetails) {
