@@ -177,13 +177,18 @@ public class LightningMeetingService {
         userRequestData.forEach((username, requestDTO) -> getNearLightningMeetings(requestDTO, username));
     }
 
-    public GetMeetingParticipantsResponseDTO getMeetingParticipants(GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO) {
+    public void getMeetingParticipants(GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO) {
         Long meetingId = getMeetingParticipantsRequestDTO.getMeetingId();
+        log.info("meetingId : {}", meetingId);
         List<LatLong> meetingParticipants = lightningMeetingParticipantRepository.getMeetingParticipantLocations(meetingId);
         log.info(meetingParticipants.toString());
-        return GetMeetingParticipantsResponseDTO.builder()
-                .locations(meetingParticipants)
-                .build();
+
+        messageService.sendMessage(
+                MessageDomainType.LIGHTNING_MEETING,
+                LightningMeetingBusinessIdentifier.PARTICIPANTS,
+                meetingId.toString(),
+                meetingParticipants
+        );
     }
 
     @Scheduled(fixedRate = 60000) // 1분마다 실행

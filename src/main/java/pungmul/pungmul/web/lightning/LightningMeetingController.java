@@ -43,14 +43,14 @@ public class LightningMeetingController {
 //    }
 
 
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/participants")
-    public ResponseEntity<BaseResponse<GetMeetingParticipantsResponseDTO>> getMeetingParticipants(
-            @RequestBody GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO){
-        log.info("getMeetingParticipants");
-        GetMeetingParticipantsResponseDTO meetingParticipants = lightningMeetingService.getMeetingParticipants(getMeetingParticipantsRequestDTO);
-        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, meetingParticipants));
-    }
+//    @PreAuthorize("hasRole('USER')")
+//    @GetMapping("/participants")
+//    public ResponseEntity<BaseResponse<GetMeetingParticipantsResponseDTO>> getMeetingParticipants(
+//            @RequestBody GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO){
+//        log.info("getMeetingParticipants");
+//        GetMeetingParticipantsResponseDTO meetingParticipants = lightningMeetingService.getMeetingParticipants(getMeetingParticipantsRequestDTO);
+//        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, meetingParticipants));
+//    }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/meeting")
