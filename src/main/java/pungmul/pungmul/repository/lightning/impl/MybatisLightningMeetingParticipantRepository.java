@@ -44,4 +44,9 @@ public class MybatisLightningMeetingParticipantRepository implements LightningMe
     public List<LightningMeetingParticipant> findAllParticipantsByMeetingId(Long meetingId) {
         return lightningMeetingParticipantMapper.findAllParticipantsByMeetingId(meetingId);
     }
+
+    @Override
+    public boolean isUserAlreadyParticipant(Long meetingId, Long id) {
+        return lightningMeetingParticipantMapper.isUserAlreadyParticipant(meetingId, id);
+    }
 }

@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.core.exception.custom.meeting.AlreadyJoinedParticipantException;
 import pungmul.pungmul.core.geo.LatLong;
 import pungmul.pungmul.domain.lightning.*;
 import pungmul.pungmul.domain.member.instrument.Instrument;
@@ -21,6 +22,7 @@ import pungmul.pungmul.repository.member.repository.InstrumentStatusRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.domain.message.FCMToken;
 import pungmul.pungmul.repository.message.repository.FCMRepository;
+import pungmul.pungmul.service.member.membermanagement.UserService;
 import pungmul.pungmul.service.message.FCMService;
 import pungmul.pungmul.service.message.MessageService;
 import pungmul.pungmul.service.message.template.LightningMeetingNotificationTemplateFactory;
@@ -51,6 +53,7 @@ public class LightningMeetingService {
     private final LightningMeetingEventListener eventListener;
 
     private final Map<String, GetNearLightningMeetingRequestDTO> userGetNearLightningMeetingData = new ConcurrentHashMap<>();
+    private final UserService userService;
 //    private final Map<String, LatLong> userCurrentLocationData = new ConcurrentHashMap<>();
 
     /**
@@ -100,6 +103,16 @@ public class LightningMeetingService {
      */
     @Transactional
     public AddLightningMeetingParticipantResponseDTO addLightningMeetingParticipant(UserDetailsImpl userDetails, AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO, Boolean isOrganizer) {
+        // 1. 중복 참가 여부 확인
+        boolean isAlreadyParticipant = lightningMeetingParticipantRepository.isUserAlreadyParticipant(
+                addLightningMeetingRequestDTO.getMeetingId(),
+                userService.getUserByEmail(userDetails.getUsername()).getId()
+        );
+        if (isAlreadyParticipant) {
+//            throw new IllegalArgumentException("User is already a participant in the meeting.");
+            throw new AlreadyJoinedParticipantException();
+        }
+
         // 1. 참여자 정보 생성
         LightningMeetingParticipant lightningMeetingParticipant = getLightningMeetingParticipant(userDetails, addLightningMeetingRequestDTO, isOrganizer);
         log.info("lightningMeetingParticipant: {}", lightningMeetingParticipant);

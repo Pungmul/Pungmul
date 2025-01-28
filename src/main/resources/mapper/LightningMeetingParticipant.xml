@@ -56,5 +56,13 @@
         WHERE meeting_id = #{meetingId};
     </update>
 
+    <!-- Select Participant -->
+    <select id="isUserAlreadyParticipant" resultType="boolean" parameterType="map">
+        SELECT COUNT(*) > 0
+        FROM lightning_meeting_participant
+        WHERE meeting_id = #{meetingId}
+          AND user_id = #{userId}
+    </select>
+
 
 </mapper>
