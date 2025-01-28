@@ -1,6 +1,7 @@
 package pungmul.pungmul.repository.lightning.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.geolatte.geom.G2D;
 import org.geolatte.geom.Point;
 import pungmul.pungmul.core.geo.LatLong;
@@ -21,4 +22,6 @@ public interface LightningMeetingParticipantMapper {
     void inactivateMeetingParticipants(Long meetingId);
 
     List<LightningMeetingParticipant> findAllParticipantsByMeetingId(Long meetingId);
+
+    boolean isUserAlreadyParticipant(@Param("meetingId") Long meetingId,@Param("userId") Long id);
 }
