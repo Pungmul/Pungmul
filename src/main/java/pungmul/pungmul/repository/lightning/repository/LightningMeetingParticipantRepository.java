@@ -19,4 +19,6 @@ public interface LightningMeetingParticipantRepository {
     List<LightningMeetingParticipant> findAllParticipantsByMeetingId(Long meetingId);
 
     boolean isUserAlreadyParticipant(Long meetingId, Long id);
+
+    boolean isUserInActiveMeeting(Long userId);
 }

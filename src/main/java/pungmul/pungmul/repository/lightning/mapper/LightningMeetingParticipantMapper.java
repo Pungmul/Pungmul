@@ -24,4 +24,6 @@ public interface LightningMeetingParticipantMapper {
     List<LightningMeetingParticipant> findAllParticipantsByMeetingId(Long meetingId);
 
     boolean isUserAlreadyParticipant(@Param("meetingId") Long meetingId,@Param("userId") Long id);
+
+    boolean isUserInActiveMeeting(Long userId);
 }

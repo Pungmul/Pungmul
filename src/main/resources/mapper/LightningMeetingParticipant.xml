@@ -64,5 +64,16 @@
           AND user_id = #{userId}
     </select>
 
+    <!-- 사용자가 다른 활성 번개 모임에 참가 중인지 확인 -->
+    <select id="isUserInActiveMeeting" parameterType="long" resultType="boolean">
+        SELECT CASE
+                   WHEN COUNT(*) > 0 THEN TRUE
+                   ELSE FALSE
+                   END
+        FROM lightning_meeting_participant
+        WHERE user_id = #{userId}
+          AND status = 'ACTIVE'
+    </select>
+
 
 </mapper>

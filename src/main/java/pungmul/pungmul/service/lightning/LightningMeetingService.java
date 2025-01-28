@@ -6,6 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.core.exception.custom.meeting.AlreadyInAnotherMeetingException;
 import pungmul.pungmul.core.exception.custom.meeting.AlreadyJoinedParticipantException;
 import pungmul.pungmul.core.geo.LatLong;
 import pungmul.pungmul.domain.lightning.*;
@@ -103,14 +104,20 @@ public class LightningMeetingService {
      */
     @Transactional
     public AddLightningMeetingParticipantResponseDTO addLightningMeetingParticipant(UserDetailsImpl userDetails, AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO, Boolean isOrganizer) {
+        Long userId = userService.getUserByEmail(userDetails.getUsername()).getId();
+
         // 1. 중복 참가 여부 확인
         boolean isAlreadyParticipant = lightningMeetingParticipantRepository.isUserAlreadyParticipant(
-                addLightningMeetingRequestDTO.getMeetingId(),
-                userService.getUserByEmail(userDetails.getUsername()).getId()
+                addLightningMeetingRequestDTO.getMeetingId(), userId
         );
         if (isAlreadyParticipant) {
 //            throw new IllegalArgumentException("User is already a participant in the meeting.");
             throw new AlreadyJoinedParticipantException();
+        }
+
+        boolean isInActiveMeeting = lightningMeetingParticipantRepository.isUserInActiveMeeting(userId);
+        if (isInActiveMeeting) {
+            throw new AlreadyInAnotherMeetingException();
         }
 
         // 1. 참여자 정보 생성
