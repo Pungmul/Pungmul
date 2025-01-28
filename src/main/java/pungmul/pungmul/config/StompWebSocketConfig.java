@@ -41,10 +41,10 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("*")
-//            .setAllowedOrigins(appUrl, testUrl)
-            .addInterceptors(handshakeInterceptor);
-//            .withSockJS();
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:8080", "https://jiangxy.github.io","https://pungmul.site")
+            .addInterceptors(handshakeInterceptor)
+            .withSockJS();
 
         registry.addEndpoint("/ws/alarm").setAllowedOrigins("*")
                 .setAllowedOrigins(appUrl, testUrl)
