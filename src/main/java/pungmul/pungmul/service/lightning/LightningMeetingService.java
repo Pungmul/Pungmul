@@ -50,7 +50,8 @@ public class LightningMeetingService {
     private final MessageService messageService;
     private final LightningMeetingEventListener eventListener;
 
-    private final Map<String, GetNearLightningMeetingRequestDTO> userRequestData = new ConcurrentHashMap<>();
+    private final Map<String, GetNearLightningMeetingRequestDTO> userGetNearLightningMeetingData = new ConcurrentHashMap<>();
+//    private final Map<String, LatLong> userCurrentLocationData = new ConcurrentHashMap<>();
 
     /**
      * 번개 모임 생성 로직.
@@ -77,7 +78,7 @@ public class LightningMeetingService {
         lightningMeetingRepository.createLightningMeeting(lightningMeeting);
 
         //  미팅 생성 이벤트 발생
-        notifyAllUsers();
+        notifyGetNearLightningMeeting();
 
         // 4. CLASSICPAN 모임일 경우 악기 구성 정보 추가
         if (lightningMeeting.getMeetingType().equals(MeetingType.CLASSICPAN)) {
@@ -101,6 +102,7 @@ public class LightningMeetingService {
     public AddLightningMeetingParticipantResponseDTO addLightningMeetingParticipant(UserDetailsImpl userDetails, AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO, Boolean isOrganizer) {
         // 1. 참여자 정보 생성
         LightningMeetingParticipant lightningMeetingParticipant = getLightningMeetingParticipant(userDetails, addLightningMeetingRequestDTO, isOrganizer);
+        log.info("lightningMeetingParticipant: {}", lightningMeetingParticipant);
 
         // 2. 참여자 정보 DB 저장
         lightningMeetingParticipantRepository.addLightningMeetingParticipant(lightningMeetingParticipant);
@@ -110,6 +112,10 @@ public class LightningMeetingService {
                         lightningMeetingParticipant.getInstrumentAssigned());
 
         lightningMeetingNotificationTrigger.triggerAddParticipant(addLightningMeetingRequestDTO.getMeetingId(), userDetails);
+
+        //  참가 유저 위치 저장
+//        userCurrentLocationData.put(userDetails.getUsername(), lightningMeetingParticipant.getLocation());
+        notifyLightningMeetingParticipants(addLightningMeetingRequestDTO.getMeetingId());
 
         // 3. 참여자 정보 반환
         return AddLightningMeetingParticipantResponseDTO.builder()
@@ -139,7 +145,7 @@ public class LightningMeetingService {
         if (requestDTO instanceof GetNearLightningMeetingRequestDTO) {
             log.info("nearLightningMeeting :{}", requestDTO);
         }
-        userRequestData.put(username, requestDTO);
+        userGetNearLightningMeetingData.put(username, requestDTO);
 
         Double userLatitude = requestDTO.getLatitude();
         Double userLongitude = requestDTO.getLongitude();
@@ -172,16 +178,20 @@ public class LightningMeetingService {
                 lightningMeetingResponse);
     }
 
-    private void notifyAllUsers() {
+    private void notifyGetNearLightningMeeting() {
         log.info("call lightningmeeting update notification");
-        userRequestData.forEach((username, requestDTO) -> getNearLightningMeetings(requestDTO, username));
+        userGetNearLightningMeetingData.forEach((username, requestDTO) -> getNearLightningMeetings(requestDTO, username));
     }
 
-    public void getMeetingParticipants(GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO) {
-        Long meetingId = getMeetingParticipantsRequestDTO.getMeetingId();
+    private void notifyLightningMeetingParticipants(Long meetingId) {
+        log.info("call lightningmeeting participants update notification");
+        getMeetingParticipants(meetingId);
+    }
+
+    public void getMeetingParticipants(Long meetingId) {
         log.info("meetingId : {}", meetingId);
         List<LatLong> meetingParticipants = lightningMeetingParticipantRepository.getMeetingParticipantLocations(meetingId);
-        log.info(meetingParticipants.toString());
+        log.info("meeting participants : {}", meetingParticipants.toString());
 
         messageService.sendMessage(
                 MessageDomainType.LIGHTNING_MEETING,
@@ -385,6 +395,8 @@ public class LightningMeetingService {
      */
     private AddLightningMeetingParticipantRequestDTO getAddLightningMeetingRequestDTO(LightningMeeting lightningMeeting,Instrument organizerInstrument) {
         return AddLightningMeetingParticipantRequestDTO.builder()
+                .latitude(lightningMeeting.getLatitude())
+                .longitude(lightningMeeting.getLongitude())
                 .meetingId(lightningMeeting.getId())
                 .instrument(organizerInstrument)
                 .build();
@@ -398,6 +410,7 @@ public class LightningMeetingService {
     public LightningMeetingParticipant getLightningMeetingParticipant(UserDetailsImpl userDetails, AddLightningMeetingParticipantRequestDTO addLightningMeetingRequestDTO, Boolean isOrganizer) {
         // 1. 사용자 정보 조회
         User user = userRepository.getUserByEmail(userDetails.getUsername()).orElseThrow(NoSuchElementException::new);
+        log.info("getLightningParticipant : {}", user.getEmail());
 
         Instrument instrument = addLightningMeetingRequestDTO.getInstrument() != null
                 ? addLightningMeetingRequestDTO.getInstrument()
