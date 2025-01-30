@@ -54,4 +54,16 @@ public class MybatisLightningMeetingParticipantRepository implements LightningMe
     public boolean isUserInActiveMeeting(Long userId) {
         return lightningMeetingParticipantMapper.isUserInActiveMeeting(userId);
     }
+
+    @Override
+    public void withdrawLightningMeeting(Long lightningMeetingId, Long id) {
+        lightningMeetingParticipantMapper.withdrawLightningMeeting(lightningMeetingId, id);
+    }
+
+    @Override
+    public boolean isUserParticipant(Long lightningMeetingId, Long id) {
+        return lightningMeetingParticipantMapper.isUserParticipant(lightningMeetingId, id);
+    }
+
+
 }

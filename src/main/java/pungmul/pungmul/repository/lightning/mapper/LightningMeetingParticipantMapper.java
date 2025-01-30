@@ -26,4 +26,10 @@ public interface LightningMeetingParticipantMapper {
     boolean isUserAlreadyParticipant(@Param("meetingId") Long meetingId,@Param("userId") Long id);
 
     boolean isUserInActiveMeeting(Long userId);
+
+    void withdrawLightningMeeting(@Param("lightningMeetingId") Long lightningMeetingId, @Param("userId") Long id);
+
+    boolean isUserParticipant(@Param("lightningMeetingId") Long lightningMeetingId,
+                              @Param("userId") Long userId);
+
 }

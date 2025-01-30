@@ -27,6 +27,25 @@
             (#{meetingId}, #{userId}, #{username}, #{instrumentAssigned}, #{organizer}, #{location.latitude}, #{location.longitude}, 'ACTIVE');
     </insert>
 
+    <!-- 사용자가 특정 번개 모임에 참가 중인지 확인 -->
+    <select id="isUserParticipant" parameterType="map" resultType="boolean">
+        SELECT CASE
+                   WHEN COUNT(*) > 0 THEN TRUE
+                   ELSE FALSE
+                   END
+        FROM lightning_meeting_participant
+        WHERE lightning_meeting_id = #{lightningMeetingId}
+          AND user_id = #{userId}
+          AND status = 'ACTIVE'
+    </select>
+
+    <update id="withdrawLightningMeeting">
+        UPDATE lightning_meeting_participant
+        SET status = 'INACTIVE'
+        WHERE lightning_meeting_id = #{lightningMeetingId}
+          AND user_id = #{userId}
+    </update>
+
     <!-- Select Participants By Meeting ID -->
     <select id="findAllParticipantsByMeetingId" parameterType="java.lang.Long" resultMap="LightningMeetingParticipantResultMap">
         SELECT *

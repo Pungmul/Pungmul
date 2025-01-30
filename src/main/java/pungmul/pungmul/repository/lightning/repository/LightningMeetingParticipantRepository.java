@@ -21,4 +21,8 @@ public interface LightningMeetingParticipantRepository {
     boolean isUserAlreadyParticipant(Long meetingId, Long id);
 
     boolean isUserInActiveMeeting(Long userId);
+
+    void withdrawLightningMeeting(Long lightningMeetingId, Long id);
+
+    boolean isUserParticipant(Long lightningMeetingId, Long id);
 }
