@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import pungmul.pungmul.domain.lightning.LightningMeeting;
 import pungmul.pungmul.domain.lightning.MapLevelDistance;
 import pungmul.pungmul.domain.member.user.User;
-import pungmul.pungmul.dto.lightning.CreateLightningMeetingRequestDTO;
-import pungmul.pungmul.dto.lightning.CreateLightningMeetingResponseDTO;
-import pungmul.pungmul.dto.lightning.GetNearLightningMeetingRequestDTO;
-import pungmul.pungmul.dto.lightning.GetNearLightningMeetingResponseDTO;
+import pungmul.pungmul.dto.lightning.*;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingRepository;
 import pungmul.pungmul.service.member.membermanagement.UserService;
 
@@ -60,6 +57,31 @@ public class LightningMeetingService {
                 .organizerName(userService.getUserById(lightningMeeting.getOrganizerId()).getName())
                 .build();
     }
+//    public GetNearLightningMeetingResponseDTO getNearLightningMeetingFilter(GetNearLightningMeetingRequestDTO requestDTO, List<LightningMeeting> allMeetings) {
+//        Double userLatitude = requestDTO.getLatitude();
+//        Double userLongitude = requestDTO.getLongitude();
+//        Integer mapLevel = requestDTO.getMapLevel();
+//
+//        // 지도 레벨에 따른 거리 계산 (미터)
+//        int distanceThreshold = MapLevelDistance.getDistanceByLevel(mapLevel) * 2;
+//
+//        // 번개 모임 필터링
+//        GetNearLightningMeetingResponseDTO lightningMeetingResponse = GetNearLightningMeetingResponseDTO.builder()
+//                .lightningMeetingList(allMeetings.stream()
+//                        .filter(meeting -> {
+//                            // 사용자 위치와 모임 위치 간 거리 계산
+//                            double distance = calculateDistance(
+//                                    userLatitude,
+//                                    userLongitude,
+//                                    meeting.getLatitude(),
+//                                    meeting.getLongitude()
+//                            );
+//                            return distance <= distanceThreshold;
+//                        })
+//                        .collect(Collectors.toList()))
+//                .build();
+//        return lightningMeetingResponse;
+//    }
 
     public GetNearLightningMeetingResponseDTO getNearLightningMeetingFilter(GetNearLightningMeetingRequestDTO requestDTO, List<LightningMeeting> allMeetings) {
         Double userLatitude = requestDTO.getLatitude();
@@ -69,21 +91,30 @@ public class LightningMeetingService {
         // 지도 레벨에 따른 거리 계산 (미터)
         int distanceThreshold = MapLevelDistance.getDistanceByLevel(mapLevel) * 2;
 
-        // 번개 모임 필터링
-        GetNearLightningMeetingResponseDTO lightningMeetingResponse = GetNearLightningMeetingResponseDTO.builder()
-                .lightningMeetingList(allMeetings.stream()
-                        .filter(meeting -> {
-                            // 사용자 위치와 모임 위치 간 거리 계산
-                            double distance = calculateDistance(
-                                    userLatitude,
-                                    userLongitude,
-                                    meeting.getLatitude(),
-                                    meeting.getLongitude()
-                            );
-                            return distance <= distanceThreshold;
-                        })
-                        .collect(Collectors.toList()))
+        // 번개 모임 필터링 및 주최자 정보 추가
+        List<LightningMeetingWithOrganizerDTO> meetingWithOrganizerList = allMeetings.stream()
+                .filter(meeting -> {
+                    // 사용자 위치와 모임 위치 간 거리 계산
+                    double distance = calculateDistance(
+                            userLatitude,
+                            userLongitude,
+                            meeting.getLatitude(),
+                            meeting.getLongitude()
+                    );
+                    return distance <= distanceThreshold;
+                })
+                .map(meeting -> {
+                    // 주최자 정보 조회
+                    User organizer = userService.getUserById(meeting.getOrganizerId());
+                    return LightningMeetingWithOrganizerDTO.builder()
+                            .lightningMeeting(meeting)
+                            .organizerName(organizer.getName())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return GetNearLightningMeetingResponseDTO.builder()
+                .lightningMeetingList(meetingWithOrganizerList)
                 .build();
-        return lightningMeetingResponse;
     }
 }
