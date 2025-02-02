@@ -34,7 +34,7 @@
                    ELSE FALSE
                    END
         FROM lightning_meeting_participant
-        WHERE lightning_meeting_id = #{lightningMeetingId}
+        WHERE meeting_id = #{lightningMeetingId}
           AND user_id = #{userId}
           AND status = 'ACTIVE'
     </select>
@@ -42,7 +42,7 @@
     <update id="withdrawLightningMeeting">
         UPDATE lightning_meeting_participant
         SET status = 'INACTIVE'
-        WHERE lightning_meeting_id = #{lightningMeetingId}
+        WHERE meeting_id = #{lightningMeetingId}
           AND user_id = #{userId}
     </update>
 
@@ -57,7 +57,8 @@
     <select id="getMeetingParticipants" parameterType="java.lang.Long" resultType="pungmul.pungmul.core.geo.LatLong">
         SELECT latitude, longitude
         FROM lightning_meeting_participant
-        WHERE meeting_id = #{meetingId};
+        WHERE meeting_id = #{meetingId}
+        AND status = 'ACTIVE';
     </select>
 
     <!-- Count ACTIVE Participants By Meeting ID -->

@@ -40,7 +40,7 @@ public class LightningMeetingController {
     }
 
     @PreAuthorize("hasRole('USER')")
-    @PostMapping
+    @PostMapping("/withdraw")
     public ResponseEntity<BaseResponse<WithdrawLightningMeetingResponseDTO>> withdrawLightningMeeting(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody WithdrawLightningMeetingRequestDTO withdrawLightningMeetingRequestDTO

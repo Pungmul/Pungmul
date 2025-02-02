@@ -118,6 +118,7 @@ public CreateLightningMeetingResponseDTO createLightningMeeting(CreateLightningM
     }
 
 
+    @Transactional
     public WithdrawLightningMeetingResponseDTO withdrawLightningMeeting(WithdrawLightningMeetingRequestDTO withdrawLightningMeetingRequestDTO, UserDetailsImpl userDetails) {
         return lightningMeetingParticipantService.withdrawLightningMeeting(withdrawLightningMeetingRequestDTO, userDetails);
     }

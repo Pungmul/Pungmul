@@ -30,8 +30,6 @@ import java.util.List;
 public class LightningMeetingParticipantService {
     private final UserService userService;
     private final MessageService messageService;
-    private final LightningMeetingInstrumentManager lightningMeetingInstrumentManager;
-    private final LightningMeetingNotificationTrigger lightningMeetingNotificationTrigger;
     private final LightningMeetingParticipantRepository participantRepository;
     private final LightningMeetingParticipantRepository lightningMeetingParticipantRepository;
     private final MybatisInstrumentStatusRepository instrumentStatusRepository;
@@ -41,10 +39,6 @@ public class LightningMeetingParticipantService {
     }
 
     public WithdrawLightningMeetingResponseDTO withdrawLightningMeeting(WithdrawLightningMeetingRequestDTO withdrawLightningMeetingRequestDTO, UserDetailsImpl userDetails) {
-//        lightningMeetingParticipantRepository.withdrawLightningMeeting(
-//                withdrawLightningMeetingRequestDTO.getLightningMeetingId(),
-//                userService.getUserByEmail(userDetails.getUsername()).getId()
-//        );
         Long userId = userService.getUserByEmail(userDetails.getUsername()).getId();
         Long meetingId = withdrawLightningMeetingRequestDTO.getLightningMeetingId();
 
@@ -54,6 +48,9 @@ public class LightningMeetingParticipantService {
 
         // 🔹 참가자의 status를 inactive로 업데이트
         participantRepository.withdrawLightningMeeting(meetingId, userId);
+
+        // 모임 참가자 정보 갱신
+        getLightningMeetingParticipants(meetingId);
 
         return new WithdrawLightningMeetingResponseDTO("번개 모임에서 성공적으로 탈퇴하였습니다.");
     }

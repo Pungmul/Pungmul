@@ -38,11 +38,11 @@ public class LightningMeetingStatus {
 
         // 모집 기간이 만료된 OPEN 상태의 모임 조회
         List<LightningMeeting> expiredMeetings = lightningMeetingRepository.findAllByDeadlineAndStatus(now, pungmul.pungmul.domain.lightning.LightningMeetingStatus.OPEN);
-        log.info("Expired meetings to process: {}", expiredMeetings.size());
+//        log.info("Expired meetings to process: {}", expiredMeetings.size());
 
         // 모집 기간 중 성사 조건을 만족하는 모임 조회
         List<LightningMeeting> successfulMeetings = lightningMeetingRepository.findAllMeetingWithEnoughParticipants(now, pungmul.pungmul.domain.lightning.LightningMeetingStatus.OPEN);
-        log.info("Successful meetings in progress: {}", successfulMeetings.size());
+//        log.info("Successful meetings in progress: {}", successfulMeetings.size());
 
         // 모집 기간이 만료된 모임 처리
         for (LightningMeeting meeting : expiredMeetings) {
