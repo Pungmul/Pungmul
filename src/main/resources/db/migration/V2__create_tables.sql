@@ -277,7 +277,6 @@ CREATE TABLE IF NOT EXISTS meeting_participant (
 CREATE TABLE IF NOT EXISTS lightning_meeting (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY, -- 기본 키
                         meeting_name VARCHAR(255) NOT NULL, -- 모임 이름
-                        meeting_description TEXT, -- 모임 설명
                         recruitment_end_time DATETIME NOT NULL, -- 모임 인원 모집 마감 시간
                         start_time DATETIME NOT NULL, -- 모임 시작 시간
                         end_time DATETIME NOT NULL, -- 모임 종료 시간

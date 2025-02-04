@@ -9,7 +9,7 @@
     <resultMap id="LightningMeetingResultMap" type="pungmul.pungmul.domain.lightning.LightningMeeting">
         <id property="id" column="id" />
         <result property="meetingName" column="meeting_name" />
-        <result property="meetingDescription" column="meeting_description" />
+<!--        <result property="meetingDescription" column="meeting_description" />-->
         <result property="recruitmentEndTime" column="recruitment_end_time" />
         <result property="startTime" column="start_time" />
         <result property="endTime" column="end_time" />
@@ -28,7 +28,7 @@
     <insert id="createLightningMeeting" parameterType="pungmul.pungmul.domain.lightning.LightningMeeting" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO lightning_meeting (
             meeting_name,
-            meeting_description,
+#             meeting_description,
             recruitment_end_time,
             start_time,
             end_time,
@@ -41,7 +41,6 @@
         )
         VALUES (
                    #{meetingName},
-                   #{meetingDescription},
                    #{recruitmentEndTime},
                    #{startTime},
                    #{endTime},
@@ -66,7 +65,6 @@
         UPDATE lightning_meeting
         SET
             meeting_name = #{meetingName},
-            meeting_description = #{meetingDescription},
             recruitment_end_time = #{recruitmentEndTime},
             start_time = #{startTime},
             end_time = #{endTime},

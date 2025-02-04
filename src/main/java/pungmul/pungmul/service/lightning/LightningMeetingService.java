@@ -33,7 +33,7 @@ public class LightningMeetingService {
         log.info("recruitmentEndTime:{}", requestDTO.getRecruitmentEndTime().toLocalTime());
         return LightningMeeting.builder()
                 .meetingName(requestDTO.getMeetingName())
-                .meetingDescription(requestDTO.getMeetingDescription())
+//                .meetingDescription(requestDTO.getMeetingDescription())
                 .recruitmentEndTime(requestDTO.getRecruitmentEndTime())
                 .startTime(requestDTO.getStartTime())
                 .endTime(requestDTO.getEndTime())
