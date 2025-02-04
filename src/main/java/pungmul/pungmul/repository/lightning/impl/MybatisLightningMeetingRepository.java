@@ -65,4 +65,14 @@ public class MybatisLightningMeetingRepository implements LightningMeetingReposi
         return lightningMeetingMapper.findMeetingsStartingInThirtyMinutes(now, thirtyMinutesLater);
     }
 
+    @Override
+    public void deactivateLightningMeeting(Long meetingId) {
+        lightningMeetingMapper.deactivateLightningMeeting(meetingId);
+    }
+
+    @Override
+    public void changeMeetingOrganizer(Long meetingId, Long userId) {
+        lightningMeetingMapper.changeMeetingOrganizer(meetingId, userId);
+    }
+
 }

@@ -38,6 +38,10 @@ public class LightningMeetingParticipantService {
         lightningMeetingParticipantRepository.addLightningMeetingParticipant(participant);
     }
 
+    public boolean isUserParticipant(Long meetingId, Long userId){
+        return participantRepository.isUserParticipant(meetingId, userId);
+    }
+
     public WithdrawLightningMeetingResponseDTO withdrawLightningMeeting(WithdrawLightningMeetingRequestDTO withdrawLightningMeetingRequestDTO, UserDetailsImpl userDetails) {
         Long userId = userService.getUserByEmail(userDetails.getUsername()).getId();
         Long meetingId = withdrawLightningMeetingRequestDTO.getLightningMeetingId();
@@ -133,5 +137,9 @@ public class LightningMeetingParticipantService {
                 .meetingId(lightningMeeting.getId())
                 .instrument(organizerInstrument)
                 .build();
+    }
+
+    public void deactivateAllParticipants(Long meetingId) {
+        participantRepository.inactivateMeetingParticipants(meetingId);
     }
 }

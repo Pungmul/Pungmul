@@ -11,6 +11,7 @@ import pungmul.pungmul.repository.lightning.repository.LightningMeetingRepositor
 import pungmul.pungmul.service.member.membermanagement.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static pungmul.pungmul.core.geo.DistanceCalculator.calculateDistance;
@@ -57,31 +58,6 @@ public class LightningMeetingService {
                 .organizerName(userService.getUserById(lightningMeeting.getOrganizerId()).getName())
                 .build();
     }
-//    public GetNearLightningMeetingResponseDTO getNearLightningMeetingFilter(GetNearLightningMeetingRequestDTO requestDTO, List<LightningMeeting> allMeetings) {
-//        Double userLatitude = requestDTO.getLatitude();
-//        Double userLongitude = requestDTO.getLongitude();
-//        Integer mapLevel = requestDTO.getMapLevel();
-//
-//        // 지도 레벨에 따른 거리 계산 (미터)
-//        int distanceThreshold = MapLevelDistance.getDistanceByLevel(mapLevel) * 2;
-//
-//        // 번개 모임 필터링
-//        GetNearLightningMeetingResponseDTO lightningMeetingResponse = GetNearLightningMeetingResponseDTO.builder()
-//                .lightningMeetingList(allMeetings.stream()
-//                        .filter(meeting -> {
-//                            // 사용자 위치와 모임 위치 간 거리 계산
-//                            double distance = calculateDistance(
-//                                    userLatitude,
-//                                    userLongitude,
-//                                    meeting.getLatitude(),
-//                                    meeting.getLongitude()
-//                            );
-//                            return distance <= distanceThreshold;
-//                        })
-//                        .collect(Collectors.toList()))
-//                .build();
-//        return lightningMeetingResponse;
-//    }
 
     public GetNearLightningMeetingResponseDTO getNearLightningMeetingFilter(GetNearLightningMeetingRequestDTO requestDTO, List<LightningMeeting> allMeetings) {
         Double userLatitude = requestDTO.getLatitude();
@@ -116,5 +92,18 @@ public class LightningMeetingService {
         return GetNearLightningMeetingResponseDTO.builder()
                 .lightningMeetingList(meetingWithOrganizerList)
                 .build();
+    }
+
+    public LightningMeeting getLightningMeetingById(Long meetingId){
+        return lightningMeetingRepository.getMeetingById(meetingId)
+                .orElseThrow(NoSuchElementException::new);
+    }
+
+    public void deactivateLightningMeeting(Long meetingId) {
+        lightningMeetingRepository.deactivateLightningMeeting(meetingId);
+    }
+
+    public void changeMeetingOrganizer(Long meetingId, Long userId) {
+        lightningMeetingRepository.changeMeetingOrganizer(meetingId, userId);
     }
 }

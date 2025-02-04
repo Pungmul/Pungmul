@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @RequiredArgsConstructor
 public class LightningMeetingManager {
-
     private final UserService userService;
     private final LightningMeetingRepository lightningMeetingRepository;
     private final LightningMeetingInstrumentManager lightningMeetingInstrumentManager;
@@ -33,6 +32,8 @@ public class LightningMeetingManager {
     private final Map<String, GetNearLightningMeetingRequestDTO> userGetNearLightningMeetingData = new ConcurrentHashMap<>();
     private final LightningMeetingNotificationTrigger lightningMeetingNotificationTrigger;
     private final MessageService messageService;
+
+    private static final int MIN_PARTICIPANTS_THRESHOLD = 3;
 
 @Transactional
 public CreateLightningMeetingResponseDTO createLightningMeeting(CreateLightningMeetingRequestDTO requestDTO,
@@ -121,5 +122,64 @@ public CreateLightningMeetingResponseDTO createLightningMeeting(CreateLightningM
     @Transactional
     public WithdrawLightningMeetingResponseDTO withdrawLightningMeeting(WithdrawLightningMeetingRequestDTO withdrawLightningMeetingRequestDTO, UserDetailsImpl userDetails) {
         return lightningMeetingParticipantService.withdrawLightningMeeting(withdrawLightningMeetingRequestDTO, userDetails);
+    }
+
+    @Transactional
+    public CancelLightningMeetingResponseDTO cancelLightningMeeting(CancelLightningMeetingRequestDTO cancelLightningMeetingRequestDTO, UserDetailsImpl userDetails) {
+        User currentUser = userService.getUserByEmail(userDetails.getUsername());
+
+        // 1. 현재 사용자가 모임장인지 확인
+        LightningMeeting lightningMeeting = lightningMeetingService.getLightningMeetingById(cancelLightningMeetingRequestDTO.getMeetingId());
+
+        if (!lightningMeeting.getOrganizerId().equals(currentUser.getId())) {
+            throw new IllegalStateException("모임장만 번개 모임을 삭제할 수 있습니다.");
+        }
+
+        // 2. 현재 ACTIVE 상태의 참가자 수 조회
+//        int activeParticipantCount = meetingRepository.getActiveParticipantCount(lightningMeetingId);
+        int meetingParticipantNum = lightningMeetingParticipantService.getMeetingParticipantNum(lightningMeeting.getId());
+        log.info("meetingParticipantNum : {}", meetingParticipantNum);
+
+        if (meetingParticipantNum < MIN_PARTICIPANTS_THRESHOLD) {
+            // 3. 참가자가 일정 수 미만이면 모임 비활성화
+            lightningMeetingService.deactivateLightningMeeting(lightningMeeting.getId());
+            lightningMeetingParticipantService.deactivateAllParticipants(lightningMeeting.getId());
+
+            messageService.sendMessage(
+                    MessageDomainType.LIGHTNING_MEETING,
+                    LightningMeetingBusinessIdentifier.NOTIFICATION,
+                    lightningMeeting.getId().toString(),
+                    lightningMeeting.getMeetingName() + "모임이 취소되었습니다."
+            );
+            return CancelLightningMeetingResponseDTO.builder()
+                    .message("모임 취소")
+                    .build();
+        } else {
+            // 4. 참가자가 일정 수 이상이면 새로운 모임장으로 변경
+            if (cancelLightningMeetingRequestDTO.getNewOrganizerUsername() == null) {
+                throw new IllegalStateException("모임장이 일정 수 이상일 때는 새로운 모임장을 지정해야 합니다.");
+            }
+
+            User newOrganizer = userService.getUserByEmail(cancelLightningMeetingRequestDTO.getNewOrganizerUsername());
+            // 새로운 모임장이 참가자인지 확인
+            boolean isParticipant = lightningMeetingParticipantService.isUserParticipant(cancelLightningMeetingRequestDTO.getMeetingId(), newOrganizer.getId());
+            if (!isParticipant) {
+                throw new IllegalStateException("선택한 새로운 모임장은 해당 모임의 참가자가 아닙니다.");
+            }
+
+            // 모임장 변경
+//            meetingRepository.changeMeetingOrganizer(lightningMeetingId, newOrganizerId);
+            lightningMeetingService.changeMeetingOrganizer(cancelLightningMeetingRequestDTO.getMeetingId(), newOrganizer.getId());
+
+            messageService.sendMessage(
+                    MessageDomainType.LIGHTNING_MEETING,
+                    LightningMeetingBusinessIdentifier.NOTIFICATION,
+                    newOrganizer.getEmail(),
+                    lightningMeeting.getMeetingName() + "모임의 모임장이 되었습니다."
+            );
+        }
+        return CancelLightningMeetingResponseDTO.builder()
+                .message("모임장 변경")
+                .build();
     }
 }

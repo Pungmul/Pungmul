@@ -21,4 +21,8 @@ public interface LightningMeetingRepository {
     List<LightningMeeting> findAllMeetingWithEnoughParticipants(LocalDateTime now, LightningMeetingStatus lightningMeetingStatus);
 
     List<LightningMeeting> findMeetingsStartingInThirtyMinutes(LocalDateTime now, LocalDateTime thirtyMinutesLater);
+
+    void deactivateLightningMeeting(Long meetingId);
+
+    void changeMeetingOrganizer(Long meetingId, Long userId);
 }

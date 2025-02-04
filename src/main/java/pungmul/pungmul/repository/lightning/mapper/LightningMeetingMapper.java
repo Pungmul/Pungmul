@@ -1,6 +1,8 @@
 package pungmul.pungmul.repository.lightning.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.security.core.parameters.P;
 import pungmul.pungmul.domain.lightning.LightningMeeting;
 import pungmul.pungmul.domain.lightning.LightningMeetingStatus;
 import pungmul.pungmul.dto.lightning.SetMeetingStatusDTO;
@@ -27,4 +29,8 @@ public interface LightningMeetingMapper {
     List<LightningMeeting> findAllMeetingWithEnoughParticipants(TimeAndStatusDTO timeAndStatusDTO);
 
     List<LightningMeeting> findMeetingsStartingInThirtyMinutes(LocalDateTime now, LocalDateTime thirtyMinutesLater);
+
+    void deactivateLightningMeeting(Long meetingId);
+
+    void changeMeetingOrganizer(@Param("meetingId")Long meetingId, @Param("userId") Long userId);
 }

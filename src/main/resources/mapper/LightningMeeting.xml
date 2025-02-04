@@ -132,4 +132,15 @@
         )
     </select>
 
+    <update id="deactivateLightningMeeting" parameterType="long">
+        UPDATE lightning_meeting
+        SET status = 'CANCELLED'
+        WHERE id = #{meetingId}
+    </update>
+
+    <update id="changeMeetingOrganizer" parameterType="map">
+        UPDATE lightning_meeting
+        SET organizer_id = #{userId}
+        WHERE id = #{meetingId}
+    </update>
 </mapper>

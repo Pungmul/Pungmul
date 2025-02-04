@@ -49,4 +49,14 @@ public class LightningMeetingController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.ACCEPTED, withdrawLightningMeetingResponseDTO));
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/meeting")
+    public ResponseEntity<BaseResponse<CancelLightningMeetingResponseDTO>> cancelLightningMeeting(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody CancelLightningMeetingRequestDTO cancelLightningMeetingRequestDTO
+    ){
+        CancelLightningMeetingResponseDTO cancelLightningMeetingResponseDTO = lightningMeetingManager.cancelLightningMeeting(cancelLightningMeetingRequestDTO, userDetails);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, cancelLightningMeetingResponseDTO));
+    }
+
 }
