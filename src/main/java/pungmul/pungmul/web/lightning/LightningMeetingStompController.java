@@ -43,7 +43,6 @@ public class LightningMeetingStompController {
     sub dest : /sub/lightning-meeting/participants/{meetingId}
     send header : {"Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyOEBleGFtcGxlLmNvbSIsImlhdCI6MTczNTc1NjE2OCwiZXhwIjoxNzM1NzU5NzY4fQ.GvZQFmbvPOtNy5IrlVFGZM6eLJvoQxRa672oXMicwtaoQyAiHo1tzX4csbSdTKlHk50d2Zw8H0d5YEwFkDIt5Q"}
     send dest : /pub/lightning-meeting/participants/{meetingId}
-    content : {   "meetingId" : 38 }
     */
     @PreAuthorize("hasRole('USER')")
     @MessageMapping("/lightning-meeting/participants/{meetingId}")

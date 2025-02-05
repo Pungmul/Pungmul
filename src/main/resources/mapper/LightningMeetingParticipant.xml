@@ -95,5 +95,23 @@
           AND status = 'ACTIVE'
     </select>
 
+    <update id="deactivateParticipantsOfCancelledMeetings">
+        UPDATE lightning_meeting_participant
+        SET status = 'INACTIVE'
+        WHERE meeting_id IN (
+        SELECT id FROM lightning_meeting
+        WHERE start_time &lt;= #{now}
+        AND status = 'CANCELLED'
+        )
+    </update>
+
+    <update id="deactivateParticipantsByMeetingIds" parameterType="list">
+        UPDATE lightning_meeting_participant
+        SET status = 'INACTIVE'
+        WHERE meeting_id IN
+        <foreach item="meetingId" collection="meetingIds" open="(" separator="," close=")">
+            #{meetingId}
+        </foreach>
+    </update>
 
 </mapper>

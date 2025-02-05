@@ -75,4 +75,22 @@ public class MybatisLightningMeetingRepository implements LightningMeetingReposi
         lightningMeetingMapper.changeMeetingOrganizer(meetingId, userId);
     }
 
+    public List<LightningMeeting> findSuccessfulMeetingsWithoutNotification(LocalDateTime now) {
+        return lightningMeetingMapper.findSuccessfulMeetingsWithoutNotification(now);
+    }
+
+    public void markNotificationAsSent(Long meetingId) {
+        lightningMeetingMapper.markNotificationAsSent(meetingId);
+    }
+
+    @Override
+    public List<LightningMeeting> findUnsuccessfulMeetingsPastStartTime(LocalDateTime now) {
+        return lightningMeetingMapper.findUnsuccessfulMeetingsPastStartTime(now);
+    }
+
+    @Override
+    public void cancelMeetingsPastStartTime(LocalDateTime now) {
+        lightningMeetingMapper.cancelMeetingsPastStartTime(now);
+    }
+
 }

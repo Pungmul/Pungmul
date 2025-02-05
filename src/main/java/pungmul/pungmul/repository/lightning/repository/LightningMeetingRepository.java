@@ -25,4 +25,14 @@ public interface LightningMeetingRepository {
     void deactivateLightningMeeting(Long meetingId);
 
     void changeMeetingOrganizer(Long meetingId, Long userId);
+
+    List<LightningMeeting> findSuccessfulMeetingsWithoutNotification(LocalDateTime now);
+
+    void markNotificationAsSent(Long meetingId);
+
+    List<LightningMeeting> findUnsuccessfulMeetingsPastStartTime(LocalDateTime now);
+
+    void cancelMeetingsPastStartTime(LocalDateTime now);
 }
+
+

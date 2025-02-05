@@ -33,4 +33,12 @@ public interface LightningMeetingMapper {
     void deactivateLightningMeeting(Long meetingId);
 
     void changeMeetingOrganizer(@Param("meetingId")Long meetingId, @Param("userId") Long userId);
+
+    void markNotificationAsSent(Long meetingId);
+
+    List<LightningMeeting> findSuccessfulMeetingsWithoutNotification(LocalDateTime now);
+
+    List<LightningMeeting> findUnsuccessfulMeetingsPastStartTime(LocalDateTime now);
+
+    void cancelMeetingsPastStartTime(LocalDateTime now);
 }

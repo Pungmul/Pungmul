@@ -20,6 +20,7 @@
         <result property="latitude" column="latitude" />
         <result property="longitude" column="longitude" />
         <result property="status" column="status" />
+        <result property="notificationSent" column="notification_sent" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
     </resultMap>
@@ -140,5 +141,33 @@
         UPDATE lightning_meeting
         SET organizer_id = #{userId}
         WHERE id = #{meetingId}
+    </update>
+
+    <!-- 🔹 메시지가 아직 발송되지 않은 성사된 모임 조회 -->
+    <select id="findSuccessfulMeetingsWithoutNotification" resultMap="LightningMeetingResultMap">
+        SELECT * FROM lightning_meeting
+        WHERE status = 'OPEN'
+        AND notification_sent = FALSE
+        AND recruitment_end_time &lt;= #{now}
+    </select>
+
+    <!-- 🔹 메시지를 보낸 후 `notification_sent` 값을 TRUE로 업데이트 -->
+    <update id="markNotificationAsSent">
+        UPDATE lightning_meeting
+        SET notification_sent = TRUE
+        WHERE id = #{meetingId}
+    </update>
+
+    <select id="findUnsuccessfulMeetingsPastStartTime" resultMap="LightningMeetingResultMap">
+        SELECT * FROM lightning_meeting
+        WHERE start_time &lt;= #{now}
+        AND status != 'SUCCESS'
+    </select>
+
+    <update id="cancelMeetingsPastStartTime">
+        UPDATE lightning_meeting
+        SET status = 'CANCELLED'
+        WHERE start_time &lt;= #{now}
+        AND status != 'SUCCESS'
     </update>
 </mapper>

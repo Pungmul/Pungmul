@@ -6,13 +6,18 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.domain.lightning.*;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.message.FCMToken;
+import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.NotificationContent;
+import pungmul.pungmul.domain.message.domain.LightningMeetingBusinessIdentifier;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingInstrumentAssignmentRepository;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingParticipantRepository;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingRepository;
 import pungmul.pungmul.repository.message.repository.FCMRepository;
+import pungmul.pungmul.service.member.membermanagement.UserService;
 import pungmul.pungmul.service.message.FCMService;
+import pungmul.pungmul.service.message.MessageService;
 import pungmul.pungmul.service.message.template.LightningMeetingNotificationTemplateFactory;
 
 import java.io.IOException;
@@ -30,6 +35,8 @@ public class LightningMeetingStatus {
     private final FCMRepository fcmRepository;
     private final LightningMeetingInstrumentAssignmentRepository lightningMeetingInstrumentAssignmentRepository;
     private final LightningMeetingEventListener eventListener;
+    private final MessageService messageService;
+    private final UserService userService;
 
     @Scheduled(fixedRate = 60000) // 1분마다 실행
     @Transactional
@@ -41,8 +48,9 @@ public class LightningMeetingStatus {
 //        log.info("Expired meetings to process: {}", expiredMeetings.size());
 
         // 모집 기간 중 성사 조건을 만족하는 모임 조회
-        List<LightningMeeting> successfulMeetings = lightningMeetingRepository.findAllMeetingWithEnoughParticipants(now, pungmul.pungmul.domain.lightning.LightningMeetingStatus.OPEN);
-//        log.info("Successful meetings in progress: {}", successfulMeetings.size());
+        List<LightningMeeting> successfulMeetings = lightningMeetingRepository.findSuccessfulMeetingsWithoutNotification(now);
+
+//        List<LightningMeeting> successfulMeetings = lightningMeetingRepository.findAllMeetingWithEnoughParticipants(now, pungmul.pungmul.domain.lightning.LightningMeetingStatus.OPEN);
 
         // 모집 기간이 만료된 모임 처리
         for (LightningMeeting meeting : expiredMeetings) {
@@ -52,6 +60,24 @@ public class LightningMeetingStatus {
         // 성사 조건을 만족한 모집 기간 중 모임 처리
         for (LightningMeeting meeting : successfulMeetings) {
             askOrganizerForMeetingApproval(meeting);
+            lightningMeetingRepository.markNotificationAsSent(meeting.getId());
+        }
+        checkAndCancelUnsuccessLightningMeeting(now);
+    }
+
+    private void checkAndCancelUnsuccessLightningMeeting(LocalDateTime now) {
+        // 🔹 start_time이 지났지만 SUCCESS 상태가 아닌 모임 조회
+        List<LightningMeeting> unsuccessfulMeetings = lightningMeetingRepository.findUnsuccessfulMeetingsPastStartTime(now);
+
+        if (!unsuccessfulMeetings.isEmpty()) {
+            // 🔹 해당 모임을 CANCELLED 상태로 변경
+            lightningMeetingRepository.cancelMeetingsPastStartTime(now);
+
+            // 🔹 해당 모임의 참가자들을 INACTIVE 상태로 변경
+            List<Long> meetingIds = unsuccessfulMeetings.stream().map(LightningMeeting::getId).toList();
+            lightningMeetingParticipantRepository.deactivateParticipantsByMeetingIds(meetingIds);
+
+            log.info("총 {}개의 모임이 start_time이 지났지만 SUCCESS 상태가 아니므로 취소됨", unsuccessfulMeetings.size());
         }
     }
 
@@ -76,10 +102,20 @@ public class LightningMeetingStatus {
     private void askOrganizerForMeetingApproval(LightningMeeting meeting) {
 //        log.info("Requesting organizer's approval for meeting: {}", meeting.getId());
 
-        // 메시지 전송 (예: WebSocket 사용)
-//        sendMeetingApprovalRequestToOrganizer(meeting);
 
-        // 상태 변경 대기 (모임장의 응답에 따라 변경)
+
+//         메시지 전송 (예: WebSocket 사용)
+        sendMeetingApprovalRequestToOrganizer(meeting);
+    }
+
+    private void sendMeetingApprovalRequestToOrganizer(LightningMeeting meeting) {
+        User organizer = userService.getUserById(meeting.getOrganizerId());
+        messageService.sendMessage(
+                MessageDomainType.LIGHTNING_MEETING,
+                LightningMeetingBusinessIdentifier.NOTIFICATION,
+                organizer.getEmail(),
+                meeting.getMeetingName() + "모임을 진행하시겠습니까? (승인 / 연기)"
+        );
     }
 
     // 모임 성사 조건 확인

@@ -8,6 +8,7 @@ import pungmul.pungmul.core.geo.LatLong;
 import pungmul.pungmul.domain.lightning.LightningMeetingParticipant;
 import pungmul.pungmul.domain.meeting.MeetingParticipant;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,4 +33,7 @@ public interface LightningMeetingParticipantMapper {
     boolean isUserParticipant(@Param("lightningMeetingId") Long lightningMeetingId,
                               @Param("userId") Long userId);
 
+    void deactivateParticipantsOfCancelledMeetings(LocalDateTime now);
+
+    void deactivateParticipantsByMeetingIds(List<Long> meetingIds);
 }

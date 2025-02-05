@@ -4,6 +4,7 @@ import pungmul.pungmul.core.geo.LatLong;
 import pungmul.pungmul.domain.lightning.LightningMeetingParticipant;
 import pungmul.pungmul.domain.meeting.MeetingParticipant;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,4 +26,7 @@ public interface LightningMeetingParticipantRepository {
     void withdrawLightningMeeting(Long lightningMeetingId, Long id);
 
     boolean isUserParticipant(Long lightningMeetingId, Long id);
+
+    void deactivateParticipantsByMeetingIds(List<Long> meetingIds);
+
 }

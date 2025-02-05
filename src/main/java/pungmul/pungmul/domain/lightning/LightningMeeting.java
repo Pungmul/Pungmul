@@ -31,6 +31,7 @@ public class LightningMeeting {
     @Builder.Default
     private List<InstrumentAssignment> instrumentAssignmentList = new ArrayList<>();
     private LightningMeetingStatus status;
+    private Boolean notificationSent;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
