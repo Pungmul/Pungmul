@@ -126,7 +126,7 @@ public class LightningMeetingStatusManager {
         for (LightningMeeting meeting : endedMeetings) {
             if (meeting.getStatus() == LightningMeetingStatus.SUCCESS) {  // ✅ SUCCESS 상태만 처리
                 lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
-                log.info("모임 종료 후 참여자 상태 변경 완료: MeetingId={}", meeting.getId());
+//                log.info("모임 종료 후 참여자 상태 변경 완료: MeetingId={}", meeting.getId());
             }
         }
     }
