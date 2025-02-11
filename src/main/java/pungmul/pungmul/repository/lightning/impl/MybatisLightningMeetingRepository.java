@@ -93,4 +93,9 @@ public class MybatisLightningMeetingRepository implements LightningMeetingReposi
         lightningMeetingMapper.cancelMeetingsPastStartTime(now);
     }
 
+    @Override
+    public List<LightningMeeting> findMeetingsPastEndTime(LocalDateTime now) {
+        return lightningMeetingMapper.findMeetingsPastEndTime(now);
+    }
+
 }

@@ -170,4 +170,11 @@
         WHERE start_time &lt;= #{now}
         AND status != 'SUCCESS'
     </update>
+
+    <select id="findMeetingsPastEndTime" parameterType="java.time.LocalDateTime" resultMap="LightningMeetingResultMap">
+        SELECT *
+        FROM lightning_meeting
+        WHERE end_time &lt;= #{now}
+        AND status = 'SUCCESS';
+    </select>
 </mapper>

@@ -27,7 +27,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LightningMeetingStatus {
+public class LightningMeetingStatusManager {
 
     private final LightningMeetingRepository lightningMeetingRepository;
     private final LightningMeetingParticipantRepository lightningMeetingParticipantRepository;
@@ -43,69 +43,118 @@ public class LightningMeetingStatus {
     public void processMeetingsAndCheckConditions() throws IOException {
         LocalDateTime now = LocalDateTime.now();
 
-        // 모집 기간이 만료된 OPEN 상태의 모임 조회
-        List<LightningMeeting> expiredMeetings = lightningMeetingRepository.findAllByDeadlineAndStatus(now, pungmul.pungmul.domain.lightning.LightningMeetingStatus.OPEN);
-//        log.info("Expired meetings to process: {}", expiredMeetings.size());
+        processExpiredMeetings(now);
+        processSuccessfulMeetings(now);
+        checkAndCancelUnsuccessfulMeetings(now);
+        deactivateParticipantsAfterMeetingEnd(now);
+    }
 
-        // 모집 기간 중 성사 조건을 만족하는 모임 조회
+    /** 🔹 모집 기간이 만료된 모임 처리 */
+    private void processExpiredMeetings(LocalDateTime now) throws IOException {
+        List<LightningMeeting> expiredMeetings = lightningMeetingRepository.findAllByDeadlineAndStatus(now, LightningMeetingStatus.OPEN);
+//        for (LightningMeeting meeting : expiredMeetings) {
+//            boolean isMeetingSuccessful = checkMeetingSuccess(meeting);
+//
+//            if (isMeetingSuccessful) {
+//                startLightningMeeting(meeting);
+//                lightningMeetingRepository.setStatus(meeting.getId(), LightningMeetingStatus.SUCCESS);
+//                sendMeetingSuccessNotification(meeting);
+//            } else {
+//                cancelLightningMeeting(meeting);
+//                lightningMeetingRepository.setStatus(meeting.getId(), LightningMeetingStatus.CANCELLED);
+//                sendMeetingCancelNotification(meeting);
+//            }
+//
+//            lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
+//        }
+        for (LightningMeeting meeting : expiredMeetings) {
+            boolean isMeetingSuccessful = checkMeetingSuccess(meeting);
+
+            if (isMeetingSuccessful) {
+                startLightningMeeting(meeting);
+                lightningMeetingRepository.setStatus(meeting.getId(), LightningMeetingStatus.SUCCESS);
+                sendMeetingSuccessNotification(meeting);
+            } else {
+                cancelLightningMeeting(meeting);
+                lightningMeetingRepository.setStatus(meeting.getId(), LightningMeetingStatus.CANCELLED);
+                sendMeetingCancelNotification(meeting);
+
+                // ✅ 모임이 취소된 경우에만 INACTIVE 처리
+                lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
+            }
+        }
+    }
+
+    /** 🔹 성사된 모임 처리 */
+    private void processSuccessfulMeetings(LocalDateTime now) {
         List<LightningMeeting> successfulMeetings = lightningMeetingRepository.findSuccessfulMeetingsWithoutNotification(now);
 
-//        List<LightningMeeting> successfulMeetings = lightningMeetingRepository.findAllMeetingWithEnoughParticipants(now, pungmul.pungmul.domain.lightning.LightningMeetingStatus.OPEN);
-
-        // 모집 기간이 만료된 모임 처리
-        for (LightningMeeting meeting : expiredMeetings) {
-            processExpiredMeeting(meeting);
-        }
-
-        // 성사 조건을 만족한 모집 기간 중 모임 처리
         for (LightningMeeting meeting : successfulMeetings) {
             askOrganizerForMeetingApproval(meeting);
             lightningMeetingRepository.markNotificationAsSent(meeting.getId());
         }
-        checkAndCancelUnsuccessLightningMeeting(now);
     }
 
-    private void checkAndCancelUnsuccessLightningMeeting(LocalDateTime now) {
-        // 🔹 start_time이 지났지만 SUCCESS 상태가 아닌 모임 조회
+    /** 🔹 시작 시간이 지난 실패한 모임을 취소 */
+    private void checkAndCancelUnsuccessfulMeetings(LocalDateTime now) {
         List<LightningMeeting> unsuccessfulMeetings = lightningMeetingRepository.findUnsuccessfulMeetingsPastStartTime(now);
-
+//        if (!unsuccessfulMeetings.isEmpty()) {
+//            lightningMeetingRepository.cancelMeetingsPastStartTime(now);
+//            List<Long> meetingIds = unsuccessfulMeetings.stream().map(LightningMeeting::getId).toList();
+//            lightningMeetingParticipantRepository.deactivateParticipantsByMeetingIds(meetingIds);
+//
+//            log.info("총 {}개의 모임이 start_time이 지났지만 SUCCESS 상태가 아니므로 취소됨", unsuccessfulMeetings.size());
+//        }
         if (!unsuccessfulMeetings.isEmpty()) {
-            // 🔹 해당 모임을 CANCELLED 상태로 변경
             lightningMeetingRepository.cancelMeetingsPastStartTime(now);
-
-            // 🔹 해당 모임의 참가자들을 INACTIVE 상태로 변경
             List<Long> meetingIds = unsuccessfulMeetings.stream().map(LightningMeeting::getId).toList();
+
+            // ✅ 실패한 모임의 참가자들을 INACTIVE로 처리
             lightningMeetingParticipantRepository.deactivateParticipantsByMeetingIds(meetingIds);
 
             log.info("총 {}개의 모임이 start_time이 지났지만 SUCCESS 상태가 아니므로 취소됨", unsuccessfulMeetings.size());
         }
     }
 
-    // 모집 기간이 만료된 모임 처리
-    private void processExpiredMeeting(LightningMeeting meeting) throws IOException {
-        boolean isMeetingSuccessful = checkMeetingSuccess(meeting);
-
-        if (isMeetingSuccessful) {
-            startLightningMeeting(meeting);
-            lightningMeetingRepository.setStatus(meeting.getId(), pungmul.pungmul.domain.lightning.LightningMeetingStatus.SUCCESS);
-            sendMeetingSuccessNotification(meeting);
-        } else {
-            cancelLightningMeeting(meeting);
-            lightningMeetingRepository.setStatus(meeting.getId(), pungmul.pungmul.domain.lightning.LightningMeetingStatus.CANCELLED);
-            sendMeetingCancelNotification(meeting);
+    /** 🔹 종료된 모임의 참가자 상태를 INACTIVE로 변경 */
+    private void deactivateParticipantsAfterMeetingEnd(LocalDateTime now) {
+        List<LightningMeeting> endedMeetings = lightningMeetingRepository.findMeetingsPastEndTime(now);
+//        for (LightningMeeting meeting : endedMeetings) {
+//            lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
+//            log.info("모임 종료 후 참여자 상태 변경 완료: MeetingId={}", meeting.getId());
+//        }
+        for (LightningMeeting meeting : endedMeetings) {
+            if (meeting.getStatus() == LightningMeetingStatus.SUCCESS) {  // ✅ SUCCESS 상태만 처리
+                lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
+                log.info("모임 종료 후 참여자 상태 변경 완료: MeetingId={}", meeting.getId());
+            }
         }
-
-        lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
     }
 
-    // 모임장에게 승인 요청 전송
+    /** 🔹 모임장에게 승인 요청 전송 */
     private void askOrganizerForMeetingApproval(LightningMeeting meeting) {
-//        log.info("Requesting organizer's approval for meeting: {}", meeting.getId());
-
-
-
-//         메시지 전송 (예: WebSocket 사용)
         sendMeetingApprovalRequestToOrganizer(meeting);
+
+        //  모임장 허가 로직 -> 추후 구현
+//        // ✅ 모임장 응답 대기 (예: 5분)
+//        LocalDateTime deadline = LocalDateTime.now().plusMinutes(5);
+//        while (LocalDateTime.now().isBefore(deadline)) {
+//            if (meeting.isApproved()) {  // 모임장 승인 처리
+//                lightningMeetingRepository.setStatus(meeting.getId(), LightningMeetingStatus.SUCCESS);
+//                return;
+//            }
+//            try {
+//                Thread.sleep(10000);  // 10초 간격으로 상태 체크
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+//        }
+//
+//        // ✅ 응답이 없으면 자동 취소
+//        lightningMeetingRepository.setStatus(meeting.getId(), LightningMeetingStatus.CANCELLED);
+//        lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
+//        sendMeetingCancelNotification(meeting);
+//        log.info("모임장 승인 요청 후 응답이 없어 모임 자동 취소됨: MeetingId={}", meeting.getId());
     }
 
     private void sendMeetingApprovalRequestToOrganizer(LightningMeeting meeting) {
@@ -114,11 +163,11 @@ public class LightningMeetingStatus {
                 MessageDomainType.LIGHTNING_MEETING,
                 LightningMeetingBusinessIdentifier.NOTIFICATION,
                 organizer.getEmail(),
-                meeting.getMeetingName() + "모임을 진행하시겠습니까? (승인 / 연기)"
+                meeting.getMeetingName() + " 모임을 진행하시겠습니까? (승인 / 연기)"
         );
     }
 
-    // 모임 성사 조건 확인
+    /** 🔹 모임 성사 조건 확인 */
     private boolean checkMeetingSuccess(LightningMeeting meeting) {
         if (meeting.getMeetingType() == MeetingType.CLASSICPAN) {
             return checkClassicParticipant(meeting);
@@ -127,22 +176,20 @@ public class LightningMeetingStatus {
         }
     }
 
-    //    // 모임장에게 메시지 전송 메서드 (구현 필요)
-//    private void sendMeetingApprovalRequestToOrganizer(LightningMeeting meeting) {
-//        // WebSocket 메시지 전송 로직
-//        messageService.sendToOrganizer(
-//                meeting.getOrganizerId(),
-//                "모임 성사 인원이 충족되었습니다. 모임 진행 여부를 결정해주세요.",
-//                meeting.getId()
-//        );
-//    }
-
     private void sendMeetingSuccessNotification(LightningMeeting meeting) throws IOException {
         List<String> participantTokens = getParticipantTokens(meeting.getId());
-
+//        for (String token : participantTokens) {
+//            NotificationContent successNotification = LightningMeetingNotificationTemplateFactory.createMeetingSuccessNotification(meeting);
+//            fcmService.sendNotification(token, successNotification);
+//        }
+//        log.info("모임 성사 알림 전송 완료: MeetingId={}", meeting.getId());
         for (String token : participantTokens) {
-            NotificationContent successNotification = LightningMeetingNotificationTemplateFactory.createMeetingSuccessNotification(meeting);
-            fcmService.sendNotification(token, successNotification);
+            try {
+                NotificationContent successNotification = LightningMeetingNotificationTemplateFactory.createMeetingSuccessNotification(meeting);
+                fcmService.sendNotification(token, successNotification);
+            } catch (IOException e) {
+                log.error("성공 알림 전송 실패: MeetingId={}, Token={}, Error={}", meeting.getId(), token, e.getMessage());
+            }
         }
         log.info("모임 성사 알림 전송 완료: MeetingId={}", meeting.getId());
     }
@@ -166,42 +213,14 @@ public class LightningMeetingStatus {
                 .toList();
     }
 
-    @Scheduled(fixedRate = 60000) // 1분 간격으로 실행
-    public void sendMeetingReminders() throws IOException {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime thirtyMinutesLater = now.plusMinutes(30);
-
-        // 30분 내에 시작하는 SUCCESS 상태의 모임 조회
-        List<LightningMeeting> meetings = lightningMeetingRepository.findMeetingsStartingInThirtyMinutes(now, thirtyMinutesLater);
-
-        for (LightningMeeting meeting : meetings) {
-            sendRemindersForMeeting(meeting);
-        }
-    }
-
-    private void sendRemindersForMeeting(LightningMeeting meeting) throws IOException {
-        // 해당 모임의 참여자 조회
-        List<LightningMeetingParticipant> participants = lightningMeetingParticipantRepository.findAllParticipantsByMeetingId(meeting.getId());
-        List<String> participantTokens = getParticipantTokens(meeting.getId());
-
-        NotificationContent notificationContent = LightningMeetingNotificationTemplateFactory.remindMeetingNotification(meeting);
-        for (String token : participantTokens) {
-            fcmService.sendNotification(token, notificationContent);
-        }
-    }
-
     private Integer getMeetingParticipantNum(LightningMeeting meeting) {
         return lightningMeetingParticipantRepository.getMeetingParticipantNum(meeting.getId());
     }
 
     private boolean checkClassicParticipant(LightningMeeting meeting) {
-        //  해당 정식판굿의 악기 구성 제한 정보
         List<InstrumentAssignment> instrumentAssignmentList = meeting.getInstrumentAssignmentList();
-        //  모든 악기 제한에 대해
         for (InstrumentAssignment instrumentAssignment : instrumentAssignmentList) {
-            //  현재 해당 악기로 가입한 사용자 수
             Integer currentInstrumentAssign = lightningMeetingInstrumentAssignmentRepository.getCurrentInstrumentAssign(instrumentAssignment.getInstrument());
-            //  악기 조건을 충족하지 못하면 false
             if (instrumentAssignment.getMinParticipants() > currentInstrumentAssign)
                 return false;
         }
@@ -209,16 +228,12 @@ public class LightningMeetingStatus {
     }
 
     private void cancelLightningMeeting(LightningMeeting meeting) {
-        //  참가자들에게 번개 모임 취소 메세지 발송
-
-        //  해당 모임의 모든 사용자 INACTIVE
         lightningMeetingParticipantRepository.inactivateMeetingParticipants(meeting.getId());
-
         eventListener.notifyMeetingDeleted(meeting.getId());
     }
 
     private void startLightningMeeting(LightningMeeting meeting) {
-        //  참가자들에게 번개 모임 진행 메세지 발송
-
+        // 참가자들에게 번개 모임 진행 메시지 발송 (구현 필요)
     }
 }
+

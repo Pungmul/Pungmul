@@ -33,6 +33,8 @@ public interface LightningMeetingRepository {
     List<LightningMeeting> findUnsuccessfulMeetingsPastStartTime(LocalDateTime now);
 
     void cancelMeetingsPastStartTime(LocalDateTime now);
+
+    List<LightningMeeting> findMeetingsPastEndTime(LocalDateTime now);
 }
 
 
