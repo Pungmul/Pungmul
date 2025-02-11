@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.message.StompMessage;
-import pungmul.pungmul.service.lightning.LightningMeetingService;
 
 @Slf4j
 @Component

@@ -27,6 +27,25 @@
             (#{meetingId}, #{userId}, #{username}, #{instrumentAssigned}, #{organizer}, #{location.latitude}, #{location.longitude}, 'ACTIVE');
     </insert>
 
+    <!-- 사용자가 특정 번개 모임에 참가 중인지 확인 -->
+    <select id="isUserParticipant" parameterType="map" resultType="boolean">
+        SELECT CASE
+                   WHEN COUNT(*) > 0 THEN TRUE
+                   ELSE FALSE
+                   END
+        FROM lightning_meeting_participant
+        WHERE meeting_id = #{lightningMeetingId}
+          AND user_id = #{userId}
+          AND status = 'ACTIVE'
+    </select>
+
+    <update id="withdrawLightningMeeting">
+        UPDATE lightning_meeting_participant
+        SET status = 'INACTIVE'
+        WHERE meeting_id = #{lightningMeetingId}
+          AND user_id = #{userId}
+    </update>
+
     <!-- Select Participants By Meeting ID -->
     <select id="findAllParticipantsByMeetingId" parameterType="java.lang.Long" resultMap="LightningMeetingParticipantResultMap">
         SELECT *
@@ -38,7 +57,8 @@
     <select id="getMeetingParticipants" parameterType="java.lang.Long" resultType="pungmul.pungmul.core.geo.LatLong">
         SELECT latitude, longitude
         FROM lightning_meeting_participant
-        WHERE meeting_id = #{meetingId};
+        WHERE meeting_id = #{meetingId}
+        AND status = 'ACTIVE';
     </select>
 
     <!-- Count ACTIVE Participants By Meeting ID -->
@@ -64,5 +84,34 @@
           AND user_id = #{userId}
     </select>
 
+    <!-- 사용자가 다른 활성 번개 모임에 참가 중인지 확인 -->
+    <select id="isUserInActiveMeeting" parameterType="long" resultType="boolean">
+        SELECT CASE
+                   WHEN COUNT(*) > 0 THEN TRUE
+                   ELSE FALSE
+                   END
+        FROM lightning_meeting_participant
+        WHERE user_id = #{userId}
+          AND status = 'ACTIVE'
+    </select>
+
+    <update id="deactivateParticipantsOfCancelledMeetings">
+        UPDATE lightning_meeting_participant
+        SET status = 'INACTIVE'
+        WHERE meeting_id IN (
+        SELECT id FROM lightning_meeting
+        WHERE start_time &lt;= #{now}
+        AND status = 'CANCELLED'
+        )
+    </update>
+
+    <update id="deactivateParticipantsByMeetingIds" parameterType="list">
+        UPDATE lightning_meeting_participant
+        SET status = 'INACTIVE'
+        WHERE meeting_id IN
+        <foreach item="meetingId" collection="meetingIds" open="(" separator="," close=")">
+            #{meetingId}
+        </foreach>
+    </update>
 
 </mapper>

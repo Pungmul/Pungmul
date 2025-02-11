@@ -9,7 +9,7 @@
     <resultMap id="LightningMeetingResultMap" type="pungmul.pungmul.domain.lightning.LightningMeeting">
         <id property="id" column="id" />
         <result property="meetingName" column="meeting_name" />
-        <result property="meetingDescription" column="meeting_description" />
+<!--        <result property="meetingDescription" column="meeting_description" />-->
         <result property="recruitmentEndTime" column="recruitment_end_time" />
         <result property="startTime" column="start_time" />
         <result property="endTime" column="end_time" />
@@ -20,6 +20,7 @@
         <result property="latitude" column="latitude" />
         <result property="longitude" column="longitude" />
         <result property="status" column="status" />
+        <result property="notificationSent" column="notification_sent" />
         <result property="createdAt" column="created_at" />
         <result property="updatedAt" column="updated_at" />
     </resultMap>
@@ -28,7 +29,7 @@
     <insert id="createLightningMeeting" parameterType="pungmul.pungmul.domain.lightning.LightningMeeting" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO lightning_meeting (
             meeting_name,
-            meeting_description,
+#             meeting_description,
             recruitment_end_time,
             start_time,
             end_time,
@@ -41,7 +42,6 @@
         )
         VALUES (
                    #{meetingName},
-                   #{meetingDescription},
                    #{recruitmentEndTime},
                    #{startTime},
                    #{endTime},
@@ -66,7 +66,6 @@
         UPDATE lightning_meeting
         SET
             meeting_name = #{meetingName},
-            meeting_description = #{meetingDescription},
             recruitment_end_time = #{recruitmentEndTime},
             start_time = #{startTime},
             end_time = #{endTime},
@@ -132,4 +131,50 @@
         )
     </select>
 
+    <update id="deactivateLightningMeeting" parameterType="long">
+        UPDATE lightning_meeting
+        SET status = 'CANCELLED'
+        WHERE id = #{meetingId}
+    </update>
+
+    <update id="changeMeetingOrganizer" parameterType="map">
+        UPDATE lightning_meeting
+        SET organizer_id = #{userId}
+        WHERE id = #{meetingId}
+    </update>
+
+    <!-- 🔹 메시지가 아직 발송되지 않은 성사된 모임 조회 -->
+    <select id="findSuccessfulMeetingsWithoutNotification" resultMap="LightningMeetingResultMap">
+        SELECT * FROM lightning_meeting
+        WHERE status = 'OPEN'
+        AND notification_sent = FALSE
+        AND recruitment_end_time &lt;= #{now}
+    </select>
+
+    <!-- 🔹 메시지를 보낸 후 `notification_sent` 값을 TRUE로 업데이트 -->
+    <update id="markNotificationAsSent">
+        UPDATE lightning_meeting
+        SET notification_sent = TRUE
+        WHERE id = #{meetingId}
+    </update>
+
+    <select id="findUnsuccessfulMeetingsPastStartTime" resultMap="LightningMeetingResultMap">
+        SELECT * FROM lightning_meeting
+        WHERE start_time &lt;= #{now}
+        AND status != 'SUCCESS'
+    </select>
+
+    <update id="cancelMeetingsPastStartTime">
+        UPDATE lightning_meeting
+        SET status = 'CANCELLED'
+        WHERE start_time &lt;= #{now}
+        AND status != 'SUCCESS'
+    </update>
+
+    <select id="findMeetingsPastEndTime" parameterType="java.time.LocalDateTime" resultMap="LightningMeetingResultMap">
+        SELECT *
+        FROM lightning_meeting
+        WHERE end_time &lt;= #{now}
+        AND status = 'SUCCESS';
+    </select>
 </mapper>

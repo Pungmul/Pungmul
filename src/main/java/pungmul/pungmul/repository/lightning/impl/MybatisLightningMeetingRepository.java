@@ -65,4 +65,37 @@ public class MybatisLightningMeetingRepository implements LightningMeetingReposi
         return lightningMeetingMapper.findMeetingsStartingInThirtyMinutes(now, thirtyMinutesLater);
     }
 
+    @Override
+    public void deactivateLightningMeeting(Long meetingId) {
+        lightningMeetingMapper.deactivateLightningMeeting(meetingId);
+    }
+
+    @Override
+    public void changeMeetingOrganizer(Long meetingId, Long userId) {
+        lightningMeetingMapper.changeMeetingOrganizer(meetingId, userId);
+    }
+
+    public List<LightningMeeting> findSuccessfulMeetingsWithoutNotification(LocalDateTime now) {
+        return lightningMeetingMapper.findSuccessfulMeetingsWithoutNotification(now);
+    }
+
+    public void markNotificationAsSent(Long meetingId) {
+        lightningMeetingMapper.markNotificationAsSent(meetingId);
+    }
+
+    @Override
+    public List<LightningMeeting> findUnsuccessfulMeetingsPastStartTime(LocalDateTime now) {
+        return lightningMeetingMapper.findUnsuccessfulMeetingsPastStartTime(now);
+    }
+
+    @Override
+    public void cancelMeetingsPastStartTime(LocalDateTime now) {
+        lightningMeetingMapper.cancelMeetingsPastStartTime(now);
+    }
+
+    @Override
+    public List<LightningMeeting> findMeetingsPastEndTime(LocalDateTime now) {
+        return lightningMeetingMapper.findMeetingsPastEndTime(now);
+    }
+
 }

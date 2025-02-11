@@ -11,6 +11,7 @@ import pungmul.pungmul.domain.meeting.MeetingParticipant;
 import pungmul.pungmul.repository.lightning.mapper.LightningMeetingParticipantMapper;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingParticipantRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -49,4 +50,27 @@ public class MybatisLightningMeetingParticipantRepository implements LightningMe
     public boolean isUserAlreadyParticipant(Long meetingId, Long id) {
         return lightningMeetingParticipantMapper.isUserAlreadyParticipant(meetingId, id);
     }
+
+    @Override
+    public boolean isUserInActiveMeeting(Long userId) {
+        return lightningMeetingParticipantMapper.isUserInActiveMeeting(userId);
+    }
+
+    @Override
+    public void withdrawLightningMeeting(Long lightningMeetingId, Long id) {
+        lightningMeetingParticipantMapper.withdrawLightningMeeting(lightningMeetingId, id);
+    }
+
+    @Override
+    public boolean isUserParticipant(Long lightningMeetingId, Long id) {
+        return lightningMeetingParticipantMapper.isUserParticipant(lightningMeetingId, id);
+    }
+
+    @Override
+    public void deactivateParticipantsByMeetingIds(List<Long> meetingIds) {
+        if (meetingIds == null || meetingIds.isEmpty()) return; // 모임 ID가 없으면 처리하지 않음
+        lightningMeetingParticipantMapper.deactivateParticipantsByMeetingIds(meetingIds);
+    }
+
+
 }

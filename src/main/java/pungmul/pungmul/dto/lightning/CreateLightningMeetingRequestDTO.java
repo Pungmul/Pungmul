@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CreateLightningMeetingRequestDTO {
     private String meetingName;
-    private String meetingDescription;
+//    private String meetingDescription;
     private LocalDateTime recruitmentEndTime;
     private LocalDateTime startTime;
     private LocalDateTime endTime;

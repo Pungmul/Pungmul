@@ -8,18 +8,16 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.config.security.UserDetailsImpl;
-import pungmul.pungmul.dto.lightning.GetMeetingParticipantsRequestDTO;
 import pungmul.pungmul.dto.lightning.GetNearLightningMeetingRequestDTO;
-import pungmul.pungmul.service.lightning.LightningMeetingService;
+import pungmul.pungmul.service.lightning.LightningMeetingManager;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class LightningMeetingStompController {
-    private final LightningMeetingService lightningMeetingService;
+    private final LightningMeetingManager lightningMeetingManager;
     private final TokenProvider tokenProvider;
     /*
     url : ws://localhost:8080/ws
@@ -37,7 +35,7 @@ public class LightningMeetingStompController {
     ) {
         String token = authorizationToken.replace("Bearer ", "");
         UserDetailsImpl userDetails = tokenProvider.getUserDetailsFromToken(token);
-        lightningMeetingService.getNearLightningMeetings(getNearLightningMeetingRequestDTO, userDetails.getUsername());
+        lightningMeetingManager.getNearLightningMeetings(getNearLightningMeetingRequestDTO, userDetails.getUsername());
     }
 
     /*
@@ -45,7 +43,6 @@ public class LightningMeetingStompController {
     sub dest : /sub/lightning-meeting/participants/{meetingId}
     send header : {"Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyOEBleGFtcGxlLmNvbSIsImlhdCI6MTczNTc1NjE2OCwiZXhwIjoxNzM1NzU5NzY4fQ.GvZQFmbvPOtNy5IrlVFGZM6eLJvoQxRa672oXMicwtaoQyAiHo1tzX4csbSdTKlHk50d2Zw8H0d5YEwFkDIt5Q"}
     send dest : /pub/lightning-meeting/participants/{meetingId}
-    content : {   "meetingId" : 38 }
     */
     @PreAuthorize("hasRole('USER')")
     @MessageMapping("/lightning-meeting/participants/{meetingId}")
@@ -59,6 +56,6 @@ public class LightningMeetingStompController {
         String token = authorizationToken.replace("Bearer ", "");
         UserDetailsImpl userDetails = tokenProvider.getUserDetailsFromToken(token);
 
-        lightningMeetingService.getMeetingParticipants(meetingId);
+        lightningMeetingManager.getLightningMeetingParticipants(meetingId);
     }
 }
