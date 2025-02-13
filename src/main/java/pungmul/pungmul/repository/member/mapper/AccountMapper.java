@@ -28,5 +28,7 @@ public interface AccountMapper {
 
     void unlockAccount(Long id);
 
+    Boolean checkDuplicateUsername(String username);
+
 //    Long selectLastInsertAccountId();
 }

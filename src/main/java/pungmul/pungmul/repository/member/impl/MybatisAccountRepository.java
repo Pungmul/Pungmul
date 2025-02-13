@@ -73,4 +73,9 @@ public class MybatisAccountRepository implements AccountRepository {
     public void unlockAccount(Long id) {
         accountMapper.unlockAccount(id);
     }
+
+    @Override
+    public Boolean checkDuplicateUsername(String username) {
+        return accountMapper.checkDuplicateUsername(username);
+    }
 }

@@ -142,4 +142,14 @@
         WHERE id = #{id}
     </update>
 
+    <!-- Username 중복 체크 -->
+    <select id="checkDuplicateUsername" parameterType="java.lang.String" resultType="boolean">
+        SELECT CASE
+                   WHEN COUNT(*) > 0 THEN TRUE
+                   ELSE FALSE
+                   END
+        FROM account
+        WHERE username = #{username};
+    </select>
+
 </mapper>

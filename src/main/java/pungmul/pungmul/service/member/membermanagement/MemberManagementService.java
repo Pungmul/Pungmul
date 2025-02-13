@@ -139,4 +139,12 @@ public class MemberManagementService {
                 .clubInfoList(clubInfoList)
                 .build();
     }
+
+    public CheckDuplicateUsernameResponseDTO checkDuplicateUsername(CheckDuplicateUsernameRequestDTO checkDuplicateUsernameRequestDTO) {
+        Boolean isRegistered = accountService.checkDuplicateUsername(checkDuplicateUsernameRequestDTO.getUsername());
+
+        return CheckDuplicateUsernameResponseDTO.builder()
+                .isRegistered(isRegistered)
+                .build();
+    }
 }

@@ -143,6 +143,14 @@ public class MemberController {
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));
     }
 
+    @GetMapping("/signup/check")
+    public ResponseEntity<BaseResponse<CheckDuplicateUsernameResponseDTO>> checkDuplicateUsername(
+            @RequestBody CheckDuplicateUsernameRequestDTO checkDuplicateUsernameRequestDTO){
+        CheckDuplicateUsernameResponseDTO checkDuplicateUsernameResponseDTO = memberManagementService.checkDuplicateUsername(checkDuplicateUsernameRequestDTO);
+
+        return ResponseEntity.ok(BaseResponse.ofSuccess(checkDuplicateUsernameResponseDTO));
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> refreshAccessToken(@RequestHeader("refreshToken") String refreshToken) {
         AuthenticationResponseDTO response = loginService.refreshAccessToken(refreshToken);
@@ -157,8 +165,4 @@ public class MemberController {
         String adminInvitationCode = invitationCodeService.issueInvitationCode(adminInvitationCodeRequestDTO.getMaxUses());
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, adminInvitationCode));
     }
-
-
-
-
 }
