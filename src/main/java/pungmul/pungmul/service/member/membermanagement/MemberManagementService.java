@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.exception.custom.member.ExpiredInvitationCodeException;
 import pungmul.pungmul.core.exception.custom.member.InvalidInvitationCodeException;
 import pungmul.pungmul.domain.member.club.Club;
@@ -146,5 +147,10 @@ public class MemberManagementService {
         return CheckDuplicateUsernameResponseDTO.builder()
                 .isRegistered(isRegistered)
                 .build();
+    }
+
+    @Transactional
+    public void updatePassword(UserDetailsImpl userDetails, UpdatePasswordRequestDTO updatePasswordRequestDTO) {
+        accountService.updatePassword(userDetails.getUsername(), updatePasswordRequestDTO.getPassword());
     }
 }

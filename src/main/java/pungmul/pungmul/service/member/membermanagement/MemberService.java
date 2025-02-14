@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.file.Image;
 import pungmul.pungmul.domain.member.account.Account;
+import pungmul.pungmul.domain.member.club.Club;
+import pungmul.pungmul.domain.member.instrument.Instrument;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.member.*;
@@ -58,6 +60,35 @@ public class MemberService {
                 .orElse(Collections.emptyList());
 
         return getGetMemberResponseDTO(username, user, instrumentStatusList);
+    }
+
+    public SearchUserInfoResponseDTO searchUserInfo(String username) {
+        User user = userRepository.getUserByEmail(username)
+                .orElseThrow(NoSuchElementException::new);
+        List<Instrument> instrumentList = instrumentStatusRepository.getAllInstruments(user.getId());
+
+        return getSearchUserInfoResponseDTO(user, instrumentList);
+    }
+
+    private SearchUserInfoResponseDTO getSearchUserInfoResponseDTO(User user, List<Instrument> instrumentList) {
+        return SearchUserInfoResponseDTO.builder()
+                .username(user.getEmail())
+                .clubName(user.getClubName())
+                .clubInfo(getClubInfo(user.getClubId()))
+                .email(user.getEmail())
+                .userRole(accountService.getAccountByEmail(user.getEmail()).getRoles().stream().findFirst().orElse(null))
+                .instrumentList(instrumentList.stream().map(Instrument::getCode).toList())
+                .profile(imageService.getImagesByDomainId(DomainType.PROFILE, user.getId()).get(0))
+                .build();
+    }
+
+    private ClubInfo getClubInfo(Long clubId) {
+        Club clubInfo = clubRepository.getClubInfo(clubId);
+        return ClubInfo.builder()
+                .clubId(clubId)
+                .clubName(clubInfo.getName())
+                .school(clubInfo.getSchool())
+                .build();
     }
 
     public GetMemberResponseDTO getGetMemberResponseDTO(String username, User user, List<InstrumentStatus> instrumentStatusList) {

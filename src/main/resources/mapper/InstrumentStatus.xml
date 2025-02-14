@@ -69,4 +69,12 @@
           AND major = TRUE
     </select>
 
+    <!-- 특정 사용자(userId)가 연주할 수 있는 악기 이름 리스트 조회 -->
+    <select id="getAllInstruments" parameterType="java.lang.Long" resultType="pungmul.pungmul.domain.member.instrument.Instrument">
+        SELECT instrument
+        FROM instrument_status
+        WHERE user_id = #{userId}
+    </select>
+
+
 </mapper>

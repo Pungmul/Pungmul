@@ -1,10 +1,13 @@
 package pungmul.pungmul.core.exception.handler;
 
 
+import com.google.api.Http;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pungmul.pungmul.core.exception.custom.member.*;
@@ -88,4 +91,19 @@ public class MemberExceptionHandler {
                 .body(BaseResponse.ofFail(MemberResponseCode.INVALID_REFRESH_TOKEN_CODE));
 
     }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<BaseResponse<String>> handleUsernameNotFoundException(UsernameNotFoundException ex){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(MemberResponseCode.USERNAME_NOT_FOUND));
+    }
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<BaseResponse<String>> handleBadCredentialsException(BadCredentialsException ex){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(MemberResponseCode.INVALID_USERNAME_OR_PASSWORD));
+    }
+
+
 }

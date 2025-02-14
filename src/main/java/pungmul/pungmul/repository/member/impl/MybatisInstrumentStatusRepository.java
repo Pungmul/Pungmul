@@ -54,4 +54,9 @@ public class MybatisInstrumentStatusRepository implements InstrumentStatusReposi
     public Instrument getMajorInstrumentByUserId(Long userId) {
         return instrumentStatusMapper.getMajorInstrumentByUserId(userId);
     }
+
+    @Override
+    public List<Instrument> getAllInstruments(Long id) {
+        return instrumentStatusMapper.getAllInstruments(id);
+    }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 public class FCMController {
     private final FCMService fcmService;
 
-    @PostMapping("/save-token")
+    @PostMapping("/save")
     public ResponseEntity<BaseResponse<Void>> saveFCMToken(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody FCMTokenRequestDTO fcmTokenRequestDTO) {
