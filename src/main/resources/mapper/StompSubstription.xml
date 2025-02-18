@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.message.mapper.StompSubscriptionMapper">
+
+    <!-- STOMP 구독 정보 저장 -->
+    <insert id="insertSubscription" parameterType="map">
+        INSERT INTO stomp_subscription (session_id, user_id, stomp_dest, created_at)
+        VALUES (#{sessionId}, #{userId}, #{destination}, NOW())
+    </insert>
+
+    <!-- 특정 STOMP 경로를 구독 중인 사용자 목록 조회 -->
+    <select id="findUsersByDestination" parameterType="string" resultType="long">
+        SELECT user_id FROM stomp_subscription WHERE stomp_dest = #{destination}
+    </select>
+
+    <!-- 특정 세션 ID의 모든 구독 정보 삭제 -->
+    <delete id="deleteBySessionId" parameterType="string">
+        DELETE FROM stomp_subscription WHERE session_id = #{sessionId}
+    </delete>
+
+    <!-- 특정 사용자의 모든 구독 정보 삭제 (예: 로그아웃 시) -->
+    <delete id="deleteByUserId" parameterType="long">
+        DELETE FROM stomp_subscription WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

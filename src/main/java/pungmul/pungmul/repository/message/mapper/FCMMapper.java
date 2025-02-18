@@ -15,4 +15,6 @@ public interface FCMMapper {
     List<FCMToken> selectValidTokens();
 
     void updateTokenValidity(UpdateFCMTokenDTO updateFCMTokenDTO);
+
+    Long getUserIdByFCMToken(String token);
 }

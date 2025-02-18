@@ -7,6 +7,7 @@ import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.lightning.LightningMeeting;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.message.FCMToken;
+import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.NotificationContent;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
@@ -61,7 +62,7 @@ public class LightningMeetingNotificationTrigger {
 
             // 5. FCM 알림 메시지 전송
             for (String token : tokens) {
-                fcmService.sendNotification(token, notificationContent);
+                fcmService.sendNotification(token, notificationContent, MessageDomainType.LIGHTNING_MEETING);
             }
 
             log.info("번개 모임 참가 요청 알림 전송 완료: MeetingId={}, OrganizerId={}, ParticipantId={}",

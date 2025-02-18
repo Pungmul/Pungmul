@@ -12,4 +12,6 @@ public interface FCMRepository {
     List<FCMToken> getValidTokens();
 
     void updateTokenValidity(UpdateFCMTokenDTO updateFCMTokenDTO);
+
+    Long getUserIdByFCMToken(String token);
 }

@@ -12,18 +12,23 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.domain.member.user.User;
+import pungmul.pungmul.domain.message.FCMMessageLog;
 import pungmul.pungmul.domain.message.FCMToken;
+import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.NotificationContent;
 import pungmul.pungmul.dto.message.FCMTokenRequestDTO;
 import pungmul.pungmul.dto.message.UpdateFCMTokenDTO;
 import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.repository.message.repository.FCMLogRepository;
 import pungmul.pungmul.repository.message.repository.FCMRepository;
+import pungmul.pungmul.service.member.membermanagement.UserService;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -36,6 +41,8 @@ public class FCMService {
 
     private final UserRepository userRepository;
     private final FCMRepository fcmRepository;
+    private final FCMLogRepository fcmLogRepository;
+    private final UserService userService;
 
     @Value("${firebase.config.path}")
     private String firebaseAccount;
@@ -76,7 +83,7 @@ public class FCMService {
     }
 
     // FCM 메시지 전송
-    public void sendNotification(String token, NotificationContent notificationContent) throws IOException {
+    public void sendNotification(String token, NotificationContent notificationContent, MessageDomainType domainType) throws IOException {
         String message = createMessage(token, notificationContent.getTitle(), notificationContent.getBody());
 
         RestTemplate restTemplate = new RestTemplate();
@@ -85,12 +92,40 @@ public class FCMService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> request = new HttpEntity<>(message, headers);
-        String response = restTemplate.postForObject(
-                FCM_API_URL.replace("{project_id}", firebaseProjectId),
-                request,
-                String.class
-        );
-//        System.out.println("Response from FCM: " + response);
+
+        String response;
+        String status;
+
+        try {
+            response = restTemplate.postForObject(FCM_API_URL.replace("{project_id}", firebaseProjectId), request, String.class);
+            status = "SUCCESS";
+            log.info("FCM 메시지 전송 성공: {}", response);
+        } catch (Exception e) {
+            response = e.getMessage();
+            status = "FAILED";
+            log.error("FCM 메시지 전송 실패: {}", response);
+        }
+        Long userId = fcmRepository.getUserIdByFCMToken(token);
+
+        // ✅ 전송 결과를 DB에 저장
+        FCMMessageLog fcmMessageLog = FCMMessageLog.builder()
+                .userId(userId)
+                .token(token)
+                .title(notificationContent.getTitle())
+                .body(notificationContent.getBody())
+                .sentAt(LocalDateTime.now())
+                .status(status)
+                .response(status.equals("FAILED") ? response : null) // 실패한 경우에만 응답 저장
+                .domainType(domainType)
+                .build();
+
+        fcmLogRepository.insertFCMMessageLog(fcmMessageLog);
+//        String response = restTemplate.postForObject(
+//                FCM_API_URL.replace("{project_id}", firebaseProjectId),
+//                request,
+//                String.class
+//        );
+
     }
 
     // 메시지 생성
@@ -117,6 +152,20 @@ public class FCMService {
                 .isValid(true)
                 .build();
         fcmRepository.saveOrUpdateToken(fcmToken);
+    }
+
+    public List<FCMMessageLog> getFCMLogsByReceiverId(UserDetailsImpl userDetails) {
+        Long receiverId = userService.getUserByEmail(userDetails.getUsername()).getId();
+        return fcmLogRepository.getFCMLogsByReceiverId(receiverId);
+    }
+
+    public List<FCMMessageLog> getAllFCMLogs(){
+        return fcmLogRepository.getAllFCMLogs();
+    }
+
+    @Transactional
+    public void deleteFCMLogById(Long logId) {
+        fcmLogRepository.deleteFCMLogById(logId);
     }
 
     public List<String> getValidTokens(Long userId) {

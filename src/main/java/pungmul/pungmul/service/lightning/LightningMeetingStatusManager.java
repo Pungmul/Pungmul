@@ -112,7 +112,7 @@ public class LightningMeetingStatusManager {
             // ✅ 실패한 모임의 참가자들을 INACTIVE로 처리
             lightningMeetingParticipantRepository.deactivateParticipantsByMeetingIds(meetingIds);
 
-            log.info("총 {}개의 모임이 start_time이 지났지만 SUCCESS 상태가 아니므로 취소됨", unsuccessfulMeetings.size());
+//            log.info("총 {}개의 모임이 start_time이 지났지만 SUCCESS 상태가 아니므로 취소됨", unsuccessfulMeetings.size());
         }
     }
 
@@ -186,7 +186,7 @@ public class LightningMeetingStatusManager {
         for (String token : participantTokens) {
             try {
                 NotificationContent successNotification = LightningMeetingNotificationTemplateFactory.createMeetingSuccessNotification(meeting);
-                fcmService.sendNotification(token, successNotification);
+                fcmService.sendNotification(token, successNotification, MessageDomainType.LIGHTNING_MEETING);
             } catch (IOException e) {
                 log.error("성공 알림 전송 실패: MeetingId={}, Token={}, Error={}", meeting.getId(), token, e.getMessage());
             }
@@ -199,7 +199,7 @@ public class LightningMeetingStatusManager {
 
         for (String token : participantTokens) {
             NotificationContent cancelNotification = LightningMeetingNotificationTemplateFactory.createMeetingFailedNotification(meeting);
-            fcmService.sendNotification(token, cancelNotification);
+            fcmService.sendNotification(token, cancelNotification, MessageDomainType.LIGHTNING_MEETING);
         }
         log.info("모임 취소 알림 전송 완료: MeetingId={}", meeting.getId());
     }

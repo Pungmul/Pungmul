@@ -13,6 +13,8 @@ import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.dto.lightning.GetNearLightningMeetingRequestDTO;
 import pungmul.pungmul.service.lightning.LightningMeetingManager;
 
+import java.security.Principal;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -30,11 +32,13 @@ public class LightningMeetingStompController {
     @MessageMapping("/lightning-meeting/nearby")
     public void getNearLightningMeeting(
             @Payload GetNearLightningMeetingRequestDTO getNearLightningMeetingRequestDTO,
-            @Header("Authorization") String authorizationToken
+            Principal principal
+//            @Header("Authorization") String authorizationToken
 //            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        String token = authorizationToken.replace("Bearer ", "");
-        UserDetailsImpl userDetails = tokenProvider.getUserDetailsFromToken(token);
+//        String token = authorizationToken.replace("Bearer ", "");
+//        UserDetailsImpl userDetails = tokenProvider.getUserDetailsFromToken(token);
+        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
         lightningMeetingManager.getNearLightningMeetings(getNearLightningMeetingRequestDTO, userDetails.getUsername());
     }
 

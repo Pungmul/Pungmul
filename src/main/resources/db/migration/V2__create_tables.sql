@@ -382,6 +382,50 @@ CREATE TABLE IF NOT EXISTS invitation_code (
                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS fcm_message_log (
+                                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                 receiver_id BIGINT NOT NULL,
+                                 token VARCHAR(255) NOT NULL,
+                                 title VARCHAR(255) NOT NULL,
+                                 body TEXT NOT NULL,
+                                 sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                 status VARCHAR(50) NOT NULL,  -- SUCCESS / FAILED
+                                 response TEXT, -- Firebase 응답 저장 (optional)
+                                 domain VARCHAR(50) NOT NULL,
+                                 FOREIGN KEY (receiver_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS stomp_message_log (
+                                   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                   sender_id BIGINT,
+                                   domain_type VARCHAR(50) NOT NULL, -- ✅ MessageDomainType 적용
+                                   business_identifier VARCHAR(100) NOT NULL, -- ex) "meeting_id", "friend_request_id"
+                                   identifier VARCHAR(255), -- 특정 사용자, 그룹, 채널 등
+                                   stomp_dest VARCHAR(255) NOT NULL,
+                                   content TEXT NOT NULL,
+                                   sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                   FOREIGN KEY (sender_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS message_read_status (
+                                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                     message_id BIGINT NOT NULL, -- 메시지 ID (STOMP 메시지 전용)
+                                     receiver_id BIGINT NOT NULL, -- 수신자 ID
+                                     is_read BOOLEAN DEFAULT FALSE,
+                                     read_at TIMESTAMP NULL, -- 읽음 여부 (NULL이면 미열람)
+                                     FOREIGN KEY (message_id) REFERENCES stomp_message_log(id) ON DELETE CASCADE,
+                                     FOREIGN KEY (receiver_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS stomp_subscription (
+                                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                    session_id VARCHAR(100) NOT NULL,
+                                    user_id BIGINT NOT NULL,
+                                    stomp_dest VARCHAR(255) NOT NULL,
+                                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
 
 
 

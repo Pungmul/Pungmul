@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pungmul.pungmul.domain.message.FCMToken;
+import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.NotificationContent;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Comment;
@@ -42,7 +43,7 @@ public class PostNotificationTrigger {
                 NotificationContent commentNotification = PostNotificationTemplateFactory.createCommentNotification(content.getTitle(), commentContent);
 
                 for (String token : tokens) {
-                    fcmService.sendNotification(token, commentNotification);
+                    fcmService.sendNotification(token, commentNotification, MessageDomainType.POST);
                 }
                 log.info("댓글 알림 전송 완료: PostId={}, AuthorId={}", postId, writerId);
             }
@@ -66,7 +67,7 @@ public class PostNotificationTrigger {
                 NotificationContent postLikeNotification = PostNotificationTemplateFactory.createPostLikeNotification(content.getTitle());
 
                 for (String token : tokens) {
-                    fcmService.sendNotification(token, postLikeNotification);
+                    fcmService.sendNotification(token, postLikeNotification, MessageDomainType.POST);
                 }
                 log.info("좋아요 알림 전송 완료: PostId={}, AuthorId={}", postId, postAuthorId);
             }
@@ -92,7 +93,7 @@ public class PostNotificationTrigger {
                 NotificationContent replyNotification = PostNotificationTemplateFactory.createReplyNotification(postTitle, replyContent);
 
                 for (String token : tokens) {
-                    fcmService.sendNotification(token, replyNotification);
+                    fcmService.sendNotification(token, replyNotification, MessageDomainType.POST);
                 }
                 log.info("답글 알림 전송 완료: CommentId={}, AuthorId={}", commentId, commentAuthorId);
             }

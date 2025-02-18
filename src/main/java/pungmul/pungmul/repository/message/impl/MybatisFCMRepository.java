@@ -56,4 +56,9 @@ public class MybatisFCMRepository implements FCMRepository {
     public void updateTokenValidity(UpdateFCMTokenDTO updateFCMTokenDTO) {
         fcmMapper.updateTokenValidity(updateFCMTokenDTO);
     }
+
+    @Override
+    public Long getUserIdByFCMToken(String token) {
+        return fcmMapper.getUserIdByFCMToken(token);
+    }
 }
