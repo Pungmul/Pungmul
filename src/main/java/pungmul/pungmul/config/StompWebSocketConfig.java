@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import pungmul.pungmul.config.security.FilterChannelInterceptor;
 import pungmul.pungmul.config.security.JwtAuthenticationProvider;
 import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.service.chat.CustomHandshakeInterceptor;
@@ -32,6 +33,7 @@ import java.nio.file.AccessDeniedException;
 @EnableWebSocketMessageBroker
 public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CustomHandshakeInterceptor handshakeInterceptor;
+    private final FilterChannelInterceptor filterChannelInterceptor;
 
     @Value("${app.url}")
     private String appUrl;
@@ -58,5 +60,10 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/sub");
         registry.setApplicationDestinationPrefixes("/pub");
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(filterChannelInterceptor);
     }
 }
