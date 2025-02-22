@@ -13,8 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
+import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 import pungmul.pungmul.config.security.FilterChannelInterceptor;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.repository.message.repository.StompSubscriptionRepository;
 import pungmul.pungmul.service.member.membermanagement.UserService;
 
@@ -24,18 +26,15 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static pungmul.pungmul.config.security.FilterChannelInterceptor.sessions;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class StompEventListener {
-    private final StompSubscriptionRepository stompSubscriptionRepository;
-    private final UserService userService;
 
     private final FilterChannelInterceptor filterChannelInterceptor;
-
-//    private final Map<String, String> sessions = new ConcurrentHashMap<>();
+    private final StompSessionManager stompSessionManager;
+    private final StompSubscriptionRepository stompSubscriptionRepository;
 
     @EventListener
     public void handleConnectEvent(SessionConnectEvent event) {
@@ -70,26 +69,91 @@ public class StompEventListener {
             log.warn("🚨 WebSocket 연결 후 사용자 정보 없음 - 세션 ID: {}", sessionId);
         }
 
-        sessions.put(sessionId, username);
+        stompSessionManager.addSession(sessionId, username);
     }
 
     @EventListener
     public void handleDisconnectEvent(SessionDisconnectEvent event) {
         String sessionId = event.getSessionId();
+        log.info("sessionId: {}", sessionId);
+
+        // ✅ WebSocket 세션이 종료될 때 구독 정보도 삭제
+        stompSubscriptionRepository.deleteBySessionId(sessionId);
+        log.info("🗑 STOMP 구독 정보 삭제 - 세션 ID: {}", sessionId);
+
         filterChannelInterceptor.removeSession(sessionId);
         log.info("❌ WebSocket 연결 종료 - 세션 ID: {}", sessionId);
     }
 
+//    @EventListener
+//    public void handleSubscriptionEvent(SessionSubscribeEvent event) {
+//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+//        String sessionId = headerAccessor.getSessionId();
+//        String username = filterChannelInterceptor.getUsernameBySessionId(sessionId);
+//
+//        if (username != null) {
+//            log.info("✅ 구독 요청 - 사용자: {}, 경로: {}", username, headerAccessor.getDestination());
+//        } else {
+//            log.warn("🚨 구독 요청 시 사용자 정보 없음 - 세션 ID: {}", sessionId);
+//        }
+//    }
+    /**
+     * STOMP 구독 이벤트 처리 (구독 정보 저장)
+     */
     @EventListener
     public void handleSubscriptionEvent(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
-        String username = filterChannelInterceptor.getUsernameBySessionId(sessionId);
+        String destination = headerAccessor.getDestination();
 
-        if (username != null) {
-            log.info("✅ 구독 요청 - 사용자: {}, 경로: {}", username, headerAccessor.getDestination());
-        } else {
-            log.warn("🚨 구독 요청 시 사용자 정보 없음 - 세션 ID: {}", sessionId);
+        if (destination == null) {
+            log.warn("🚨 구독 요청에 destination 정보가 없음 - 세션 ID: {}", sessionId);
+            return;
         }
+
+        String username = stompSessionManager.getUsernameFromSession(sessionId);
+        if (username == null) {
+            log.warn("🚨 구독 요청 시 사용자 정보 없음 - 세션 ID: {}", sessionId);
+            return;
+        }
+
+        Long userId = stompSubscriptionRepository.findUserIdByUsername(username);
+        if (userId == null) {
+            log.warn("🚨 데이터베이스에서 사용자 ID를 찾을 수 없음 - username: {}", username);
+            return;
+        }
+
+        log.info("✅ 구독 요청 - 사용자: {}, 경로: {}", username, destination);
+        stompSubscriptionRepository.insertSubscription(sessionId, userId, destination); // ✅ 구독 정보 저장
+    }
+
+    /**
+     * STOMP 구독 취소(UNSUBSCRIBE) 이벤트 처리 (구독 정보 삭제)
+     */
+    @EventListener
+    public void handleUnsubscribeEvent(SessionUnsubscribeEvent event) {
+        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
+        String sessionId = headerAccessor.getSessionId();
+        String destination = headerAccessor.getDestination();
+
+        if (destination == null) {
+            log.warn("🚨 구독 취소 요청에 destination 정보가 없음 - 세션 ID: {}", sessionId);
+            return;
+        }
+
+        String username = stompSessionManager.getUsernameFromSession(sessionId);
+        if (username == null) {
+            log.warn("🚨 구독 취소 요청 시 사용자 정보 없음 - 세션 ID: {}", sessionId);
+            return;
+        }
+
+        Long userId = stompSubscriptionRepository.findUserIdByUsername(username);
+        if (userId == null) {
+            log.warn("🚨 데이터베이스에서 사용자 ID를 찾을 수 없음 - username: {}", username);
+            return;
+        }
+
+        log.info("✅ 구독 취소 요청 - 사용자: {}, 경로: {}", username, destination);
+        stompSubscriptionRepository.deleteSubscription(sessionId, userId, destination); // ✅ 구독 정보 삭제
     }
 }

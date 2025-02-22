@@ -27,11 +27,15 @@
         )
     </select>
 
-    <!-- 메시지를 읽었을 때 읽음 상태 갱신 -->
+    <!-- 여러 메시지 읽음 처리 -->
     <update id="markMessageAsRead" parameterType="map">
         UPDATE message_read_status
         SET is_read = TRUE, read_at = NOW()
-        WHERE message_id = #{messageId} AND receiver_id = #{receiverId}
+        WHERE message_id IN
+        <foreach item="messageId" collection="messageIdList" open="(" separator="," close=")">
+            #{messageId}
+        </foreach>
+        AND receiver_id = #{receiverId}
     </update>
 
 <!--    &lt;!&ndash; 특정 사용자의 안 읽은 메시지 조회 &ndash;&gt;-->

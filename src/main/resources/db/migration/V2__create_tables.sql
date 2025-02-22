@@ -410,7 +410,7 @@ CREATE TABLE IF NOT EXISTS stomp_message_log (
 CREATE TABLE IF NOT EXISTS message_read_status (
                                      id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                      message_id BIGINT NOT NULL, -- 메시지 ID (STOMP 메시지 전용)
-                                     receiver_id BIGINT NOT NULL, -- 수신자 ID
+                                     reciver_id BIGINT NOT NULL, -- 수신자 ID
                                      is_read BOOLEAN DEFAULT FALSE,
                                      read_at TIMESTAMP NULL, -- 읽음 여부 (NULL이면 미열람)
                                      FOREIGN KEY (message_id) REFERENCES stomp_message_log(id) ON DELETE CASCADE,

@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 import pungmul.pungmul.service.member.authorization.UserDetailsServiceImpl;
+import pungmul.pungmul.service.message.StompSessionManager;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,10 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class FilterChannelInterceptor implements ChannelInterceptor {
     private final TokenProvider tokenProvider;
-    private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final StompSessionManager stompSessionManager;
 
     // ✅ WebSocket 세션과 사용자 정보를 저장하는 Map (세션 유지)
-    public static Map<String, String> sessions = new ConcurrentHashMap<>();
+//    public static Map<String, String> sessions = new ConcurrentHashMap<>();
 
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
@@ -51,48 +52,13 @@ public class FilterChannelInterceptor implements ChannelInterceptor {
         return message;
     }
 
-//    @Override
-//    public Message<?> preSend(Message<?> message, MessageChannel channel) {
-////        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-//        //  stomp 메세지 헤더 접근
-//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-//
-//        if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
-//            log.info("🔐 WebSocket CONNECT 요청 감지");
-//
-//            String authHeader = headerAccessor.getFirstNativeHeader("Authorization");
-//
-//            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-//                String token = authHeader.substring(7);
-//                try {
-//                    if (tokenProvider.validateToken(token)) {
-//                        String username = tokenProvider.getUsernameFromToken(token);
-//
-//                        // ✅ 세션 ID와 사용자 정보 저장
-//                        String sessionId = headerAccessor.getSessionId();
-//                        sessions.put(sessionId, username);
-//
-//                        // ✅ STOMP 헤더에 사용자 정보 추가 (나중에 구독/전송 시 사용 가능)
-//                        headerAccessor.addNativeHeader("username", username);
-//                        log.info("✅ WebSocket 사용자 인증 성공: {} (Session ID: {})", username, sessionId);
-//                    }
-//                } catch (JWTVerificationException e) {
-//                    log.error("🚨 JWT 검증 실패: {}", e.getMessage());
-//                }
-//            } else {
-//                log.warn("🚨 WebSocket CONNECT 요청에 Authorization 헤더 없음");
-//            }
-//        }
-//        return message;
-//    }
-
     // ✅ WebSocket 연결이 종료되면 사용자 정보 삭제
     public void removeSession(String sessionId) {
-        sessions.remove(sessionId);
+        stompSessionManager.removeSession(sessionId);
     }
 
     // ✅ WebSocket 세션 ID를 기반으로 사용자 조회
     public String getUsernameBySessionId(String sessionId) {
-        return sessions.get(sessionId);
+        return stompSessionManager.getUsernameFromSession(sessionId);
     }
 }

@@ -25,8 +25,8 @@ public class MybatisStompMessageReadStatusRepository implements StompMessageRead
     }
 
     @Override
-    public void markMessageAsRead(Long messageId, Long receiverId) {
-        stompMessageReadStatusMapper.markMessageAsRead(messageId, receiverId);
+    public void markMessageAsRead(List<Long> messageIdList, Long receiverId) {
+        stompMessageReadStatusMapper.markMessageAsRead(messageIdList, receiverId);
     }
 
 //    @Override

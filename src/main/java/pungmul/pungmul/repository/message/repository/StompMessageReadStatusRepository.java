@@ -1,6 +1,7 @@
 package pungmul.pungmul.repository.message.repository;
 
 import org.apache.ibatis.annotations.Param;
+import pungmul.pungmul.domain.message.StompMessageLog;
 import pungmul.pungmul.domain.message.domain.StompMessageReadStatus;
 
 import java.util.List;
@@ -12,8 +13,8 @@ public interface StompMessageReadStatusRepository {
     boolean isMessageRead(Long messageId, Long receiverId);
 
     // 메시지를 읽었을 때 읽음 상태 갱신
-    void markMessageAsRead(Long messageId, Long receiverId);
+    void markMessageAsRead(List<Long> messageIdList, Long receiverId);
 
     // 특정 사용자의 안 읽은 메시지 조회
-//    List<StompMessageReadStatus> findUnreadMessages(Long receiverId);
+//    List<StompMessageLog> findUnreadMessages(Long receiverId);
 }

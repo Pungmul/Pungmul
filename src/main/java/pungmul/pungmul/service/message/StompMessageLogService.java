@@ -8,6 +8,7 @@ import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.StompMessageLog;
 import pungmul.pungmul.repository.message.repository.StompMessageLogRepository;
 import pungmul.pungmul.repository.message.repository.StompMessageReadStatusRepository;
+import pungmul.pungmul.service.member.membermanagement.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
 public class StompMessageLogService {
     private final StompMessageLogRepository stompMessageLogRepository;
     private final StompMessageReadStatusRepository stompMessageReadStatusRepository;
+    private final UserService userService;
 
     /**
      * STOMP 메시지 로그 저장
@@ -50,7 +52,7 @@ public class StompMessageLogService {
     }
 
     @Transactional
-    public void logStompMessageAndRecipients(Long senderId, MessageDomainType domainType,
+    public StompMessageLog logStompMessageAndRecipients(Long senderId, MessageDomainType domainType,
                                              String businessIdentifier, String identifier,
                                              String stompDest, String content, List<Long> recipientUserIds) {
         try {
@@ -72,8 +74,10 @@ public class StompMessageLogService {
             }
 
             log.info("STOMP 메시지 저장 및 {}명의 수신자 등록", recipientUserIds.size());
+            return stompMessageLog;
         } catch (Exception e) {
             log.error("STOMP 메시지 저장 실패: {}", e.getMessage());
+            throw new RuntimeException("메세지 저장 실패", e);
         }
     }
 
@@ -115,5 +119,15 @@ public class StompMessageLogService {
 
     public List<StompMessageLog> findUnreadMessages(Long receiverId){
         return stompMessageLogRepository.findUnreadMessages(receiverId);
+    }
+
+    public List<StompMessageLog> getUnreadMessages(String username) {
+        log.info("call unreadMessages service");
+        Long receiverId = userService.getUserByEmail(username).getId();
+        log.info("receiverId: {}", receiverId);
+        List<StompMessageLog> unreadMessages = stompMessageLogRepository.findUnreadMessages(receiverId);
+        log.info("unreadMessages: {}", unreadMessages);
+
+        return unreadMessages;
     }
 }

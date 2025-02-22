@@ -10,7 +10,11 @@ public interface StompSubscriptionMapper {
 
     List<Long> findUsersByDestination(String destination);
 
-    void deleteBySessionId(String sessionId) ;
+    void deleteBySessionId(String sessionId);
 
     void deleteByUserId(Long userId);
+
+    void deleteSubscription(String sessionId, Long userId, String destination);
+
+    Long findUserIdByUsername(String username);
 }

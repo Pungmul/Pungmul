@@ -13,18 +13,18 @@ import pungmul.pungmul.config.security.TokenProvider;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.dto.lightning.GetNearLightningMeetingRequestDTO;
 import pungmul.pungmul.service.lightning.LightningMeetingManager;
+import pungmul.pungmul.service.message.StompSessionManager;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;
 
-import static pungmul.pungmul.config.security.FilterChannelInterceptor.sessions;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class LightningMeetingStompController {
     private final LightningMeetingManager lightningMeetingManager;
-    private final TokenProvider tokenProvider;
+    private final StompSessionManager stompSessionManager;
     /*
     url : ws://localhost:8080/ws
     sub dest : /sub/lightning-meeting/nearby/{username}
@@ -45,7 +45,6 @@ public class LightningMeetingStompController {
 //        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
 //        lightningMeetingManager.getNearLightningMeetings(getNearLightningMeetingRequestDTO, userDetails.getUsername());
 //    }
-
     @PreAuthorize("hasRole('USER')")
     @MessageMapping("/lightning-meeting/nearby")
     public void getNearLightningMeeting(
@@ -53,7 +52,7 @@ public class LightningMeetingStompController {
             SimpMessageHeaderAccessor accessor
     ) throws AccessDeniedException {
         String sessionId = accessor.getSessionId();
-        String username = sessions.get(sessionId);
+        String username = stompSessionManager.getUsernameFromSession(sessionId);
 
         if (username == null) {
             throw new AccessDeniedException("사용자 인증 실패: 세션 정보가 존재하지 않습니다.");
@@ -73,13 +72,13 @@ public class LightningMeetingStompController {
     @MessageMapping("/lightning-meeting/participants/{meetingId}")
     public void getLightningMeetingParticipants(
             @DestinationVariable Long meetingId,
+            SimpMessageHeaderAccessor accessor
 //            @Payload GetMeetingParticipantsRequestDTO getMeetingParticipantsRequestDTO,
-            @Header("Authorization") String authorizationToken
     ){
         log.info("call getLightningMeetingParticipants");
         log.info("meetingId : {}", meetingId);
-        String token = authorizationToken.replace("Bearer ", "");
-        UserDetailsImpl userDetails = tokenProvider.getUserDetailsFromToken(token);
+//        String token = authorizationToken.replace("Bearer ", "");
+//        UserDetailsImpl userDetails = tokenProvider.getUserDetailsFromToken(token);
 
         lightningMeetingManager.getLightningMeetingParticipants(meetingId);
     }

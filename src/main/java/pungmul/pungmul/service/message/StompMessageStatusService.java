@@ -3,8 +3,11 @@ package pungmul.pungmul.service.message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pungmul.pungmul.domain.message.StompMessageLog;
 import pungmul.pungmul.domain.message.domain.StompMessageReadStatus;
 import pungmul.pungmul.repository.message.repository.StompMessageReadStatusRepository;
+import pungmul.pungmul.service.member.membermanagement.UserService;
 
 import java.util.List;
 
@@ -13,16 +16,23 @@ import java.util.List;
 @Slf4j
 public class StompMessageStatusService {
     private final StompMessageReadStatusRepository stompMessageReadStatusRepository;
+    private final UserService userService;
 
     public boolean isMessageRead(Long messageId, Long receiverId){
         return stompMessageReadStatusRepository.isMessageRead(messageId, receiverId);
     }
 
-    public void markMessageAsRead(Long messageId, Long receiverId){
-        stompMessageReadStatusRepository.markMessageAsRead(messageId, receiverId);
+    @Transactional
+    public void markMessagesAsRead(List<Long> messageIdList, String receiverUsername) {
+        if (messageIdList == null || messageIdList.isEmpty()) {
+            throw new IllegalArgumentException("메시지 ID 목록이 비어 있습니다.");
+        }
+
+        Long receiverId = userService.getUserByEmail(receiverUsername).getId();
+        stompMessageReadStatusRepository.markMessageAsRead(messageIdList, receiverId);
     }
 
-//    public List<StompMessageReadStatus> findUnreadMessages(Long receiverId){
+//    public List<StompMessageLog> getUnreadMessages(Long receiverId){
 //        return stompMessageReadStatusRepository.findUnreadMessages(receiverId);
 //    }
 

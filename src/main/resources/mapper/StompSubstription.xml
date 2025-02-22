@@ -25,4 +25,17 @@
         DELETE FROM stomp_subscription WHERE user_id = #{userId}
     </delete>
 
+    <!-- 특정 구독을 취소 -->
+    <delete id="deleteSubscription" parameterType="map">
+        DELETE FROM stomp_subscription WHERE session_id = #{sessionId} AND user_id = #{userId} AND stomp_dest = #{destination}
+    </delete>
+
+    <!-- 사용자 이름을 기반으로 User 엔터티 조회 -->
+    <select id="findUserIdByUsername" parameterType="string" resultType="long">
+        SELECT id
+        FROM user
+        WHERE email = #{username}
+    </select>
+
 </mapper>
+

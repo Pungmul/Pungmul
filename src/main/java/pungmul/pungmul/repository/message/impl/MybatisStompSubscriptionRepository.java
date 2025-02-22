@@ -2,6 +2,7 @@ package pungmul.pungmul.repository.message.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.repository.message.mapper.StompSubscriptionMapper;
 import pungmul.pungmul.repository.message.repository.StompSubscriptionRepository;
 
@@ -38,5 +39,15 @@ public class MybatisStompSubscriptionRepository implements StompSubscriptionRepo
      */
     public void deleteByUserId(Long userId) {
         stompSubscriptionMapper.deleteByUserId(userId);
+    }
+
+    @Override
+    public void deleteSubscription(String sessionId, Long userId, String destination) {
+
+    }
+
+    @Override
+    public Long findUserIdByUsername(String username) {
+        return stompSubscriptionMapper.findUserIdByUsername(username);
     }
 }

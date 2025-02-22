@@ -15,7 +15,7 @@ public interface StompMessageReadStatusMapper {
     boolean isMessageRead(@Param("messageId") Long messageId, @Param("receiverId") Long receiverId);
 
     // 메시지를 읽었을 때 읽음 상태 갱신
-    void markMessageAsRead(@Param("messageId") Long messageId, @Param("receiverId") Long receiverId);
+    void markMessageAsRead(@Param("messageIdList") List<Long> messageIdList, @Param("receiverId") Long receiverId);
 
     // 특정 사용자의 안 읽은 메시지 조회
 //    List<StompMessageReadStatus> findUnreadMessages(@Param("receiverId") Long receiverId);
