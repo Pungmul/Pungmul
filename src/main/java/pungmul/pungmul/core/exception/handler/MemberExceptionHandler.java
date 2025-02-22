@@ -96,7 +96,7 @@ public class MemberExceptionHandler {
     public ResponseEntity<BaseResponse<String>> handleUsernameNotFoundException(UsernameNotFoundException ex){
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(BaseResponse.ofFail(MemberResponseCode.USERNAME_NOT_FOUND));
+                .body(BaseResponse.ofFail(MemberResponseCode.INVALID_USERNAME_OR_PASSWORD));
     }
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<BaseResponse<String>> handleBadCredentialsException(BadCredentialsException ex){
