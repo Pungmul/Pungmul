@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.message.mapper.StompMessageLogMapper">
+
+    <!-- ResultMap for StompMessageLog -->
+    <resultMap id="StompMessageLogResultMap" type="pungmul.pungmul.domain.message.StompMessageLog">
+        <id property="id" column="id" />
+        <result property="senderId" column="sender_id" />
+        <result property="domainType" column="domain" />
+        <result property="businessIdentifier" column="business_identifier" />
+        <result property="identifier" column="identifier" />
+        <result property="stompDest" column="stomp_dest" />
+        <result property="content" column="content" />
+        <result property="sentAt" column="sent_at" />
+    </resultMap>
+
+    <!-- Insert Stomp Message Log -->
+    <insert id="insertStompMessageLog" parameterType="pungmul.pungmul.domain.message.StompMessageLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO stomp_message_log (sender_id, domain, business_identifier, identifier, stomp_dest, content, sent_at)
+        VALUES (#{senderId}, #{domainType}, #{businessIdentifier}, #{identifier}, #{stompDest}, #{content}, NOW())
+    </insert>
+
+    <!-- Select by Domain, Business Identifier, and Identifier -->
+    <select id="findByDomainAndBusinessIdentifierAndIdentifier" parameterType="map" resultMap="StompMessageLogResultMap">
+        SELECT * FROM stomp_message_log
+        WHERE domain = #{domain}
+          AND business_identifier = #{businessIdentifier}
+          AND identifier = #{identifier}
+        ORDER BY sent_at DESC
+    </select>
+
+    <!-- Select by Domain and Business Identifier -->
+    <select id="findByDomainAndBusinessIdentifier" parameterType="map" resultMap="StompMessageLogResultMap">
+        SELECT * FROM stomp_message_log
+        WHERE domain = #{domainType}
+          AND business_identifier = #{businessIdentifier}
+        ORDER BY sent_at DESC
+    </select>
+
+    <!-- Select by Domain Type -->
+    <select id="findByDomainType" parameterType="pungmul.pungmul.domain.message.MessageDomainType" resultMap="StompMessageLogResultMap">
+        SELECT * FROM stomp_message_log
+        WHERE domain = #{domainType}
+        ORDER BY sent_at DESC
+    </select>
+
+    <!-- Select All -->
+    <select id="findAll" resultMap="StompMessageLogResultMap">
+        SELECT * FROM stomp_message_log
+        ORDER BY sent_at DESC
+    </select>
+
+    <!-- Delete by ID -->
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM stomp_message_log
+        WHERE id = #{logId}
+    </delete>
+
+    <!-- 특정 도메인 및 비즈니스 식별자에 해당하는 수신자 조회 -->
+    <select id="findRecipientsByDomainAndIdentifier" parameterType="map" resultType="long">
+        SELECT user_id
+        FROM message_recipient
+        WHERE domain = #{domain} AND business_identifier = #{businessIdentifier}
+    </select>
+
+    <select id="findUnreadMessages" parameterType="long" resultMap="StompMessageLogResultMap">
+        SELECT * FROM stomp_message_log m
+        WHERE EXISTS (
+            SELECT 1 FROM message_read_status r
+            WHERE r.message_id = m.id
+              AND r.receiver_id = #{receiverId}
+              AND r.is_read = FALSE
+        )
+        ORDER BY m.sent_at DESC
+    </select>
+
+
+</mapper>

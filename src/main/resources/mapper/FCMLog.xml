@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.message.mapper.FCMLogMapper">
+
+    <!-- ResultMap for FCMMessageLog -->
+    <resultMap id="FCMMessageLogResultMap" type="pungmul.pungmul.domain.message.FCMMessageLog">
+        <id property="id" column="id" />
+        <result property="receiverId" column="receiver_id" />
+        <result property="token" column="token" />
+        <result property="title" column="title" />
+        <result property="body" column="body" />
+        <result property="sentAt" column="sent_at" />
+        <result property="status" column="status" />
+        <result property="response" column="response" />
+        <result property="domain" column="domain" />
+    </resultMap>
+
+    <!-- Insert FCM Message Log -->
+    <insert id="insertFCMMessageLog" parameterType="pungmul.pungmul.domain.message.FCMMessageLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO fcm_message_log (receiver_id, token, title, body, sent_at, status, response, domain)
+        VALUES (#{receiverId}, #{token}, #{title}, #{body}, NOW(), #{status}, #{response}, #{domain})
+    </insert>
+
+    <!-- Select FCM Message Logs by User ID -->
+    <select id="getFCMLogsByReceiverId" parameterType="long" resultMap="FCMMessageLogResultMap">
+        SELECT * FROM fcm_message_log
+        WHERE receiver_id = #{receiverId}
+        ORDER BY sent_at DESC
+    </select>
+
+    <!-- Select All FCM Message Logs -->
+    <select id="getAllFCMLogs" resultMap="FCMMessageLogResultMap">
+        SELECT * FROM fcm_message_log
+        ORDER BY sent_at DESC
+    </select>
+
+    <!-- Delete FCM Message Log by ID -->
+    <delete id="deleteFCMLogById" parameterType="long">
+        DELETE FROM fcm_message_log
+        WHERE id = #{id}
+    </delete>
+
+</mapper>

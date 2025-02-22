@@ -82,4 +82,8 @@ public class AccountService {
     public Account getAccountByEmail(String username) {
         return accountRepository.getAccountByEmail(username).orElseThrow(NoSuchElementException::new);
     }
+
+    public Boolean checkDuplicateUsername(String username) {
+        return accountRepository.checkDuplicateUsername(username);
+    }
 }

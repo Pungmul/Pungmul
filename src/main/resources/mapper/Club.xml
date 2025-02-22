@@ -22,4 +22,10 @@
     <select id="getGroupName" resultType="String">
         SELECT name FROM club where id = #{clubId}
     </select>
+
+    <!-- 동아리 가져오기 -->
+    <select id="getClubInfo" resultType="pungmul.pungmul.domain.member.club.Club">
+        SELECT * from club where id = #{clubId}
+    </select>
+
 </mapper>

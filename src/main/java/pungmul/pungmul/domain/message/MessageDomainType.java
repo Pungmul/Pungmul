@@ -10,7 +10,8 @@ public enum MessageDomainType {
     USER("user"),
     SYSTEM("system"),
     NOTIFICATION("notification"),
-    LIGHTNING_MEETING("lightning-meeting");
+    LIGHTNING_MEETING("lightning-meeting"),
+    POST("post");
 
     private final String path;
 

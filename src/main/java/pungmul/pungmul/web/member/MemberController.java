@@ -3,6 +3,7 @@ package pungmul.pungmul.web.member;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -100,6 +101,16 @@ public class MemberController {
     }
 
     @PreAuthorize("hasRole('USER')")
+    @PatchMapping("/password")
+    public ResponseEntity<BaseResponse<Void>> updatePassword(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody UpdatePasswordRequestDTO updatePasswordRequestDTO
+    ){
+        memberManagementService.updatePassword(userDetails, updatePasswordRequestDTO);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
+    }
+
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("")
     public ResponseEntity<BaseResponse<GetMemberResponseDTO>> getMemberInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         GetMemberResponseDTO memberInfo = memberService.getMemberInfo(userDetails.getUsername());
@@ -114,6 +125,24 @@ public class MemberController {
             ){
         SearchUserResponseDTO searchUserResponseDTO = memberService.searchUsers(userDetails, keyword);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, searchUserResponseDTO));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/users/info")
+    public ResponseEntity<BaseResponse<SearchUserInfoResponseDTO>> searchUserInfo(
+        @RequestParam String username
+    ){
+        SearchUserInfoResponseDTO memberInfo = memberService.searchUserInfo(username);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, memberInfo));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/users/detail")
+    public ResponseEntity<BaseResponse<SearchUserInfoResponseDTO>> searchUserDetailInfo(
+            @RequestParam String username
+    ){
+        SearchUserInfoResponseDTO memberInfo = memberService.searchUserInfo(username);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, memberInfo));
     }
 
     @PreAuthorize("hasRole('USER')")
@@ -143,6 +172,14 @@ public class MemberController {
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, response));
     }
 
+    @GetMapping("/signup/check")
+    public ResponseEntity<BaseResponse<CheckDuplicateUsernameResponseDTO>> checkDuplicateUsername(
+            @RequestBody CheckDuplicateUsernameRequestDTO checkDuplicateUsernameRequestDTO){
+        CheckDuplicateUsernameResponseDTO checkDuplicateUsernameResponseDTO = memberManagementService.checkDuplicateUsername(checkDuplicateUsernameRequestDTO);
+
+        return ResponseEntity.ok(BaseResponse.ofSuccess(checkDuplicateUsernameResponseDTO));
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<BaseResponse<AuthenticationResponseDTO>> refreshAccessToken(@RequestHeader("refreshToken") String refreshToken) {
         AuthenticationResponseDTO response = loginService.refreshAccessToken(refreshToken);
@@ -157,8 +194,5 @@ public class MemberController {
         String adminInvitationCode = invitationCodeService.issueInvitationCode(adminInvitationCodeRequestDTO.getMaxUses());
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, adminInvitationCode));
     }
-
-
-
 
 }

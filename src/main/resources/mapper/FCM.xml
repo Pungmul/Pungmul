@@ -39,4 +39,12 @@
         SELECT * FROM fcm_token
         WHERE is_valid = TRUE
     </select>
+
+    <!-- Get User ID by FCM Token -->
+    <select id="getUserIdByFCMToken" parameterType="java.lang.String" resultType="java.lang.Long">
+        SELECT user_id
+        FROM fcm_token
+        WHERE token = #{token}
+        LIMIT 1
+    </select>
 </mapper>

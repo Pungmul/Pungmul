@@ -28,4 +28,6 @@ public interface AccountRepository {
     void updateAccount(Account account);
 
     void unlockAccount(Long id);
+
+    Boolean checkDuplicateUsername(String username);
 }

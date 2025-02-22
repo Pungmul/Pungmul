@@ -3,12 +3,14 @@ package pungmul.pungmul.web.message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
+import pungmul.pungmul.domain.message.FCMMessageLog;
 import pungmul.pungmul.dto.message.FCMTokenRequestDTO;
 import pungmul.pungmul.dto.message.UpdateFCMTokenDTO;
 import pungmul.pungmul.service.message.FCMService;
@@ -22,7 +24,7 @@ import java.util.List;
 public class FCMController {
     private final FCMService fcmService;
 
-    @PostMapping("/save-token")
+    @PostMapping("/save")
     public ResponseEntity<BaseResponse<Void>> saveFCMToken(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody FCMTokenRequestDTO fcmTokenRequestDTO) {
@@ -50,4 +52,21 @@ public class FCMController {
         List<String> validTokens = fcmService.getAllValidTokens();
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, validTokens));
     }
+
+    @GetMapping("/logs/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BaseResponse<List<FCMMessageLog>>> getAllLogs() {
+        List<FCMMessageLog> allFCMLogs = fcmService.getAllFCMLogs();
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, allFCMLogs));
+    }
+
+    @GetMapping("/logs")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BaseResponse<List<FCMMessageLog>>> getFCMLogsByUserId(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        List<FCMMessageLog> fcmLogsByUserId = fcmService.getFCMLogsByReceiverId(userDetails);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, fcmLogsByUserId));
+    }
+
 }

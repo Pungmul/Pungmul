@@ -23,4 +23,6 @@ public interface InstrumentStatusRepository {
     void updateInstrumentAbilityAndMajor(InstrumentStatus instrumentStatus);
 
     Instrument getMajorInstrumentByUserId(Long userId);
+
+    List<Instrument> getAllInstruments(Long id);
 }

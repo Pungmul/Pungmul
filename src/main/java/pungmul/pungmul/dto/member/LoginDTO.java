@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class LoginDTO {
 
-    @NotEmpty @Email
+    @NotEmpty @Email(message = "올바른 아이디 형식이 아닙니다.")
     private String loginId;
 
     @NotEmpty   @Size(min = 8, max = 20)

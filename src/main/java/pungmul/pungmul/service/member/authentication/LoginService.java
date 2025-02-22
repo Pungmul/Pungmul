@@ -164,6 +164,7 @@ public class LoginService {
     }
 
     public void isValidCredentials(LoginDTO loginDTO) {
+
         Account account = accountRepository.getAccountByUsernameForLogin(loginDTO.getLoginId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
