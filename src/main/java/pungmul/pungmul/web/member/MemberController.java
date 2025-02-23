@@ -174,9 +174,8 @@ public class MemberController {
 
     @GetMapping("/signup/check")
     public ResponseEntity<BaseResponse<CheckDuplicateUsernameResponseDTO>> checkDuplicateUsername(
-            @RequestBody CheckDuplicateUsernameRequestDTO checkDuplicateUsernameRequestDTO){
-        CheckDuplicateUsernameResponseDTO checkDuplicateUsernameResponseDTO = memberManagementService.checkDuplicateUsername(checkDuplicateUsernameRequestDTO);
-
+            @RequestParam String username){
+        CheckDuplicateUsernameResponseDTO checkDuplicateUsernameResponseDTO = memberManagementService.checkDuplicateUsername(username);
         return ResponseEntity.ok(BaseResponse.ofSuccess(checkDuplicateUsernameResponseDTO));
     }
 
