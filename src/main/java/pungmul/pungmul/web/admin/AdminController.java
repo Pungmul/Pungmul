@@ -13,12 +13,13 @@ import pungmul.pungmul.service.member.authorization.UserRoleService;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 public class AdminController {
     private final UserRoleService userRoleService;
 
     @PostMapping("/role")
     public SetRoleResponseDTO addRole(@RequestBody SetRoleRequestDTO setRoleRequestDTO) {
+        log.info("add role {}", setRoleRequestDTO);
         return userRoleService.addRoleToAccount(setRoleRequestDTO);
     }
 }

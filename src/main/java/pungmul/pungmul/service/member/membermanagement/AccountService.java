@@ -14,6 +14,7 @@ import pungmul.pungmul.dto.member.CreateMemberRequestDTO;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.AccountBanRepository;
 import pungmul.pungmul.repository.member.repository.InvitationCodeRepository;
+import pungmul.pungmul.repository.member.repository.UserRoleRepository;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
@@ -25,6 +26,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccountBanRepository accountBanRepository;
+    private final UserRoleRepository userRoleRepository;
 
     public Long createAccount(CreateMemberRequestDTO createMemberRequestDTO) {
         Account account = Account.builder()
@@ -33,6 +35,7 @@ public class AccountService {
                 .roles(Set.of(UserRole.ROLE_USER))
                 .build();
         accountRepository.saveAccount(account);
+        userRoleRepository.addRoleToAccount(account.getId(), UserRole.ROLE_USER.getRole());
         return account.getId();
     }
 
