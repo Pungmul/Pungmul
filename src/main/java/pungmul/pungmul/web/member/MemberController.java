@@ -198,9 +198,11 @@ public class MemberController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, adminInvitationCode));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/role")
     public SetRoleResponseDTO addRole(@RequestBody SetRoleRequestDTO setRoleRequestDTO) {
         log.info("add role {}", setRoleRequestDTO);
         return userRoleService.addRoleToAccount(setRoleRequestDTO);
     }
+
 }
