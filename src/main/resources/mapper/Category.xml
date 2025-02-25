@@ -8,14 +8,15 @@
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="parentId" column="parent_id"/>
+        <result property="description" column="description"/>
         <result property="createdAt" column="created_at"/>
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
     <!-- Insert Category -->
     <insert id="saveCategory" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO category (name, parent_id)
-        VALUES (#{name}, #{parentId})
+        INSERT INTO category (name, description, parent_id)
+        VALUES (#{name}, #{description}, #{parentId})
     </insert>
 
     <!-- Select Category By Id -->
@@ -49,6 +50,7 @@
     <update id="updateCategory">
         UPDATE category
         SET name = #{name},
+            description = #{description},
             parent_id = #{parentId},
             updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id}

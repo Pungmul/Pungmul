@@ -43,6 +43,7 @@ public class BoardService {
                             .id(category.getId())
                             .parentId(category.getParentId())
                             .name(category.getName())
+                            .description(category.getDescription())
                             .build()
                     );
         }

@@ -114,6 +114,7 @@ CREATE TABLE IF NOT EXISTS category (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         parent_id BIGINT DEFAULT NULL,
                         name VARCHAR(255) NOT NULL,
+                        description varchar(255),
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         FOREIGN KEY (parent_id) REFERENCES category(id) ON DELETE SET NULL
