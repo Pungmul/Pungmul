@@ -3,6 +3,8 @@ package pungmul.pungmul.service.post.post;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PostManagementService {
+    private static final Logger log = LoggerFactory.getLogger(PostManagementService.class);
     private final PostRepository postRepository;
     private final PostValidationService validationService;
     private final PostContentService contentService;
@@ -56,6 +59,7 @@ public class PostManagementService {
         Long userId = userService.getUserByEmail(userDetails.getUsername()).getId();
         validationService.validateUserForPosting(userId);
 
+        log.info("files : {}", files.isEmpty());
         Long postId = savePost(categoryId, userId);
         contentService.saveContent(userId, postId, postRequestDTO, files);
 

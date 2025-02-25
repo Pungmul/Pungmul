@@ -34,7 +34,7 @@ public class PostContentService {
         Content content = getContent(userId, postId, postRequestDTO);
         contentRepository.save(content);
 
-        if (!files.isEmpty()) {
+        if (files != null && !files.isEmpty() && files.stream().anyMatch(file -> !file.isEmpty())) {
             saveImages(content.getId(), files, userId);
         }
     }
