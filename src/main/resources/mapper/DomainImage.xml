@@ -52,7 +52,7 @@
     <!-- Delete Domain Images -->
     <delete id="deleteDomainImage" parameterType="list">
         DELETE FROM domain_image
-        WHERE id IN
+        WHERE domain_image.image_id IN
         <foreach collection="deleteImageIdList" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>

@@ -58,7 +58,9 @@ public class DomainImageService {
     }
 
     public void deleteDomainImage(List<Long> deleteImageIdList) {
-        if (deleteImageIdList != null && !deleteImageIdList.isEmpty())
+        if (deleteImageIdList != null && !deleteImageIdList.isEmpty()) {
+            log.info("call deleteDomainImage");
             domainImageRepository.deleteDomainImage(deleteImageIdList);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package pungmul.pungmul.repository.image.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import pungmul.pungmul.domain.file.DomainImage;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.dto.file.DomainImageDTO;
@@ -19,5 +20,5 @@ public interface DomainImageMapper {
 
     void activatePrimaryImage(DomainType domainType, Long domainId, Long imageId);
 
-    void deleteDomainImage(List<Long> deleteImageIdList);
+    void deleteDomainImage(@Param("deleteImageIdList")List<Long> deleteImageIdList);
 }
