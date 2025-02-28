@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pungmul.pungmul.domain.file.Image;
-import pungmul.pungmul.dto.post.CommentResponseDTO;
 
 import java.util.List;
 

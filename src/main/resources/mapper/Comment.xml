@@ -82,4 +82,11 @@
         FROM comment_likes
         WHERE comment_id = #{commentId}
     </select>
+
+    <update id="hideComment" parameterType="java.lang.Long">
+        UPDATE comment
+        SET deleted = true
+        WHERE id = #{commentId}
+    </update>
+
 </mapper>

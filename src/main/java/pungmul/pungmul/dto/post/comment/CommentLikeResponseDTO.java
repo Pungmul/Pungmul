@@ -1,4 +1,4 @@
-package pungmul.pungmul.dto.post;
+package pungmul.pungmul.dto.post.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

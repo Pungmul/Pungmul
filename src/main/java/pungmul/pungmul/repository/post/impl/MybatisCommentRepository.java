@@ -3,12 +3,13 @@ package pungmul.pungmul.repository.post.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import pungmul.pungmul.core.exception.custom.post.NoSuchCommentException;
 import pungmul.pungmul.domain.post.Comment;
-import pungmul.pungmul.dto.post.CommentResponseDTO;
 import pungmul.pungmul.repository.post.mapper.CommentMapper;
 import pungmul.pungmul.repository.post.repository.CommentRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -55,7 +56,13 @@ public class MybatisCommentRepository implements CommentRepository {
 
     @Override
     public Comment getCommentByCommentId(Long id) {
-        return commentMapper.getCommentById(id);
+        return commentMapper.getCommentById(id)
+                .orElseThrow(NoSuchCommentException::new);
+    }
+
+    @Override
+    public void hideComment(Long commentId) {
+        commentMapper.hideComment(commentId);
     }
 
     @Override

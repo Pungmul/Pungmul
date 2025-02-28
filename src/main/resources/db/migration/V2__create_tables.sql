@@ -427,6 +427,17 @@ CREATE TABLE IF NOT EXISTS stomp_subscription (
                                     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS report_comment (
+                                              id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                              comment_id BIGINT NOT NULL,
+                                              user_id BIGINT NOT NULL,
+                                              report_reason ENUM('INCITING_TROUBLE', 'PORNOGRAPHY', 'SPAM', 'DEFAMATION', 'OFF_TOPIC', 'OTHER') NOT NULL,
+                                              report_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                              UNIQUE KEY unique_report (comment_id, user_id),
+                                              FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+                                              FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
 
 
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="pungmul.pungmul.repository.post.mapper.ReportCommentMapper">
+    <!-- ResultMap 정의 -->
+    <resultMap id="ReportCommentResultMap" type="pungmul.pungmul.domain.post.CommentReport">
+        <id property="id" column="id" />
+        <result property="commentId" column="comment_id" />
+        <result property="userId" column="user_id" />
+        <result property="reportReason" column="report_reason" />
+        <result property="reportTime" column="report_time" />
+    </resultMap>
+
+    <!-- 신고 기록 저장 -->
+    <insert id="reportComment" parameterType="pungmul.pungmul.domain.post.CommentReport">
+        INSERT INTO report_comment (comment_id, user_id, report_reason)
+        VALUES (#{commentId}, #{userId}, #{reportReason})
+    </insert>
+
+    <!-- 특정 댓글에 대한 신고 개수 조회 -->
+    <select id="getReportCountByCommentId" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM report_comment WHERE comment_id = #{commentId}
+    </select>
+
+</mapper>
