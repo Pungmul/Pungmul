@@ -141,8 +141,8 @@ public class MemberManagementService {
                 .build();
     }
 
-    public CheckDuplicateUsernameResponseDTO checkDuplicateUsername(CheckDuplicateUsernameRequestDTO checkDuplicateUsernameRequestDTO) {
-        Boolean isRegistered = accountService.checkDuplicateUsername(checkDuplicateUsernameRequestDTO.getUsername());
+    public CheckDuplicateUsernameResponseDTO checkDuplicateUsername(String username) {
+        Boolean isRegistered = accountService.checkDuplicateUsername(username);
 
         return CheckDuplicateUsernameResponseDTO.builder()
                 .isRegistered(isRegistered)

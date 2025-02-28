@@ -1,6 +1,7 @@
 package pungmul.pungmul.service.post.post;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
@@ -22,6 +23,7 @@ import java.util.NoSuchElementException;
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostContentService {
@@ -34,7 +36,7 @@ public class PostContentService {
         Content content = getContent(userId, postId, postRequestDTO);
         contentRepository.save(content);
 
-        if (!files.isEmpty()) {
+        if (files != null && !files.isEmpty() && files.stream().anyMatch(file -> !file.isEmpty())) {
             saveImages(content.getId(), files, userId);
         }
     }
@@ -60,14 +62,17 @@ public class PostContentService {
     }
 
     public void updateContent(UserDetailsImpl userDetails, Long postId, UpdatePostRequestDTO updatePostRequestDTO, List<MultipartFile> files) throws IOException {
+        log.info("call updateContent");
         Long contentId = getContentByPostId(postId).getId();
         contentRepository.updateContentById(ContentUpdateDTO.builder()
                 .contentId(contentId)
                 .anonymity(updatePostRequestDTO.isAnonymity())
                 .text(updatePostRequestDTO.getText())
                 .build());
-        if (!updatePostRequestDTO.getDeleteImageIdList().isEmpty())
+        if (!updatePostRequestDTO.getDeleteImageIdList().isEmpty()) {
+            log.info("call updateImage");
             deleteContentImage(updatePostRequestDTO.getDeleteImageIdList());
+        }
 
         if (!files.isEmpty()) {
             Long userId = userService.getUserByEmail(userDetails.getUsername()).getId();
@@ -94,6 +99,7 @@ public class PostContentService {
     }
 
     private void deleteContentImage(List<Long> deleteImageIdList) {
+        log.info("deleteImageIdList : {}", deleteImageIdList);
         domainImageService.deleteDomainImage(deleteImageIdList);
     }
 

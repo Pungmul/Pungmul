@@ -114,6 +114,7 @@ CREATE TABLE IF NOT EXISTS category (
                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         parent_id BIGINT DEFAULT NULL,
                         name VARCHAR(255) NOT NULL,
+                        description varchar(255),
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         FOREIGN KEY (parent_id) REFERENCES category(id) ON DELETE SET NULL
@@ -424,6 +425,17 @@ CREATE TABLE IF NOT EXISTS stomp_subscription (
                                     stomp_dest VARCHAR(255) NOT NULL,
                                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                     FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS report_comment (
+                                              id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                              comment_id BIGINT NOT NULL,
+                                              user_id BIGINT NOT NULL,
+                                              report_reason ENUM('INCITING_TROUBLE', 'PORNOGRAPHY', 'SPAM', 'DEFAMATION', 'OFF_TOPIC', 'OTHER') NOT NULL,
+                                              report_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                              UNIQUE KEY unique_report (comment_id, user_id),
+                                              FOREIGN KEY (comment_id) REFERENCES comment(id) ON DELETE CASCADE,
+                                              FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
 

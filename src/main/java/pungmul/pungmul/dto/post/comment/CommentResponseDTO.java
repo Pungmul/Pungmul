@@ -1,12 +1,10 @@
-package pungmul.pungmul.dto.post;
+package pungmul.pungmul.dto.post.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pungmul.pungmul.domain.file.Image;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -18,6 +16,7 @@ public class CommentResponseDTO {
     private Long parentId;
     private String content;
     private String userName;
+    private Boolean deleted;
     private Image profile;
     private String createdAt;
 }

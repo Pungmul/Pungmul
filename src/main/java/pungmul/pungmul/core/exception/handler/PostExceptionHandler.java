@@ -48,4 +48,18 @@ public class PostExceptionHandler {
                 .body(BaseResponse.ofFail(PostResponseCode.HOT_POST_MODIFICATION));
     }
 
+    @ExceptionHandler(NoSuchCommentException.class)
+    public ResponseEntity<BaseResponse<String>> noSuchCommentException(NoSuchCommentException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(BaseResponse.ofFail(PostResponseCode.NO_SUCH_COMMENT));
+    }
+
+    @ExceptionHandler(NotValidCommentAccess.class)
+    public ResponseEntity<BaseResponse<String>> notValidCommentAccess(NotValidCommentAccess ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(BaseResponse.ofFail(PostResponseCode.NOT_VALID_COMMENT_ACCESS));
+    }
+
 }

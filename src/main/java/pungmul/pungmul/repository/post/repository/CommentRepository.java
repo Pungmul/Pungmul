@@ -1,9 +1,9 @@
 package pungmul.pungmul.repository.post.repository;
 
 import pungmul.pungmul.domain.post.Comment;
-import pungmul.pungmul.dto.post.CommentResponseDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentRepository {
     void save(Comment comment);
@@ -23,4 +23,6 @@ public interface CommentRepository {
     List<Comment> getCommentsByPostId(Long postId);
 
     Comment getCommentByCommentId(Long id);
+
+    void hideComment(Long commentId);
 }

@@ -16,9 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.domain.member.instrument.InstrumentStatus;
+import pungmul.pungmul.dto.admin.SetRoleRequestDTO;
+import pungmul.pungmul.dto.admin.SetRoleResponseDTO;
 import pungmul.pungmul.dto.member.*;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.service.member.authentication.LoginService;
+import pungmul.pungmul.service.member.authorization.UserRoleService;
 import pungmul.pungmul.service.member.membermanagement.*;
 
 import java.io.IOException;
@@ -39,6 +42,7 @@ public class MemberController {
     private final MemberService memberService;
     private final LoginService loginService;
     private final InvitationCodeService invitationCodeService;
+    private final UserRoleService userRoleService;
 
     /**
      * 사용자의 회원가입 요청을 처리하는 메서드
@@ -174,9 +178,8 @@ public class MemberController {
 
     @GetMapping("/signup/check")
     public ResponseEntity<BaseResponse<CheckDuplicateUsernameResponseDTO>> checkDuplicateUsername(
-            @RequestBody CheckDuplicateUsernameRequestDTO checkDuplicateUsernameRequestDTO){
-        CheckDuplicateUsernameResponseDTO checkDuplicateUsernameResponseDTO = memberManagementService.checkDuplicateUsername(checkDuplicateUsernameRequestDTO);
-
+            @RequestParam String username){
+        CheckDuplicateUsernameResponseDTO checkDuplicateUsernameResponseDTO = memberManagementService.checkDuplicateUsername(username);
         return ResponseEntity.ok(BaseResponse.ofSuccess(checkDuplicateUsernameResponseDTO));
     }
 
@@ -193,6 +196,13 @@ public class MemberController {
     ){
         String adminInvitationCode = invitationCodeService.issueInvitationCode(adminInvitationCodeRequestDTO.getMaxUses());
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, adminInvitationCode));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/role")
+    public SetRoleResponseDTO addRole(@RequestBody SetRoleRequestDTO setRoleRequestDTO) {
+        log.info("add role {}", setRoleRequestDTO);
+        return userRoleService.addRoleToAccount(setRoleRequestDTO);
     }
 
 }
