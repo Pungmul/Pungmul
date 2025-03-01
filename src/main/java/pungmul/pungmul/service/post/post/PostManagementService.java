@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
-import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
-import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
-import pungmul.pungmul.core.exception.custom.post.HotPostModificationException;
-import pungmul.pungmul.core.exception.custom.post.NotPostAuthorException;
+import pungmul.pungmul.core.exception.custom.post.*;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Content;
@@ -213,5 +210,16 @@ public class PostManagementService {
         Duration duration = Duration.between(postedTime, now);
 
         return (int) duration.toMinutes();
+    }
+
+    public void deletePost(UserDetailsImpl userDetails, Long postId) {
+        Long writerId = contentService.getContentByPostId(postId).getWriterId();
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        log.info("userId : {}, writerId : {}", user.getId(), writerId);
+
+        if (!user.getId().equals(writerId))
+            throw new NotValidPostAccessException();
+        postRepository.deletePost(postId);
     }
 }

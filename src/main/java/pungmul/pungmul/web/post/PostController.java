@@ -90,4 +90,14 @@ public class PostController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reportPostResponseDTO));
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<BaseResponse<Void>> deletePostByPostId(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long postId
+    ){
+        postManagementService.deletePost(userDetails, postId);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
+    }
+
 }

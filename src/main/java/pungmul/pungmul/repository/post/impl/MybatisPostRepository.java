@@ -39,6 +39,11 @@ public class MybatisPostRepository implements PostRepository {
     public void hidePost(Long postId) {
         postMapper.hidePost(postId);
     }
+
+    @Override
+    public void deletePost(Long postId) {
+        postMapper.hidePost(postId);
+    }
 //
 //    @Override
 //    public void updatePost(UpdatePostRequestDTO updatePostRequestDTO) {
