@@ -13,8 +13,10 @@ import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.board.BoardDetailsResponseDTO;
 import pungmul.pungmul.dto.post.board.CategoryDTO;
+import pungmul.pungmul.dto.post.board.GetHotPostsResponseDTO;
 import pungmul.pungmul.dto.post.post.SimplePostDTO;
 import pungmul.pungmul.service.post.board.BoardService;
+import pungmul.pungmul.service.post.post.PostManagementService;
 
 import java.util.List;
 
@@ -24,6 +26,7 @@ import java.util.List;
 @RequestMapping("/api/boards")
 public class BoardController {
     private final BoardService boardService;
+    private final PostManagementService postManagementService;
 
     /**
      * 최상위 카테고리(부모 카테고리가 없는 게시판) 목록을 가져오는 메서드입니다.
@@ -70,5 +73,12 @@ public class BoardController {
         PageInfo<SimplePostDTO> additionalPosts = boardService.getAdditionalPosts(categoryId, page, size, userDetails);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, additionalPosts));
+    }
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/hot")
+    public ResponseEntity<BaseResponse<GetHotPostsResponseDTO>> getHotPosts(
+    ){
+        GetHotPostsResponseDTO hotPosts = postManagementService.getHotPosts();
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK,hotPosts));
     }
 }

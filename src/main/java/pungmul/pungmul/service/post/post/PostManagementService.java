@@ -17,9 +17,11 @@ import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
 import pungmul.pungmul.dto.post.PostRequestDTO;
+import pungmul.pungmul.dto.post.board.GetHotPostsResponseDTO;
 import pungmul.pungmul.dto.post.post.*;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.repository.post.repository.CategoryRepository;
 import pungmul.pungmul.repository.post.repository.PostRepository;
 import pungmul.pungmul.service.member.membermanagement.UserService;
 import pungmul.pungmul.service.post.CommentService;
@@ -46,6 +48,7 @@ public class PostManagementService {
     private final AccountRepository accountRepository;
     private final UserService userService;
     private final CommentService commentService;
+    private final CategoryRepository categoryRepository;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
@@ -197,6 +200,22 @@ public class PostManagementService {
                 .build();
     }
 
+    public SimpleHotPostDTO getSimpleHotPostDTO(Post post) {
+        Content contentByPostId = contentService.getContentByPostId(post.getId());
+        return SimpleHotPostDTO.builder()
+                .postId(post.getId())
+                .title(contentByPostId.getTitle())
+                .content(contentByPostId.getText())
+                .author(getAuthorNameOrAnonymous(contentByPostId))
+                .timeSincePosted(getTimeSincePosted(post.getCreatedAt()))
+                .timeSincePostedText(timeSincePosted.getTimeSincePostedText(post.getCreatedAt()))
+                .viewCount(post.getViewCount())
+                .likedNum(post.getLikeNum())
+                .categoryId(post.getCategoryId())
+                .categoryName(categoryRepository.getCategoryById(post.getCategoryId()).getName())
+                .build();
+    }
+
     private String getAuthorNameOrAnonymous(Content content) {
         if (content.getAnonymity())
             return "Anonymous";
@@ -221,5 +240,16 @@ public class PostManagementService {
         if (!user.getId().equals(writerId))
             throw new NotValidPostAccessException();
         postRepository.deletePost(postId);
+    }
+
+    public GetHotPostsResponseDTO getHotPosts() {
+        List<Post> hotPosts = postRepository.getHotPosts(hotPostMinLikeNum);
+
+        return GetHotPostsResponseDTO.builder()
+                .hotPosts(
+                        hotPosts.stream().map(this::getSimpleHotPostDTO)
+                                .collect(Collectors.toList())
+                )
+                .build();
     }
 }
