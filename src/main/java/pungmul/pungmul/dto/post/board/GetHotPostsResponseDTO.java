@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pungmul.pungmul.dto.post.post.SimpleHotPostDTO;
-import pungmul.pungmul.dto.post.post.SimplePostDTO;
+import pungmul.pungmul.dto.post.post.SimplePostAndCategoryDTO;
 
 import java.util.List;
 
@@ -15,5 +14,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetHotPostsResponseDTO {
-    private List<SimpleHotPostDTO> hotPosts;
+    private PageInfo<SimplePostAndCategoryDTO> hotPosts;
 }

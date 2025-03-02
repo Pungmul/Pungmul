@@ -77,8 +77,10 @@ public class BoardController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/hot")
     public ResponseEntity<BaseResponse<GetHotPostsResponseDTO>> getHotPosts(
+            @RequestParam(defaultValue = "1", required = false) Integer page,
+            @RequestParam(defaultValue = "20", required = false) Integer size
     ){
-        GetHotPostsResponseDTO hotPosts = postManagementService.getHotPosts();
+        GetHotPostsResponseDTO hotPosts = postManagementService.getHotPosts(page, size);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK,hotPosts));
     }
 }

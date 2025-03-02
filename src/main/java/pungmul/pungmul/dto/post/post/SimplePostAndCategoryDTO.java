@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SimpleHotPostDTO {
+public class SimplePostAndCategoryDTO {
     private Long postId;
     private String title;
     private String content;

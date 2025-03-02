@@ -31,4 +31,6 @@ public interface PostMapper {
     void hidePost(Long postId);
 
     List<Post> getHotPosts(Integer thresholdLikes);
+
+    List<Post> getPostsByUserId(Long userId);
 }

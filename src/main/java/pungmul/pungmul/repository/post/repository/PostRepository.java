@@ -34,5 +34,7 @@ public interface PostRepository {
 
     List<Post> getHotPosts(Integer thresholdLikes);
 
+    List<Post> getPostsByUserId(Long userId);
+
 //    void updatePost(UpdatePostRequestDTO updatePostRequestDTO);
 }

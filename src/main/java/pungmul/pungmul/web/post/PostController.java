@@ -16,7 +16,6 @@ import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.PostLikeResponseDTO;
 import pungmul.pungmul.dto.post.PostRequestDTO;
-import pungmul.pungmul.dto.post.board.GetHotPostsResponseDTO;
 import pungmul.pungmul.dto.post.post.*;
 import pungmul.pungmul.service.post.post.PostInteractionService;
 import pungmul.pungmul.service.post.post.PostManagementService;
@@ -101,11 +100,15 @@ public class PostController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
     }
 
-//    @PreAuthorize("hasRole('USER')")
-//    @GetMapping("/hot")
-//    public ResponseEntity<BaseResponse<GetHotPostsResponseDTO>> getHotPosts(
-//    ){
-//        GetHotPostsResponseDTO hotPosts = postManagementService.getHotPosts();
-//        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK,hotPosts));
-//    }
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/user")
+    public ResponseEntity<BaseResponse<GetUserPostsResponseDTO>> getUserPosts(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(defaultValue = "1", required = false) Integer page,
+            @RequestParam(defaultValue = "20", required = false) Integer size
+    ){
+        log.info("size : {}", size);
+        GetUserPostsResponseDTO userPosts = postManagementService.getUserPosts(userDetails, page, size);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, userPosts));
+    }
 }

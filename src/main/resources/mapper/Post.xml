@@ -100,4 +100,14 @@
         ORDER BY p.like_num DESC
     </select>
 
+
+    <select id="getPostsByUserId" parameterType="java.lang.Long" resultMap="PostResultMap">
+        SELECT p.*
+        FROM post p
+                 INNER JOIN content c ON p.id = c.post_id
+        WHERE c.writer_id = #{userId}
+        ORDER BY p.created_at DESC
+    </select>
+
+
 </mapper>

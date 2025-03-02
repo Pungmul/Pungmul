@@ -1,5 +1,6 @@
 package pungmul.pungmul.service.post.post;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -95,7 +96,7 @@ public class PostManagementService {
             throw new HotPostModificationException("인기 게시물은 내용을 수정할 수 없습니다.");
     }
 
-    public PageInfo<SimplePostDTO> getPostsByCategory(Long categoryId, Integer page, Integer size, UserDetails userDetails) {
+    public PageInfo<SimplePostDTO>  getPostsByCategory(Long categoryId, Integer page, Integer size, UserDetails userDetails) {
         // 사용자 권한 확인
         boolean isAdmin = userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
@@ -200,9 +201,9 @@ public class PostManagementService {
                 .build();
     }
 
-    public SimpleHotPostDTO getSimpleHotPostDTO(Post post) {
+    public SimplePostAndCategoryDTO getSimplePostAndCategoryDTO(Post post) {
         Content contentByPostId = contentService.getContentByPostId(post.getId());
-        return SimpleHotPostDTO.builder()
+        return SimplePostAndCategoryDTO.builder()
                 .postId(post.getId())
                 .title(contentByPostId.getTitle())
                 .content(contentByPostId.getText())
@@ -242,14 +243,34 @@ public class PostManagementService {
         postRepository.deletePost(postId);
     }
 
-    public GetHotPostsResponseDTO getHotPosts() {
+    @Transactional
+    public GetHotPostsResponseDTO getHotPosts(Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+
         List<Post> hotPosts = postRepository.getHotPosts(hotPostMinLikeNum);
+        List<SimplePostAndCategoryDTO> hotPostsDTO = hotPosts.stream().map(this::getSimplePostAndCategoryDTO).toList();
+
+//        PageInfo<SimplePostAndCategoryDTO> hotPostsPageInfo = new PageInfo<>(hotPostsDTO);
 
         return GetHotPostsResponseDTO.builder()
-                .hotPosts(
-                        hotPosts.stream().map(this::getSimpleHotPostDTO)
-                                .collect(Collectors.toList())
-                )
+                .hotPosts(new PageInfo<>(hotPostsDTO))
+                .build();
+    }
+
+
+    public GetUserPostsResponseDTO getUserPosts(UserDetailsImpl userDetails, Integer page, Integer size) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        PageHelper.startPage(page, size);
+
+        List<Post> postsByUserId = postRepository.getPostsByUserId(user.getId());
+
+        List<SimplePostAndCategoryDTO> list = postsByUserId.stream().map(this::getSimplePostAndCategoryDTO).toList();
+
+        // 원본 PageInfo의 페이지 정보를 유지한 채 DTO 리스트를 적용
+
+        return GetUserPostsResponseDTO.builder()
+                .userPosts(new PageInfo<>(list))
                 .build();
     }
 }
