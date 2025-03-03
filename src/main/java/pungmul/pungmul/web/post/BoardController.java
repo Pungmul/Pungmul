@@ -51,34 +51,50 @@ public class BoardController {
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardList));
     }
 
-    @PreAuthorize("hasRole('USER')")
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long categoryId){
-        BoardDetailsResponseDTO boardDetailsResponseDTO = boardService.getInitialBoardData(categoryId, userDetails);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardDetailsResponseDTO));
-    }
+//    @PreAuthorize("hasRole('USER')")
+//    @GetMapping("/{categoryId}")
+//    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getInitialBoardData(
+//            @AuthenticationPrincipal UserDetailsImpl userDetails,
+//            @PathVariable Long categoryId){
+//        BoardDetailsResponseDTO boardDetailsResponseDTO = boardService.getInitialBoardData(categoryId, userDetails);
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, boardDetailsResponseDTO));
+//    }
+//
+//    @PreAuthorize("hasRole('USER')")
+//    @GetMapping("/{categoryId}/add")
+//    public ResponseEntity<BaseResponse<PageInfo<SimplePostDTO>>> getAdditionalPosts(
+//            @AuthenticationPrincipal UserDetailsImpl userDetails,
+//            @PathVariable Long categoryId,
+//            @RequestParam(defaultValue = "2") Integer page,
+//            @RequestParam(defaultValue = "10") Integer size
+//    )
+//    {
+//        PageInfo<SimplePostDTO> additionalPosts = boardService.getAdditionalPosts(categoryId, page, size, userDetails);
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(BaseResponse.ofSuccess(BaseResponseCode.OK, additionalPosts));
+//    }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/{categoryId}/add")
-    public ResponseEntity<BaseResponse<PageInfo<SimplePostDTO>>> getAdditionalPosts(
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<BaseResponse<BoardDetailsResponseDTO>> getBoardPosts(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long categoryId,
-            @RequestParam(defaultValue = "2") Integer page,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam(defaultValue = "1", required = false) Integer page,
+            @RequestParam(defaultValue = "10", required = false) Integer size
     )
     {
-        PageInfo<SimplePostDTO> additionalPosts = boardService.getAdditionalPosts(categoryId, page, size, userDetails);
+        BoardDetailsResponseDTO additionalPosts = boardService.getBoardPosts(categoryId, page, size, userDetails);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.OK, additionalPosts));
     }
+
+
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/hot")
     public ResponseEntity<BaseResponse<GetHotPostsResponseDTO>> getHotPosts(
             @RequestParam(defaultValue = "1", required = false) Integer page,
-            @RequestParam(defaultValue = "20", required = false) Integer size
+            @RequestParam(defaultValue = "10", required = false) Integer size
     ){
         GetHotPostsResponseDTO hotPosts = postManagementService.getHotPosts(page, size);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK,hotPosts));

@@ -1,5 +1,6 @@
 package pungmul.pungmul.service.post.board;
 
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,32 @@ public class BoardService {
         }
         return postManagementService.getPostsByCategory(categoryId, page, size, userDetails);
     }
+
+    public BoardDetailsResponseDTO getBoardPosts(Long categoryId, Integer page, Integer size, UserDetailsImpl userDetails) {
+        if (!categoryRepository.isCategoryExistById(categoryId))
+            throw new NoSuchElementException("해당 카테고리 없음");
+
+        BoardInfoDTO boardInfo = new BoardInfoDTO();
+        SimplePostDTO hotPost = new SimplePostDTO();
+
+        if (page == 1){
+             boardInfo = getBoardInfo(categoryId);
+             hotPost = postManagementService.getHotPost(categoryId);
+        }
+
+        PageInfo<SimplePostDTO> pageInfo = postManagementService.getPostsByCategory(categoryId, page, size, userDetails);
+        log.info("pageInfo 정보 - 현재 페이지: {}, 총 페이지 수: {}, 전체 데이터 개수: {}, isLastPage: {}",
+                pageInfo.getPageNum(), pageInfo.getPages(), pageInfo.getTotal(), pageInfo.isIsLastPage());
+
+//        // 더 이상 호출할 데이터가 없는 경우 예외 처리
+//        if (page > 1 && (pageInfo.getList().isEmpty() || pageInfo.isIsLastPage())) {
+//            log.warn("NoMoreDataException 발생 - page: {}, size: {}, total: {}", page, size, pageInfo.getTotal());
+//            throw new NoMoreDataException("더 이상 호출할 데이터가 없습니다.");
+//        }
+        return getBoardDetailsResponseDTO(boardInfo, hotPost, pageInfo);
+    }
+
+
 
     private BoardDetailsResponseDTO getBoardDetailsResponseDTO(
             BoardInfoDTO boardInfo,

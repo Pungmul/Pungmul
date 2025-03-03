@@ -3,10 +3,12 @@ package pungmul.pungmul.dto.post.post;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class SimplePostDTO {
     private Long postId;
     private String title;
