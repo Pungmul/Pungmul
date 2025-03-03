@@ -92,4 +92,22 @@
         WHERE id = #{postId};
     </update>
 
+    <select id="getHotPosts" resultMap="PostResultMap">
+        SELECT *
+        FROM post p
+        WHERE p.created_at >= NOW() - INTERVAL 1 DAY
+        AND p.like_num >= #{thresholdLikes}  <!-- 추천 개수 조건 추가 -->
+        ORDER BY p.like_num DESC
+    </select>
+
+
+    <select id="getPostsByUserId" parameterType="java.lang.Long" resultMap="PostResultMap">
+        SELECT p.*
+        FROM post p
+                 INNER JOIN content c ON p.id = c.post_id
+        WHERE c.writer_id = #{userId}
+        ORDER BY p.created_at DESC
+    </select>
+
+
 </mapper>

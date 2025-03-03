@@ -30,5 +30,11 @@ public interface PostRepository {
 
     void hidePost(Long postId);
 
+    void deletePost(Long postId);
+
+    List<Post> getHotPosts(Integer thresholdLikes);
+
+    List<Post> getPostsByUserId(Long userId);
+
 //    void updatePost(UpdatePostRequestDTO updatePostRequestDTO);
 }

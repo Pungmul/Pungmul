@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SimplePostDTO {
+public class SimplePostAndCategoryDTO {
     private Long postId;
     private String title;
     private String content;
@@ -17,5 +17,7 @@ public class SimplePostDTO {
     private Integer likedNum;
     private Integer timeSincePosted;
     private String timeSincePostedText;
+    private Long categoryId;
+    private String categoryName;
     private String author;
 }

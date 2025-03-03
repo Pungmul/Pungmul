@@ -90,4 +90,25 @@ public class PostController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, reportPostResponseDTO));
     }
 
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<BaseResponse<Void>> deletePostByPostId(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long postId
+    ){
+        postManagementService.deletePost(userDetails, postId);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/user")
+    public ResponseEntity<BaseResponse<GetUserPostsResponseDTO>> getUserPosts(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(defaultValue = "1", required = false) Integer page,
+            @RequestParam(defaultValue = "20", required = false) Integer size
+    ){
+        log.info("size : {}", size);
+        GetUserPostsResponseDTO userPosts = postManagementService.getUserPosts(userDetails, page, size);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, userPosts));
+    }
 }

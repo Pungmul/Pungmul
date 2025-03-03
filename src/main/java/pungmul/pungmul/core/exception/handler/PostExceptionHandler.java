@@ -62,4 +62,11 @@ public class PostExceptionHandler {
                 .body(BaseResponse.ofFail(PostResponseCode.NOT_VALID_COMMENT_ACCESS));
     }
 
+    @ExceptionHandler(NotValidPostAccessException.class)
+    public ResponseEntity<BaseResponse<String>> notValidPostAccessException(NotValidPostAccessException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(BaseResponse.ofFail(PostResponseCode.NOT_POST_AUTHOR));
+    }
+
 }

@@ -1,5 +1,6 @@
 package pungmul.pungmul.service.post.post;
 
+import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
@@ -11,18 +12,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pungmul.pungmul.config.security.UserDetailsImpl;
-import pungmul.pungmul.core.exception.custom.post.ExceededPostingNumException;
-import pungmul.pungmul.core.exception.custom.post.ForbiddenPostingUserException;
-import pungmul.pungmul.core.exception.custom.post.HotPostModificationException;
-import pungmul.pungmul.core.exception.custom.post.NotPostAuthorException;
+import pungmul.pungmul.core.exception.custom.post.*;
 import pungmul.pungmul.domain.member.account.Account;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.post.Content;
 import pungmul.pungmul.domain.post.Post;
 import pungmul.pungmul.dto.post.PostRequestDTO;
+import pungmul.pungmul.dto.post.board.GetHotPostsResponseDTO;
 import pungmul.pungmul.dto.post.post.*;
 import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
+import pungmul.pungmul.repository.post.repository.CategoryRepository;
 import pungmul.pungmul.repository.post.repository.PostRepository;
 import pungmul.pungmul.service.member.membermanagement.UserService;
 import pungmul.pungmul.service.post.CommentService;
@@ -49,6 +49,7 @@ public class PostManagementService {
     private final AccountRepository accountRepository;
     private final UserService userService;
     private final CommentService commentService;
+    private final CategoryRepository categoryRepository;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
@@ -95,7 +96,7 @@ public class PostManagementService {
             throw new HotPostModificationException("인기 게시물은 내용을 수정할 수 없습니다.");
     }
 
-    public PageInfo<SimplePostDTO> getPostsByCategory(Long categoryId, Integer page, Integer size, UserDetails userDetails) {
+    public PageInfo<SimplePostDTO>  getPostsByCategory(Long categoryId, Integer page, Integer size, UserDetails userDetails) {
         // 사용자 권한 확인
         boolean isAdmin = userDetails.getAuthorities().stream()
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
@@ -200,6 +201,22 @@ public class PostManagementService {
                 .build();
     }
 
+    public SimplePostAndCategoryDTO getSimplePostAndCategoryDTO(Post post) {
+        Content contentByPostId = contentService.getContentByPostId(post.getId());
+        return SimplePostAndCategoryDTO.builder()
+                .postId(post.getId())
+                .title(contentByPostId.getTitle())
+                .content(contentByPostId.getText())
+                .author(getAuthorNameOrAnonymous(contentByPostId))
+                .timeSincePosted(getTimeSincePosted(post.getCreatedAt()))
+                .timeSincePostedText(timeSincePosted.getTimeSincePostedText(post.getCreatedAt()))
+                .viewCount(post.getViewCount())
+                .likedNum(post.getLikeNum())
+                .categoryId(post.getCategoryId())
+                .categoryName(categoryRepository.getCategoryById(post.getCategoryId()).getName())
+                .build();
+    }
+
     private String getAuthorNameOrAnonymous(Content content) {
         if (content.getAnonymity())
             return "Anonymous";
@@ -213,5 +230,47 @@ public class PostManagementService {
         Duration duration = Duration.between(postedTime, now);
 
         return (int) duration.toMinutes();
+    }
+
+    public void deletePost(UserDetailsImpl userDetails, Long postId) {
+        Long writerId = contentService.getContentByPostId(postId).getWriterId();
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        log.info("userId : {}, writerId : {}", user.getId(), writerId);
+
+        if (!user.getId().equals(writerId))
+            throw new NotValidPostAccessException();
+        postRepository.deletePost(postId);
+    }
+
+    @Transactional
+    public GetHotPostsResponseDTO getHotPosts(Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+
+        List<Post> hotPosts = postRepository.getHotPosts(hotPostMinLikeNum);
+        List<SimplePostAndCategoryDTO> hotPostsDTO = hotPosts.stream().map(this::getSimplePostAndCategoryDTO).toList();
+
+//        PageInfo<SimplePostAndCategoryDTO> hotPostsPageInfo = new PageInfo<>(hotPostsDTO);
+
+        return GetHotPostsResponseDTO.builder()
+                .hotPosts(new PageInfo<>(hotPostsDTO))
+                .build();
+    }
+
+
+    public GetUserPostsResponseDTO getUserPosts(UserDetailsImpl userDetails, Integer page, Integer size) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        PageHelper.startPage(page, size);
+
+        List<Post> postsByUserId = postRepository.getPostsByUserId(user.getId());
+
+        List<SimplePostAndCategoryDTO> list = postsByUserId.stream().map(this::getSimplePostAndCategoryDTO).toList();
+
+        // 원본 PageInfo의 페이지 정보를 유지한 채 DTO 리스트를 적용
+
+        return GetUserPostsResponseDTO.builder()
+                .userPosts(new PageInfo<>(list))
+                .build();
     }
 }
