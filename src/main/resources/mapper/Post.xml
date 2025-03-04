@@ -119,5 +119,10 @@
         ORDER BY p.created_at DESC
     </select>
 
+    <select id="getHiddenPosts" resultMap="PostResultMap">
+        SELECT *
+        FROM post
+        WHERE hidden = true
+    </select>
 
 </mapper>

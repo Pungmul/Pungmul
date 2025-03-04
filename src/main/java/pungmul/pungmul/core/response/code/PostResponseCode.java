@@ -14,7 +14,8 @@ public enum PostResponseCode implements ResponseCode {
     NOT_POST_AUTHOR("POST_004", "게시물 작성자가 아닙니다."),
     HOT_POST_MODIFICATION("POST_005", "인기 게시물은 내용을 수정할 수 없습니다."),
     NO_SUCH_COMMENT("POST_006", "해당하는 댓글이 없습니다."),
-    NOT_VALID_COMMENT_ACCESS("POST_007", "해당 댓글 접근 권한이 없습니다.");
+    NOT_VALID_COMMENT_ACCESS("POST_007", "해당 댓글 접근 권한이 없습니다."),
+    NO_COMMENT_DATA("POST_008", "댓글이 존재하지 않습니다.");
 
     private final String code;
     private final String message;

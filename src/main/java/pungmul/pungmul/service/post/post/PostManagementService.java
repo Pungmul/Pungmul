@@ -274,4 +274,16 @@ public class PostManagementService {
                 .userPosts(new PageInfo<>(list))
                 .build();
     }
+
+    public GetHiddenPostResponseDTO getHiddenPosts(Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+        List<Post> hiddenPosts = postRepository.getHiddenPosts();
+
+        List<SimplePostAndCategoryDTO> hiddenPostsDTO = hiddenPosts.stream().map(this::getSimplePostAndCategoryDTO)
+                .toList();
+
+        return GetHiddenPostResponseDTO.builder()
+                .hiddenPosts(new PageInfo<>(hiddenPostsDTO))
+                .build();
+    }
 }

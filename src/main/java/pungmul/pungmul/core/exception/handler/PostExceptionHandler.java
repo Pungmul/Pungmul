@@ -69,4 +69,10 @@ public class PostExceptionHandler {
                 .body(BaseResponse.ofFail(PostResponseCode.NOT_POST_AUTHOR));
     }
 
+    @ExceptionHandler(NoCommentDataException.class)
+    public ResponseEntity<BaseResponse<String>> noCommentDataException(NoCommentDataException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(BaseResponse.ofFail(PostResponseCode.NO_COMMENT_DATA));
+    }
 }
