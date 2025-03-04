@@ -30,6 +30,13 @@
         WHERE post_id = #{postId}
     </select>
 
+    <!-- SELECT Comment By UserId -->
+    <select id="getCommentsByUserId" parameterType="java.lang.Long" resultMap="CommentResultMap">
+        SELECT *
+        FROM comment
+        WHERE user_id = #{userId}
+    </select>
+
 
 
     <!-- Insert Comment -->

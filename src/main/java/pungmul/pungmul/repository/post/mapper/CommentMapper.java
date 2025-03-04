@@ -27,4 +27,6 @@ public interface CommentMapper {
     List<Comment> getCommentsByPostId(Long postId);
 
     void hideComment(Long commentId);
+
+    List<Comment> getCommentsByUserId(Long userId);
 }

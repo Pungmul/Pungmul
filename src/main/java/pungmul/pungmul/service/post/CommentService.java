@@ -1,10 +1,13 @@
 package pungmul.pungmul.service.post;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.config.security.UserDetailsImpl;
+import pungmul.pungmul.core.exception.custom.post.NoCommentDataException;
 import pungmul.pungmul.core.exception.custom.post.NotValidCommentAccess;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.user.User;
@@ -155,5 +158,24 @@ public class CommentService {
             throw new NotValidCommentAccess();
         }
         commentRepository.hideComment(commentId);
+    }
+
+    public GetUserCommentsResponseDTO getCommentsByUser(UserDetailsImpl userDetails, Integer page, Integer size) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        PageHelper.startPage(page, size);
+        List<Comment> commentsByUserId = commentRepository.getCommentsByUserId(user.getId());
+
+        PageInfo<Comment> pageInfo = new PageInfo<>(commentsByUserId);
+
+
+        if (page > pageInfo.getPages())
+            // 요청한 페이지가 마지막 페이지를 넘는 경우 NoSuchElementException 던지기
+            throw new NoCommentDataException();
+
+
+        return GetUserCommentsResponseDTO.builder()
+                .comments(pageInfo)
+                .build();
     }
 }

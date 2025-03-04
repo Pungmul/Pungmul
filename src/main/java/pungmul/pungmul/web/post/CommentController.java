@@ -80,4 +80,15 @@ public class CommentController {
         commentService.deleteComment(userDetails, commentId);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK));
     }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/user")
+    public ResponseEntity<BaseResponse<GetUserCommentsResponseDTO>> getUserComments(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam(defaultValue = "1", required = false) Integer page,
+            @RequestParam(defaultValue = "20", required = false) Integer size
+    ){
+        GetUserCommentsResponseDTO commentsByUser = commentService.getCommentsByUser(userDetails, page, size);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, commentsByUser));
+    }
 }

@@ -107,6 +107,7 @@ public class PostManagementService {
         // 데이터베이스에서 모든 게시물 조회
         List<Post> postListByCategory = postRepository.getPostListByCategory(categoryId);
 
+
         // 관리자 권한이 없는 경우 hidden 또는 deleted가 true인 게시물 제외
         List<Post> filteredPosts = postListByCategory.stream()
                 .filter(post -> isAdmin || (!post.getHidden() && !post.getDeleted())) // 조건에 따라 필터링
@@ -271,6 +272,18 @@ public class PostManagementService {
 
         return GetUserPostsResponseDTO.builder()
                 .userPosts(new PageInfo<>(list))
+                .build();
+    }
+
+    public GetHiddenPostResponseDTO getHiddenPosts(Integer page, Integer size) {
+        PageHelper.startPage(page, size);
+        List<Post> hiddenPosts = postRepository.getHiddenPosts();
+
+        List<SimplePostAndCategoryDTO> hiddenPostsDTO = hiddenPosts.stream().map(this::getSimplePostAndCategoryDTO)
+                .toList();
+
+        return GetHiddenPostResponseDTO.builder()
+                .hiddenPosts(new PageInfo<>(hiddenPostsDTO))
                 .build();
     }
 }

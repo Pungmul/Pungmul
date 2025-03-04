@@ -1,6 +1,7 @@
 package pungmul.pungmul.repository.post.repository;
 
 import pungmul.pungmul.domain.post.Post;
+import pungmul.pungmul.dto.post.post.GetHiddenPostResponseDTO;
 import pungmul.pungmul.dto.post.post.UpdatePostRequestDTO;
 
 import java.util.List;
@@ -35,6 +36,8 @@ public interface PostRepository {
     List<Post> getHotPosts(Integer thresholdLikes);
 
     List<Post> getPostsByUserId(Long userId);
+
+    List<Post> getHiddenPosts();
 
 //    void updatePost(UpdatePostRequestDTO updatePostRequestDTO);
 }

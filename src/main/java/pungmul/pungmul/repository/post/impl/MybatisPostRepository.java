@@ -54,6 +54,11 @@ public class MybatisPostRepository implements PostRepository {
     public List<Post> getPostsByUserId(Long userId) {
         return postMapper.getPostsByUserId(userId);
     }
+
+    @Override
+    public List<Post> getHiddenPosts() {
+        return postMapper.getHiddenPosts();
+    }
 //
 //    @Override
 //    public void updatePost(UpdatePostRequestDTO updatePostRequestDTO) {

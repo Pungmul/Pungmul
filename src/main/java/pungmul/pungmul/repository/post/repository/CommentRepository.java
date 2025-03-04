@@ -25,4 +25,6 @@ public interface CommentRepository {
     Comment getCommentByCommentId(Long id);
 
     void hideComment(Long commentId);
+
+    List<Comment> getCommentsByUserId(Long userId);
 }

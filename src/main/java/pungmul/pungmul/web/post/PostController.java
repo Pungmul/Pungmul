@@ -111,4 +111,14 @@ public class PostController {
         GetUserPostsResponseDTO userPosts = postManagementService.getUserPosts(userDetails, page, size);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, userPosts));
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/hidden")
+    public ResponseEntity<BaseResponse<GetHiddenPostResponseDTO>> getHiddenPosts(
+            @RequestParam(defaultValue = "1", required = false) Integer page,
+            @RequestParam(defaultValue = "20", required = false) Integer size
+    ){
+        GetHiddenPostResponseDTO hiddenPosts = postManagementService.getHiddenPosts(page, size);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, hiddenPosts));
+    }
 }
