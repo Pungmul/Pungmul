@@ -66,6 +66,11 @@ public class MybatisCommentRepository implements CommentRepository {
     }
 
     @Override
+    public List<Comment> getCommentsByUserId(Long userId) {
+        return commentMapper.getCommentsByUserId(userId);
+    }
+
+    @Override
     public Integer getCommentLikesNum(Long commentId) {
         return commentMapper.getCommentLikesNum(commentId);
     }

@@ -16,11 +16,21 @@
         <result property="updatedAt" column="updated_at" />
     </resultMap>
 
+<!--    <select id="getPostListByCategory" resultType="pungmul.pungmul.domain.post.Post">-->
+<!--        SELECT * FROM post p-->
+<!--            INNER JOIN category c-->
+<!--                ON p.category_id = c.id-->
+<!--        WHERE c.id = #{categoryId}-->
+<!--    </select>-->
+
     <select id="getPostListByCategory" resultType="pungmul.pungmul.domain.post.Post">
         SELECT * FROM post p
-            INNER JOIN category c
-                ON p.category_id = c.id
+        INNER JOIN category c ON p.category_id = c.id
         WHERE c.id = #{categoryId}
+        <if test="isAdmin == false">
+            AND p.hidden = false
+            AND p.deleted = false
+        </if>
     </select>
 
     <!-- Select the Hot Post (Most liked post within the last 24 hours) -->

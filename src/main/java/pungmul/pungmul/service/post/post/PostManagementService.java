@@ -107,6 +107,7 @@ public class PostManagementService {
         // 데이터베이스에서 모든 게시물 조회
         List<Post> postListByCategory = postRepository.getPostListByCategory(categoryId);
 
+
         // 관리자 권한이 없는 경우 hidden 또는 deleted가 true인 게시물 제외
         List<Post> filteredPosts = postListByCategory.stream()
                 .filter(post -> isAdmin || (!post.getHidden() && !post.getDeleted())) // 조건에 따라 필터링

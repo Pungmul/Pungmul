@@ -1,5 +1,7 @@
 package pungmul.pungmul.service.post;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -155,5 +157,16 @@ public class CommentService {
             throw new NotValidCommentAccess();
         }
         commentRepository.hideComment(commentId);
+    }
+
+    public GetUserCommentsResponseDTO getCommentsByUser(UserDetailsImpl userDetails, Integer page, Integer size) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        PageHelper.startPage(page, size);
+        List<Comment> commentsByUserId = commentRepository.getCommentsByUserId(user.getId());
+
+        return GetUserCommentsResponseDTO.builder()
+                .comments(new PageInfo<>(commentsByUserId))
+                .build();
     }
 }
