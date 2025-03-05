@@ -23,13 +23,12 @@
 <!--        WHERE c.id = #{categoryId}-->
 <!--    </select>-->
 
-    <select id="getPostListByCategory" resultType="pungmul.pungmul.domain.post.Post">
+    <select id="getPostListByCategory" parameterType="map" resultType="pungmul.pungmul.domain.post.Post">
         SELECT * FROM post p
         INNER JOIN category c ON p.category_id = c.id
         WHERE c.id = #{categoryId}
         <if test="isAdmin == false">
             AND p.hidden = false
-            AND p.deleted = false
         </if>
     </select>
 

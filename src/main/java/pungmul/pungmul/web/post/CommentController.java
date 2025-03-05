@@ -1,6 +1,5 @@
 package pungmul.pungmul.web.post;
 
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,7 @@ import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.dto.post.comment.*;
-import pungmul.pungmul.service.post.CommentService;
+import pungmul.pungmul.service.post.comment.CommentService;
 
 @Slf4j
 @RestController

@@ -1,4 +1,4 @@
-package pungmul.pungmul.service.post;
+package pungmul.pungmul.service.post.comment;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -19,6 +19,7 @@ import pungmul.pungmul.repository.post.repository.CommentRepository;
 import pungmul.pungmul.repository.post.repository.ReportCommentRepository;
 import pungmul.pungmul.service.file.ImageService;
 import pungmul.pungmul.service.member.membermanagement.UserService;
+import pungmul.pungmul.service.post.TimeSincePosted;
 import pungmul.pungmul.service.post.post.PostNotificationTrigger;
 
 import java.util.List;

@@ -93,6 +93,7 @@ public class BoardController {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/hot")
     public ResponseEntity<BaseResponse<GetHotPostsResponseDTO>> getHotPosts(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam(defaultValue = "1", required = false) Integer page,
             @RequestParam(defaultValue = "10", required = false) Integer size
     ){
