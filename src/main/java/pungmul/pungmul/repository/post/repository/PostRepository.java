@@ -23,7 +23,7 @@ public interface PostRepository {
 
     void minusPostLikeNum(Long postId);
 
-    List<Post> getPostListByCategory(Long categoryId);
+    List<Post> getPostListByCategory(Long categoryId, Boolean isAdmin);
 
     Optional<Post> getHotPost(Long categoryId);
 

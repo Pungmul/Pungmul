@@ -1,9 +1,9 @@
 package pungmul.pungmul.service.post.post;
 
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,8 +24,9 @@ import pungmul.pungmul.repository.member.repository.AccountRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.post.repository.CategoryRepository;
 import pungmul.pungmul.repository.post.repository.PostRepository;
+import pungmul.pungmul.service.common.PageHelperService;
 import pungmul.pungmul.service.member.membermanagement.UserService;
-import pungmul.pungmul.service.post.CommentService;
+import pungmul.pungmul.service.post.comment.CommentService;
 import pungmul.pungmul.service.post.TimeSincePosted;
 
 import java.io.IOException;
@@ -38,18 +39,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostManagementService {
-    private static final Logger log = LoggerFactory.getLogger(PostManagementService.class);
     private final PostRepository postRepository;
     private final PostValidationService validationService;
     private final PostContentService contentService;
     private final UserRepository userRepository;
     private final PostLimitService postLimitService;
-    private final TimeSincePosted timeSincePosted;
     private final AccountRepository accountRepository;
     private final UserService userService;
-    private final CommentService commentService;
-    private final CategoryRepository categoryRepository;
+    private final PostBuilderService postBuilderService;
 
     @Value("${post.hot.minLikes}")
     private Integer hotPostMinLikeNum;
@@ -76,9 +75,9 @@ public class PostManagementService {
         Content content = contentService.getContentByPostId(postId);
         boolean postLikedByUser = isPostLikedByUser(userDetails, postId);
 
-        if (validationService.isNotAdminUser(userDetails) && isHiddenPost(post)) return getHiddenPostResponseDTO(post);
+        if (validationService.isNotAdminUser(userDetails) && isHiddenPost(post)) return postBuilderService.getHiddenPostResponseDTO(post);
 
-        return getPostResponseDTO(post, content, postLikedByUser);
+        return postBuilderService.getPostResponseDTO(post, content, postLikedByUser);
     }
 
     @Transactional
@@ -105,27 +104,23 @@ public class PostManagementService {
         PageHelper.startPage(page, size);
 
         // 데이터베이스에서 모든 게시물 조회
-        List<Post> postListByCategory = postRepository.getPostListByCategory(categoryId);
-
-
-        // 관리자 권한이 없는 경우 hidden 또는 deleted가 true인 게시물 제외
-        List<Post> filteredPosts = postListByCategory.stream()
-                .filter(post -> isAdmin || (!post.getHidden() && !post.getDeleted())) // 조건에 따라 필터링
-                .toList();
+        List<Post> postListByCategory = postRepository.getPostListByCategory(categoryId, isAdmin);
 
         // DTO 변환
-        List<SimplePostDTO> postDTOList = filteredPosts.stream()
-                .map(this::getSimplePostDTO)
+        List<SimplePostDTO> postDTOList = postListByCategory.stream()
+                .map(postBuilderService::getSimplePostDTO)
                 .collect(Collectors.toList());
 
         // 페이징 정보 생성 및 반환
-        return new PageInfo<>(postDTOList);
+        PageInfo<Post> originalPageInfo = new PageInfo<>(postListByCategory);
+
+        return PageHelperService.copyPageInfo(originalPageInfo, postDTOList);
     }
 
     public SimplePostDTO getHotPost(Long categoryId) {
         return postRepository.getHotPost(categoryId)
                 .filter(post -> post.getLikeNum() >= hotPostMinLikeNum)
-                .map(this::getSimplePostDTO)
+                .map(postBuilderService::getSimplePostDTO)
                 .orElse(null);
     }
 
@@ -137,43 +132,12 @@ public class PostManagementService {
     }
 
     private Long savePost(Long categoryId, Long userId) throws IOException {
-        Post post = getPost(categoryId);
+        Post post = postBuilderService.getPost(categoryId);
         postRepository.save(post);
 
         postLimitService.incrementPostCount(userId);
 
         return post.getId();
-    }
-
-    private static Post getPost(Long categoryId) {
-        return Post.builder()
-                .categoryId(categoryId)
-                .build();
-    }
-
-    private PostResponseDTO getHiddenPostResponseDTO(Post postById){
-        return PostResponseDTO.builder()
-                .postId(postById.getId())
-                .title("삭제된 게시글")
-                .content("")
-                .author("")
-                .build();
-    }
-
-    private PostResponseDTO getPostResponseDTO(Post postById, Content contentByPostId, Boolean postLikedByUser) {
-        return PostResponseDTO.builder()
-                .postId(postById.getId())
-                .title(contentByPostId.getTitle())
-                .content(contentByPostId.getText())
-                .author(getAuthorNameOrAnonymous(contentByPostId))
-                .imageList(contentByPostId.getImageList())
-                .commentList(commentService.getCommentsByPostId(postById.getId()))
-                .timeSincePosted(getTimeSincePosted(postById.getCreatedAt()))
-                .timeSincePostedText(timeSincePosted.getTimeSincePostedText(postById.getCreatedAt()))
-                .isLiked(postLikedByUser)
-                .likedNum(postById.getLikeNum())
-                .viewCount(postById.getViewCount())
-                .build();
     }
 
     private boolean isHiddenPost(Post post) {
@@ -185,52 +149,6 @@ public class PostManagementService {
                 .orElseThrow(NoSuchElementException::new);
         Long userId = userRepository.getUserIdByAccountId(account.getId());
         return postRepository.isPostLikedByUser(userId, postId);
-    }
-
-
-    public SimplePostDTO getSimplePostDTO(Post post) {
-        Content contentByPostId = contentService.getContentByPostId(post.getId());
-        return SimplePostDTO.builder()
-                .postId(post.getId())
-                .title(contentByPostId.getTitle())
-                .content(contentByPostId.getText())
-                .author(getAuthorNameOrAnonymous(contentByPostId))
-                .timeSincePosted(getTimeSincePosted(post.getCreatedAt()))
-                .timeSincePostedText(timeSincePosted.getTimeSincePostedText(post.getCreatedAt()))
-                .viewCount(post.getViewCount())
-                .likedNum(post.getLikeNum())
-                .build();
-    }
-
-    public SimplePostAndCategoryDTO getSimplePostAndCategoryDTO(Post post) {
-        Content contentByPostId = contentService.getContentByPostId(post.getId());
-        return SimplePostAndCategoryDTO.builder()
-                .postId(post.getId())
-                .title(contentByPostId.getTitle())
-                .content(contentByPostId.getText())
-                .author(getAuthorNameOrAnonymous(contentByPostId))
-                .timeSincePosted(getTimeSincePosted(post.getCreatedAt()))
-                .timeSincePostedText(timeSincePosted.getTimeSincePostedText(post.getCreatedAt()))
-                .viewCount(post.getViewCount())
-                .likedNum(post.getLikeNum())
-                .categoryId(post.getCategoryId())
-                .categoryName(categoryRepository.getCategoryById(post.getCategoryId()).getName())
-                .build();
-    }
-
-    private String getAuthorNameOrAnonymous(Content content) {
-        if (content.getAnonymity())
-            return "Anonymous";
-        Optional<User> userByUserId = userRepository.getUserByUserId(content.getWriterId());
-        return userByUserId.map(User::getName)
-                .orElse("Unknown User");
-    }
-
-    private Integer getTimeSincePosted(LocalDateTime postedTime) {
-        LocalDateTime now = LocalDateTime.now();
-        Duration duration = Duration.between(postedTime, now);
-
-        return (int) duration.toMinutes();
     }
 
     public void deletePost(UserDetailsImpl userDetails, Long postId) {
@@ -247,9 +165,9 @@ public class PostManagementService {
     @Transactional
     public GetHotPostsResponseDTO getHotPosts(Integer page, Integer size) {
         PageHelper.startPage(page, size);
+        List<Post> originHotPosts = postRepository.getHotPosts(hotPostMinLikeNum);
 
-        List<Post> hotPosts = postRepository.getHotPosts(hotPostMinLikeNum);
-        List<SimplePostAndCategoryDTO> hotPostsDTO = hotPosts.stream().map(this::getSimplePostAndCategoryDTO).toList();
+        List<SimplePostAndCategoryDTO> hotPostsDTO = originHotPosts.stream().map(postBuilderService::getSimplePostAndCategoryDTO).toList();
 
 //        PageInfo<SimplePostAndCategoryDTO> hotPostsPageInfo = new PageInfo<>(hotPostsDTO);
 
@@ -258,7 +176,6 @@ public class PostManagementService {
                 .build();
     }
 
-
     public GetUserPostsResponseDTO getUserPosts(UserDetailsImpl userDetails, Integer page, Integer size) {
         User user = userService.getUserByEmail(userDetails.getUsername());
 
@@ -266,7 +183,7 @@ public class PostManagementService {
 
         List<Post> postsByUserId = postRepository.getPostsByUserId(user.getId());
 
-        List<SimplePostAndCategoryDTO> list = postsByUserId.stream().map(this::getSimplePostAndCategoryDTO).toList();
+        List<SimplePostAndCategoryDTO> list = postsByUserId.stream().map(postBuilderService::getSimplePostAndCategoryDTO).toList();
 
         // 원본 PageInfo의 페이지 정보를 유지한 채 DTO 리스트를 적용
 
@@ -279,7 +196,7 @@ public class PostManagementService {
         PageHelper.startPage(page, size);
         List<Post> hiddenPosts = postRepository.getHiddenPosts();
 
-        List<SimplePostAndCategoryDTO> hiddenPostsDTO = hiddenPosts.stream().map(this::getSimplePostAndCategoryDTO)
+        List<SimplePostAndCategoryDTO> hiddenPostsDTO = hiddenPosts.stream().map(postBuilderService::getSimplePostAndCategoryDTO)
                 .toList();
 
         return GetHiddenPostResponseDTO.builder()

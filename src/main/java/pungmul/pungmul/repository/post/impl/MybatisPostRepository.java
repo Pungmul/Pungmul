@@ -18,8 +18,8 @@ public class MybatisPostRepository implements PostRepository {
     private final PostMapper postMapper;
 
     @Override
-    public List<Post> getPostListByCategory(Long categoryId) {
-        return postMapper.getPostListByCategory(categoryId);
+    public List<Post> getPostListByCategory(Long categoryId, Boolean isAdmin) {
+        return postMapper.getPostListByCategory(categoryId, isAdmin);
     }
 
     @Override
