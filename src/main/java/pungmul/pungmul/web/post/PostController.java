@@ -37,8 +37,13 @@ public class PostController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam Long categoryId,
             @Validated @RequestPart("postData") PostRequestDTO postRequestDTO,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files
+            @RequestPart(value = "files", required = false) List<MultipartFile> files,
+            @RequestHeader(value = "Content-Type") String contentType, // 특정 헤더 추출
+            @RequestHeader(value = "Authorization") String authorization // 특정 헤더 추출
     ) throws IOException, ExceededPostingNumException, ForbiddenPostingUserException {
+        log.info("Content-Type: {}", contentType);
+        log.info("Authorization: {}", authorization);
+
         CreatePostResponseDTO createPostResponseDTO = postManagementService.addPost(userDetails, categoryId, postRequestDTO, files);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createPostResponseDTO));
