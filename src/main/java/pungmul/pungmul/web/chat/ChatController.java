@@ -29,13 +29,27 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
     private final TokenProvider tokenProvider;
 
+//    // 개인 DM 방 생성
+//    @PreAuthorize("hasRole('USER')")
+//    @PostMapping("/personal")
+//    public ResponseEntity<BaseResponse<ChatRoomDTO>> createPersonalChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+//                                                                                    @RequestBody CreatePersonalChatRoomRequestDTO createPersonalChatRoomRequestDTO) {
+//        ChatRoomDTO chatRoomWithRoomCheck = chatService.createPersonalChatRoom(userDetails.getLoginId(), createPersonalChatRoomRequestDTO.getReceiverName());
+//        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
+//    }
+
     // 개인 DM 방 생성
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/personal")
-    public ResponseEntity<BaseResponse<ChatRoomDTO>> createPersonalChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                                    @RequestBody CreatePersonalChatRoomRequestDTO createPersonalChatRoomRequestDTO) {
-        ChatRoomDTO chatRoomWithRoomCheck = chatService.createPersonalChatRoom(userDetails.getLoginId(), createPersonalChatRoomRequestDTO.getReceiverName());
-        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
+    public ResponseEntity<BaseResponse<CreatePersonalChatRoomResponseDTO>> createPersonalChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                            @RequestBody CreatePersonalChatRoomRequestDTO createPersonalChatRoomRequestDTO) {
+        CreatePersonalChatRoomResponseDTO chatRoomWithRoomCheck = chatService.createPersonalChatRoom(userDetails.getLoginId(), createPersonalChatRoomRequestDTO.getReceiverName());
+
+        if (chatRoomWithRoomCheck.getIsCreated())
+            return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
+        else
+            return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, chatRoomWithRoomCheck));
+//        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
     }
 
     // 단체 채팅방 생성

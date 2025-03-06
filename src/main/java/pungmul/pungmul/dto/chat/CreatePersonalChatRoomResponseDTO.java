@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreatePersonalChatRoomResponseDTO {
-    private String senderName;
-    private String receiverName;
+    private Boolean isCreated;
     private String roomUUID;
 }

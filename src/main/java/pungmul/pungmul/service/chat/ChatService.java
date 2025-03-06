@@ -55,20 +55,27 @@ public class ChatService {
 //    }
 
     @Transactional
-    public ChatRoomDTO createPersonalChatRoom(String senderName, String receiverName) {
+    public CreatePersonalChatRoomResponseDTO createPersonalChatRoom(String senderName, String receiverName) {
         // 1. 기존 채팅방 조회
         Optional<ChatRoom> existingChatRoom = chatRoomRepository.findChatRoomByUsers(senderName, receiverName);
 
         // 2. 기존 채팅방이 존재하면 UUID 반환
         if (existingChatRoom.isPresent()) {
-            return buildChatRoomResponseDTO(existingChatRoom.get().getRoomUUID());
+//            return buildChatRoomResponseDTO(existingChatRoom.get().getRoomUUID());
+            return CreatePersonalChatRoomResponseDTO.builder()
+                    .isCreated(false)
+                    .roomUUID(existingChatRoom.get().getRoomUUID())
+                    .build();
         }
 
         // 3. 새 채팅방 생성 및 멤버 추가
         String newChatRoomUUID = createNewPersonalChatRoom(senderName, receiverName);
 
         // 4. 생성된 채팅방 정보 반환
-        return buildChatRoomResponseDTO(newChatRoomUUID);
+        return CreatePersonalChatRoomResponseDTO.builder()
+                .isCreated(true)
+                .roomUUID(newChatRoomUUID)
+                .build();
     }
 
     @Transactional
