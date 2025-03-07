@@ -21,5 +21,5 @@ public class ChatRoom {
     private String roomName;             // 단체 채팅방 이름 (단체 채팅일 경우)
     private String profileImageUrl;      // 단체 채팅방 이미지 (단체 채팅일 경우)
     private LocalDateTime createdAt;     // 방 생성 시간
-    private Integer unreadCount;
+//    private Integer unreadCount;
 }

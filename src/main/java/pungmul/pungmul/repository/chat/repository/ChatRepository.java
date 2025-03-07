@@ -18,5 +18,5 @@ public interface ChatRepository {
     List<ChatMessage> getMessagesByChatRoom(@Param("chatRoomUUID") String chatRoomUUID,
                                             @Param("limit") int limit,
                                             @Param("offset") int offset);
-//    ChatMessage getLastMessageByRoomUUID(String chatRoomUUID);
+    //    ChatMessage getLastMessageByRoomUUID(String chatRoomUUID);
 }
