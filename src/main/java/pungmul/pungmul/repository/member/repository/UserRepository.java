@@ -12,7 +12,7 @@ public interface UserRepository {
 
     public Optional<User> getUserByAccountId(Long accountId);
 
-    public Optional<User> getUserByEmail(String email);
+    User getUserByEmail(String email);
 
     public Long getUserIdByAccountId(Long accountId);
 

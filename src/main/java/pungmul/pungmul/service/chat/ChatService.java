@@ -55,14 +55,14 @@ public class ChatService {
 //    }
 
     @Transactional
-    public CreatePersonalChatRoomResponseDTO createPersonalChatRoom(String senderName, String receiverName) {
+    public CreateChatRoomResponseDTO createPersonalChatRoom(String senderName, String receiverName) {
         // 1. 기존 채팅방 조회
         Optional<ChatRoom> existingChatRoom = chatRoomRepository.findChatRoomByUsers(senderName, receiverName);
 
         // 2. 기존 채팅방이 존재하면 UUID 반환
         if (existingChatRoom.isPresent()) {
 //            return buildChatRoomResponseDTO(existingChatRoom.get().getRoomUUID());
-            return CreatePersonalChatRoomResponseDTO.builder()
+            return CreateChatRoomResponseDTO.builder()
                     .isCreated(false)
                     .roomUUID(existingChatRoom.get().getRoomUUID())
                     .build();
@@ -72,17 +72,21 @@ public class ChatService {
         String newChatRoomUUID = createNewPersonalChatRoom(senderName, receiverName);
 
         // 4. 생성된 채팅방 정보 반환
-        return CreatePersonalChatRoomResponseDTO.builder()
+        return CreateChatRoomResponseDTO.builder()
                 .isCreated(true)
                 .roomUUID(newChatRoomUUID)
                 .build();
     }
 
     @Transactional
-    public ChatRoomDTO createMultiChatRoom(String senderName, List<String> receiverNameList){
+    public CreateChatRoomResponseDTO createMultiChatRoom(String senderName, List<String> receiverNameList){
         String newChatRoomUUID = createNewMultiChatRoom(senderName, receiverNameList);
 
-        return buildChatRoomResponseDTO(newChatRoomUUID);
+        return CreateChatRoomResponseDTO.builder()
+                .isCreated(true)
+                .roomUUID(newChatRoomUUID)
+                .build();
+//        return buildChatRoomResponseDTO(newChatRoomUUID);
     }
 
     private String createNewPersonalChatRoom(String senderName, String receiverName) {

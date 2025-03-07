@@ -46,9 +46,19 @@ public class MemberExceptionHandler {
 
     @ExceptionHandler(NoSuchUsernameException.class)
     public ResponseEntity<BaseResponse<String>> handleNoSuchUsernameException(NoSuchUsernameException ex) {
+        String errorMessage;
+
+        // 예외가 username을 포함하고 있는 경우 (인자 있는 예외)
+        if (ex.getMessage() != null && ex.getMessage().contains("not found")) {
+            errorMessage = "No user found with the username: " + ex.getUsername();
+        } else {
+            // 예외 메시지가 기본 메시지일 경우 (인자 없는 예외)
+            errorMessage = "User not found";
+        }
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(BaseResponse.ofFail(MemberResponseCode.NOTFOUND_USERNAME));
+                .body(BaseResponse.ofFail(MemberResponseCode.NOTFOUND_USERNAME, errorMessage));
     }
 
     @ExceptionHandler(AccountWithdrawnException.class)

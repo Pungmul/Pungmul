@@ -18,12 +18,10 @@ import pungmul.pungmul.domain.chat.ChatMessage;
 import pungmul.pungmul.dto.chat.*;
 import pungmul.pungmul.service.chat.ChatService;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/chat")
+@RequestMapping("/api/chat")
 public class ChatController {
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -41,9 +39,9 @@ public class ChatController {
     // 개인 DM 방 생성
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/personal")
-    public ResponseEntity<BaseResponse<CreatePersonalChatRoomResponseDTO>> createPersonalChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                            @RequestBody CreatePersonalChatRoomRequestDTO createPersonalChatRoomRequestDTO) {
-        CreatePersonalChatRoomResponseDTO chatRoomWithRoomCheck = chatService.createPersonalChatRoom(userDetails.getLoginId(), createPersonalChatRoomRequestDTO.getReceiverName());
+    public ResponseEntity<BaseResponse<CreateChatRoomResponseDTO>> createPersonalChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                                          @RequestBody CreatePersonalChatRoomRequestDTO createPersonalChatRoomRequestDTO) {
+        CreateChatRoomResponseDTO chatRoomWithRoomCheck = chatService.createPersonalChatRoom(userDetails.getLoginId(), createPersonalChatRoomRequestDTO.getReceiverName());
 
         if (chatRoomWithRoomCheck.getIsCreated())
             return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
@@ -55,9 +53,9 @@ public class ChatController {
     // 단체 채팅방 생성
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/multi")
-    public ResponseEntity<BaseResponse<ChatRoomDTO>> createMultiChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<BaseResponse<CreateChatRoomResponseDTO>> createMultiChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                                  @RequestBody CreateMultiChatRoomRequestDTO createMultiChatRoomRequestDTO) {
-        ChatRoomDTO createMultiChatRoomResponseDTO = chatService.createMultiChatRoom(userDetails.getLoginId(), createMultiChatRoomRequestDTO.getReceiverNameList());
+        CreateChatRoomResponseDTO createMultiChatRoomResponseDTO = chatService.createMultiChatRoom(userDetails.getLoginId(), createMultiChatRoomRequestDTO.getReceiverNameList());
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createMultiChatRoomResponseDTO));
     }
 

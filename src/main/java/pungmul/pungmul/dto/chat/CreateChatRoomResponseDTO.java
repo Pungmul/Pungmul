@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePersonalChatRoomResponseDTO {
+public class CreateChatRoomResponseDTO {
     private Boolean isCreated;
     private String roomUUID;
 }

@@ -54,17 +54,15 @@ public class MemberService {
     }
 
     public GetMemberResponseDTO getMemberInfo(String username) {
-        User user = userRepository.getUserByEmail(username)
-                .orElseThrow(NoSuchElementException::new);
-        List<InstrumentStatus> instrumentStatusList = instrumentStatusRepository.getAllInstrumentStatusByUserId(userRepository.getUserByEmail(username).map(User::getId).orElseThrow(NoSuchElementException::new))
+        User user = userRepository.getUserByEmail(username);
+        List<InstrumentStatus> instrumentStatusList = instrumentStatusRepository.getAllInstrumentStatusByUserId(userRepository.getUserByEmail(username).getId())
                 .orElse(Collections.emptyList());
 
         return getGetMemberResponseDTO(username, user, instrumentStatusList);
     }
 
     public SearchUserInfoResponseDTO searchUserInfo(String username) {
-        User user = userRepository.getUserByEmail(username)
-                .orElseThrow(NoSuchElementException::new);
+        User user = userRepository.getUserByEmail(username);
         List<Instrument> instrumentList = instrumentStatusRepository.getAllInstruments(user.getId());
 
         return getSearchUserInfoResponseDTO(user, instrumentList);
