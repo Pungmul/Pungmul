@@ -151,7 +151,7 @@ public class ChatService {
         ChatRoomDTO.ChatRoomDTOBuilder builder = ChatRoomDTO.builder()
                 .chatRoomUUID(chatRoomUUID)
                 .isGroup(chatRoom.isGroup())
-                .lastMessageTime(lastMessage != null ? lastMessage.getTimestamp() : null)
+                .lastMessageTime(lastMessage != null ? lastMessage.getCreatedAt() : null)
                 .lastMessageContent(lastMessage != null ? lastMessage.getContent() : null)
                 .unreadCount(null)  // unreadCount 로직 구현 후 추가
 //                .unreadCount(chatRoom.getUnreadCount() != null ? chatRoom.getUnreadCount() : 0)
@@ -261,7 +261,7 @@ public class ChatService {
     private ChatMessage getChatMessage(String senderName, String chatRoomUUID, ChatMessageRequestDTO chatMessageRequestDTO) {
         return ChatMessage.builder()
                 .senderUsername(senderName)
-                .receiverUsername(chatMessageRequestDTO.getReceiverUsername())
+//                .receiverUsername(chatMessageRequestDTO.getReceiverUsername())
                 .content(chatMessageRequestDTO.getContent())
                 .chatType(chatMessageRequestDTO.getChatType())
                 .imageUrl(chatMessageRequestDTO.getImageUrl())
@@ -310,7 +310,7 @@ public class ChatService {
         int offset = (page - 1) * size; // 역순으로 로드
         List<ChatMessage> messages = chatRepository.getMessagesByChatRoom(chatRoomUUID, size, offset);
         List<ChatMessage> chatMessageList = messages.stream()
-                .sorted(Comparator.comparing(ChatMessage::getTimestamp)) // 시간 순서로 정렬
+                .sorted(Comparator.comparing(ChatMessage::getCreatedAt)) // 시간 순서로 정렬
                 .toList();
 
         return GetMessagesByChatRoomResponseDTO.builder()

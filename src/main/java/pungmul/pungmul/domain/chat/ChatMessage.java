@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 public class ChatMessage {
     private Long id;
     private String senderUsername;  // userId 대신 username으로 변경
-    private String receiverUsername;  // userId 대신 username으로 변경
+//    private String receiverUsername;  // userId 대신 username으로 변경
     private String content;
     private ChatType chatType;
     private String imageUrl;
     private String chatRoomUUID;
-    private LocalDateTime timestamp;
+    private LocalDateTime createdAt;
 }

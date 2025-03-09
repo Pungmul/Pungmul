@@ -8,18 +8,18 @@
     <resultMap id="ChatMessageResultMap" type="pungmul.pungmul.domain.chat.ChatMessage">
         <id property="id" column="id" />
         <result property="senderUsername" column="sender_username" />
-        <result property="receiverUsername" column="receiver_username" />
+<!--        <result property="receiverUsername" column="receiver_username" />-->
         <result property="content" column="content" />
         <result property="chatRoomUUID" column="chat_room_uuid" />
         <result property="chatType" column="chat_type" />
         <result property="imageUrl" column="image_url" />
-        <result property="timestamp" column="timestamp" />
+        <result property="createdAt" column="created_at" />
     </resultMap>
 
     <!-- Save ChatMessage -->
     <insert id="save" parameterType="pungmul.pungmul.domain.chat.ChatMessage" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO chat_messages (sender_username, receiver_username, content, chat_room_uuid, chat_type, image_url)
-        VALUES (#{senderUsername}, #{receiverUsername}, #{content}, #{chatRoomUUID}, #{chatType}, #{imageUrl})
+        INSERT INTO chat_messages (sender_username, content, chat_room_uuid, chat_type, image_url)
+        VALUES (#{senderUsername}, #{content}, #{chatRoomUUID}, #{chatType}, #{imageUrl})
     </insert>
 
     <!-- Find ChatMessage by ChatRoom ID -->
@@ -27,16 +27,16 @@
         SELECT *
         FROM chat_messages
         WHERE chat_room_uuid = #{chatRoomId}
-        ORDER BY timestamp ASC
+        ORDER BY created_at ASC
     </select>
 
-    <!-- Find ChatMessages by Sender or Recipient -->
-    <select id="findBySenderOrRecipient" parameterType="string" resultMap="ChatMessageResultMap">
-        SELECT *
-        FROM chat_messages
-        WHERE sender_username = #{userId} OR receiver_username = #{userId}
-        ORDER BY timestamp ASC
-    </select>
+<!--    &lt;!&ndash; Find ChatMessages by Sender or Recipient &ndash;&gt;-->
+<!--    <select id="findBySenderOrRecipient" parameterType="string" resultMap="ChatMessageResultMap">-->
+<!--        SELECT *-->
+<!--        FROM chat_messages-->
+<!--        WHERE sender_username = #{userId} OR receiver_username = #{userId}-->
+<!--        ORDER BY timestamp ASC-->
+<!--    </select>-->
 
     <!-- Find ChatMessage by ID -->
     <select id="selectChatMessageById" parameterType="long" resultMap="ChatMessageResultMap">
@@ -50,7 +50,7 @@
         SELECT *
         FROM chat_messages
         WHERE chat_room_uuid = #{chatRoomUUID}
-        ORDER BY timestamp DESC
+        ORDER BY created_at DESC
         LIMIT 1
     </select>
 
@@ -58,7 +58,7 @@
         SELECT *
         FROM chat_messages
         WHERE chat_room_uuid = #{chatRoomUUID}
-        ORDER BY timestamp DESC
+        ORDER BY created_at DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 

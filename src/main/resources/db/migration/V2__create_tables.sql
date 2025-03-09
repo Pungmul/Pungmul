@@ -203,11 +203,9 @@ CREATE TABLE IF NOT EXISTS chat_room_members (
 CREATE TABLE IF NOT EXISTS chat_messages (
                                 id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                 sender_username VARCHAR(255) NOT NULL,
-                                receiver_username VARCHAR(255) NOT NULL,
                                 content TEXT NOT NULL,
-                                is_read BOOLEAN DEFAULT FALSE,
                                 deleted_at TIMESTAMP NULL,
-                                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                 chat_room_uuid VARCHAR(36) NOT NULL ,
                                 chat_type ENUM('CHAT','JOIN','LEAVE','IMAGE'),
                                 image_url VARCHAR(255),
