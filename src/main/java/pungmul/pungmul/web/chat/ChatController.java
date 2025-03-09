@@ -15,6 +15,7 @@ import pungmul.pungmul.config.security.UserDetailsImpl;
 import pungmul.pungmul.core.response.BaseResponse;
 import pungmul.pungmul.core.response.BaseResponseCode;
 import pungmul.pungmul.domain.chat.ChatMessage;
+import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.dto.chat.*;
 import pungmul.pungmul.service.chat.ChatService;
 
@@ -70,14 +71,28 @@ public class ChatController {
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, chatRoomList));
     }
 
-    @GetMapping("/{chatRoomUUID}")
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/{chatRoomUUID}/message")
     public ResponseEntity<BaseResponse<GetMessagesByChatRoomResponseDTO>> getMessagesByChatRoom(
             @PathVariable String chatRoomUUID,
-            @RequestParam(defaultValue = "1", required = false) int page,
+            @RequestParam(defaultValue = "2", required = false) int page,
             @RequestParam(defaultValue = "20", required = false) int size) {
         GetMessagesByChatRoomResponseDTO messagesByChatRoom = chatService.getMessagesByChatRoom(chatRoomUUID, page, size);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, messagesByChatRoom));
     }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/{chatRoomUUID}")
+    public ResponseEntity<BaseResponse<GetChatRoomInfoResponseDTO>> getChatRoomInfo(
+            @PathVariable String chatRoomUUID,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+            ){
+        GetChatRoomInfoResponseDTO chatRoomInfo = chatService.getChatRoomInfo(chatRoomUUID, userDetails);
+        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, chatRoomInfo));
+    }
+
+
+
 
     /*
         url : ws://localhost:8080/ws/chat

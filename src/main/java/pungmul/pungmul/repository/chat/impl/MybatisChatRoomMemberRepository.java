@@ -20,4 +20,9 @@ public class MybatisChatRoomMemberRepository implements ChatRoomMemberRepository
     public List<Long> getOpponentMultiMemberNameList(String chatRoomUUID, Long userId) {
         return chatRoomMemberMapper.getOpponentMultiMemberNameList(chatRoomUUID, userId);
     }
+
+    @Override
+    public List<Long> findAllMembersByChatRoomId(String chatRoomUUID) {
+        return chatRoomMemberMapper.findAllMembersByChatRoomId(chatRoomUUID);
+    }
 }

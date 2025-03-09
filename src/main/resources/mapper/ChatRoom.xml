@@ -118,13 +118,7 @@
             cr.is_group,
             cr.room_name,
             cr.profile_image_url,
-            cr.created_at,
-            (
-                SELECT COUNT(*)
-                FROM chat_messages
-                WHERE chat_room_uuid = cr.room_uuid
-                  AND is_read = FALSE
-            ) AS unread_count
+            cr.created_at
         FROM chat_room cr
         WHERE cr.room_uuid = #{chatRoomUUID}
     </select>
