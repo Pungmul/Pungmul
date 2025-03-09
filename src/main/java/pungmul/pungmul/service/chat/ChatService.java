@@ -12,6 +12,8 @@ import pungmul.pungmul.domain.chat.ChatRoom;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.chat.ChatMessage;
+import pungmul.pungmul.domain.message.MessageDomainType;
+import pungmul.pungmul.domain.message.domain.ChatBusinessIdentifier;
 import pungmul.pungmul.dto.chat.*;
 import pungmul.pungmul.dto.file.RequestImageDTO;
 import pungmul.pungmul.dto.member.SimpleUserDTO;
@@ -21,6 +23,7 @@ import pungmul.pungmul.repository.chat.repository.ChatRoomRepository;
 import pungmul.pungmul.service.file.ImageService;
 import pungmul.pungmul.service.member.membermanagement.MemberService;
 import pungmul.pungmul.service.member.membermanagement.UserService;
+import pungmul.pungmul.service.message.MessageService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -37,6 +40,7 @@ public class ChatService {
     private final ImageService imageService;
     private final UserService userService;
     private final MemberService memberService;
+    private final MessageService messageService;
 
 //    @Transactional
 //    public CreatePersonalChatRoomResponseDTO createPersonalChatRoom(String senderName, String receiverName) {
@@ -204,16 +208,16 @@ public class ChatService {
         return userService.getUserById(opponentUserId).getName();
     }
 
-    @Transactional
-    public ChatMessage saveMessage(String senderName, String chatRoomUUID, ChatMessageRequestDTO chatMessageRequestDTO) {
-        log.info("sender name: {}, chat room uuid: {}", senderName, chatRoomUUID);
-
-        ChatMessage message = chatRepository.save(getChatMessage(senderName, chatRoomUUID, chatMessageRequestDTO));
-        log.info("messageId : {}", message.getId());
-        chatRoomRepository.updateLastMessage(chatRoomUUID, message.getId());
-
-        return message;
-    }
+//    @Transactional
+//    public ChatMessage saveMessage(String senderName, String chatRoomUUID, ChatMessageRequestDTO chatMessageRequestDTO) {
+//        log.info("sender name: {}, chat room uuid: {}", senderName, chatRoomUUID);
+//
+//        ChatMessage message = chatRepository.save(getChatMessage(senderName, chatRoomUUID, chatMessageRequestDTO));
+//        log.info("messageId : {}", message.getId());
+//        chatRoomRepository.updateLastMessage(chatRoomUUID, message.getId());
+//
+//        return message;
+//    }
 
     private void saveChatImage(Long chatId, MultipartFile image, Long userId) throws IOException {
         imageService.saveImage(getRequestChatImageDTO(chatId, image, userId));
@@ -228,14 +232,14 @@ public class ChatService {
                 .build();
     }
 
-    private ChatMessage getChatMessage(String senderName, String chatRoomUUID, ChatMessageRequestDTO chatMessageRequestDTO) {
+    private ChatMessage getChatMessage(ChatMessageRequestDTO chatMessageRequestDTO, String senderName) {
         return ChatMessage.builder()
                 .senderUsername(senderName)
 //                .receiverUsername(chatMessageRequestDTO.getReceiverUsername())
                 .content(chatMessageRequestDTO.getContent())
                 .chatType(chatMessageRequestDTO.getChatType())
                 .imageUrl(chatMessageRequestDTO.getImageUrl())
-                .chatRoomUUID(chatRoomUUID)
+                .chatRoomUUID(chatMessageRequestDTO.getChatRoomUUID())
                 .build();
     }
 
@@ -322,5 +326,14 @@ public class ChatService {
                 )
                 .profileImageUrl(chatRoom.getProfileImageUrl())
                 .build();
+    }
+
+    public void sendChatMessage(ChatMessageRequestDTO chatMessageRequestDTO, String username) {
+        Long userId = userService.getUserByEmail(username).getId();
+
+        ChatMessage chatMessage = getChatMessage(chatMessageRequestDTO, username);
+
+        messageService.sendMessage(MessageDomainType.CHAT, ChatBusinessIdentifier.MESSAGE, chatMessageRequestDTO.getChatRoomUUID(), chatMessage, userId);
+
     }
 }

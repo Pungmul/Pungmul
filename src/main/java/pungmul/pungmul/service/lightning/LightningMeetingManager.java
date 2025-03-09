@@ -106,7 +106,7 @@ public CreateLightningMeetingResponseDTO createLightningMeeting(CreateLightningM
         messageService.sendMessage(MessageDomainType.LIGHTNING_MEETING,
                 LightningMeetingBusinessIdentifier.NEARBY,
                 username,
-                lightningMeetingResponse);
+                lightningMeetingResponse, null);
     }
 
     public void getLightningMeetingParticipants(Long meetingId){
@@ -149,8 +149,8 @@ public CreateLightningMeetingResponseDTO createLightningMeeting(CreateLightningM
                     MessageDomainType.LIGHTNING_MEETING,
                     LightningMeetingBusinessIdentifier.NOTIFICATION,
                     lightningMeeting.getId().toString(),
-                    lightningMeeting.getMeetingName() + "모임이 취소되었습니다."
-            );
+                    lightningMeeting.getMeetingName() + "모임이 취소되었습니다.",
+                    null);
             return CancelLightningMeetingResponseDTO.builder()
                     .message("모임 취소")
                     .build();
@@ -175,8 +175,8 @@ public CreateLightningMeetingResponseDTO createLightningMeeting(CreateLightningM
                     MessageDomainType.LIGHTNING_MEETING,
                     LightningMeetingBusinessIdentifier.NOTIFICATION,
                     newOrganizer.getEmail(),
-                    lightningMeeting.getMeetingName() + "모임의 모임장이 되었습니다."
-            );
+                    lightningMeeting.getMeetingName() + "모임의 모임장이 되었습니다.",
+                    null);
         }
         return CancelLightningMeetingResponseDTO.builder()
                 .message("모임장 변경")

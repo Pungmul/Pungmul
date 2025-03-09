@@ -135,8 +135,8 @@ public class FriendService {
                 MessageDomainType.FRIEND,
                 FriendBusinessIdentifier.REQUEST, // 메시지 도메인
                 receiverUserName,               // 수신자 식별자
-                invitationMessage               // 메시지 내용
-        );
+                invitationMessage,               // 메시지 내용
+                null);
     }
 
     private static Friend getFriend(Long userId, Long receiverId) {

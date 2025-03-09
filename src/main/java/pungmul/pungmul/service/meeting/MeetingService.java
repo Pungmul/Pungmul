@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.core.exception.custom.meeting.MeetingNameAlreadyExistsException;
-import pungmul.pungmul.domain.friend.Friend;
 import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.meeting.*;
 import pungmul.pungmul.domain.member.user.User;
@@ -26,7 +25,6 @@ import pungmul.pungmul.service.friend.FriendService;
 import pungmul.pungmul.service.message.MessageService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -103,8 +101,8 @@ public class MeetingService {
                 MessageDomainType.MEETING,
                 MeetingBusinessIdentifier.INVITATION,
                 receiver.getEmail(), // 수신자 identifier로 이메일 사용
-                invitationMessage // 초대 메시지 내용
-        );
+                invitationMessage, // 초대 메시지 내용
+                null);
     }
 
 
@@ -242,7 +240,7 @@ public class MeetingService {
             log.info("Processing meeting invitation for user: {}", username);
 
             // MessageService를 통해 메시지를 전송
-            messageService.sendMessage(MessageDomainType.MEETING, FriendBusinessIdentifier.FRIENDS, username, message);
+            messageService.sendMessage(MessageDomainType.MEETING, FriendBusinessIdentifier.FRIENDS, username, message, null);
 
             log.info("Meeting invitation sent for user: {}", username);
         }

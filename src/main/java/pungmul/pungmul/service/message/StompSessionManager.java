@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StompSessionManager {
     private final ConcurrentHashMap<String, String> sessions = new ConcurrentHashMap<>();
 
-
     public void addSession(String sessionId, String username) {
         sessions.put(sessionId, username);
     }

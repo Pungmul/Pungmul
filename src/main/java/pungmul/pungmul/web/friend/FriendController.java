@@ -70,7 +70,7 @@ public class FriendController {
         log.info("Friend request notification received for user: {}", username);
 
         // 알림 전송 경로 생성 및 메시지 전송
-        messageService.sendMessage(MessageDomainType.FRIEND, FriendBusinessIdentifier.INVITATION, username, message);
+        messageService.sendMessage(MessageDomainType.FRIEND, FriendBusinessIdentifier.INVITATION, username, message, null);
     }
 
     //  친구 요청 수락 -> 친구 목록 창에서 특정 사용자에게 와있는 pending 상태의 친구 관계를 ACCEPTED로 변경

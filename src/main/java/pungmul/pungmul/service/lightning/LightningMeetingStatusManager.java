@@ -163,8 +163,8 @@ public class LightningMeetingStatusManager {
                 MessageDomainType.LIGHTNING_MEETING,
                 LightningMeetingBusinessIdentifier.NOTIFICATION,
                 organizer.getEmail(),
-                meeting.getMeetingName() + " 모임을 진행하시겠습니까? (승인 / 연기)"
-        );
+                meeting.getMeetingName() + " 모임을 진행하시겠습니까? (승인 / 연기)",
+                null);
     }
 
     /** 🔹 모임 성사 조건 확인 */

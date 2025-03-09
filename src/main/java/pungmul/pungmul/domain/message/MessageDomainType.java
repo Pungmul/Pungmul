@@ -11,6 +11,7 @@ public enum MessageDomainType {
     SYSTEM("system"),
     NOTIFICATION("notification"),
     LIGHTNING_MEETING("lightning-meeting"),
+    CHAT("chat"),
     POST("post");
 
     private final String path;

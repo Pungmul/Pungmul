@@ -94,28 +94,4 @@ public class ChatController {
 
 
 
-    /*
-        url : ws://localhost:8080/ws/chat
-        sub dest : /sub/channel/567b5a78-6541-4dd0-9dc9-9e28239c420d
-        send header : {"Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyOEBleGFtcGxlLmNvbSIsImlhdCI6MTczNTc1NjE2OCwiZXhwIjoxNzM1NzU5NzY4fQ.GvZQFmbvPOtNy5IrlVFGZM6eLJvoQxRa672oXMicwtaoQyAiHo1tzX4csbSdTKlHk50d2Zw8H0d5YEwFkDIt5Q"}
-        send dest : /pub/message
-        content : {    "receiverUsername": "user10@example.com",
-                       "content": "Hello, this is a test message!",
-                       "chatType": "CHAT",
-                       "chatRoomUUID": "567b5a78-6541-4dd0-9dc9-9e28239c420d" }
-     */
-    @MessageMapping("/message")
-    public ChatMessage sendMessage(
-            @Payload ChatMessageRequestDTO chatMessageRequestDTO,
-            @Header("Authorization") String authorizationToken) {
-
-        String token = authorizationToken.replace("Bearer ", "");
-        String username = tokenProvider.getUsernameFromToken(token);
-
-        String chatRoomUUID = chatService.extractChatRoomUUIDFromDestination(chatMessageRequestDTO.getChatRoomUUID());
-        ChatMessage chatMessage = chatService.saveMessage(username, chatRoomUUID, chatMessageRequestDTO);
-        messagingTemplate.convertAndSend("/sub/channel/" + chatMessage.getChatRoomUUID(), chatMessage);
-
-        return chatMessage;
-    }
 }

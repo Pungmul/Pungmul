@@ -96,7 +96,7 @@
         GROUP BY cr.room_uuid, cr.created_at  -- 채팅방을 기준으로 그룹화
         ORDER BY
             -- 메시지가 있는 경우 마지막 메시지 시간으로 정렬하고, 메시지가 없는 경우 채팅방 생성 시간으로 정렬
-            COALESCE(MAX(m.timestamp), cr.created_at) DESC
+            COALESCE(MAX(m.created_at), cr.created_at) DESC
         LIMIT #{limit} OFFSET #{offset};
     </select>
 
