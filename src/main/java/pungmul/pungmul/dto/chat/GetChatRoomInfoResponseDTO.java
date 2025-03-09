@@ -18,6 +18,4 @@ public class GetChatRoomInfoResponseDTO {
     private ChatRoomDTO chatRoomInfo;
     private List<SimpleUserDTO> userInfoList;
     private PageInfo<ChatMessage> messageList;
-
-
 }
