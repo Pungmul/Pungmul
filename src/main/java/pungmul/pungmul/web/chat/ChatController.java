@@ -73,8 +73,8 @@ public class ChatController {
     @GetMapping("/{chatRoomUUID}")
     public ResponseEntity<BaseResponse<GetMessagesByChatRoomResponseDTO>> getMessagesByChatRoom(
             @PathVariable String chatRoomUUID,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "1", required = false) int page,
+            @RequestParam(defaultValue = "20", required = false) int size) {
         GetMessagesByChatRoomResponseDTO messagesByChatRoom = chatService.getMessagesByChatRoom(chatRoomUUID, page, size);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, messagesByChatRoom));
     }

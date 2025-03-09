@@ -54,12 +54,20 @@
         LIMIT 1
     </select>
 
-    <select id="getMessagesByChatRoom" parameterType="map" resultMap="ChatMessageResultMap">
+<!--    <select id="getMessagesByChatRoom" parameterType="map" resultMap="ChatMessageResultMap">-->
+<!--        SELECT *-->
+<!--        FROM chat_messages-->
+<!--        WHERE chat_room_uuid = #{chatRoomUUID}-->
+<!--        ORDER BY created_at DESC-->
+<!--        LIMIT #{limit} OFFSET #{offset}-->
+<!--    </select>-->
+
+    <!-- Get Messages by ChatRoom UUID with pagination -->
+    <select id="getMessagesByChatRoomUUID" resultMap="ChatMessageResultMap" parameterType="string">
         SELECT *
         FROM chat_messages
         WHERE chat_room_uuid = #{chatRoomUUID}
         ORDER BY created_at DESC
-        LIMIT #{limit} OFFSET #{offset}
     </select>
 
 </mapper>

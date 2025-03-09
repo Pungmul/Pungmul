@@ -1,5 +1,7 @@
 package pungmul.pungmul.service.chat;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -299,22 +301,28 @@ public class ChatService {
                 .build();
     }
 
-//    public GetMessagesByChatRoomResponseDTO getMessagesByChatRoom(String chatRoomUUID) {
-//        List<ChatMessage> messagesByChatRoom = chatRepository.getMessagesByChatRoom(chatRoomUUID);
+//    public GetMessagesByChatRoomResponseDTO getMessagesByChatRoom(String chatRoomUUID, int page, int size) {
+//        int offset = (page - 1) * size; // 역순으로 로드
+//        List<ChatMessage> messages = chatRepository.getMessagesByChatRoom(chatRoomUUID, size, offset);
+//        List<ChatMessage> chatMessageList = messages.stream()
+//                .sorted(Comparator.comparing(ChatMessage::getCreatedAt)) // 시간 순서로 정렬
+//                .toList();
+//
 //        return GetMessagesByChatRoomResponseDTO.builder()
-//                .chatMessageList(messagesByChatRoom)
+//                .chatMessageList(chatMessageList)
 //                .build();
 //    }
 
     public GetMessagesByChatRoomResponseDTO getMessagesByChatRoom(String chatRoomUUID, int page, int size) {
-        int offset = (page - 1) * size; // 역순으로 로드
-        List<ChatMessage> messages = chatRepository.getMessagesByChatRoom(chatRoomUUID, size, offset);
-        List<ChatMessage> chatMessageList = messages.stream()
-                .sorted(Comparator.comparing(ChatMessage::getCreatedAt)) // 시간 순서로 정렬
-                .toList();
+        PageHelper.startPage(page, size);
+        List<ChatMessage> messages = chatRepository.getMessagesByChatRoomUUID(chatRoomUUID);
+
+//        List<ChatMessage> chatMessageList = messages.stream()
+//                .sorted(Comparator.comparing(ChatMessage::getCreatedAt)) // 시간 순서로 정렬
+//                .toList();
 
         return GetMessagesByChatRoomResponseDTO.builder()
-                .chatMessageList(chatMessageList)
+                .chatMessageList(new PageInfo<>(messages))
                 .build();
     }
 }
