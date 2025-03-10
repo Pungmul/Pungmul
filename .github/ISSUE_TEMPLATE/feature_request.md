@@ -7,12 +7,16 @@ assignees: ''
 
 ---
 
-> description
+<!-- 제목양식을 지켜주세요! [Feat/#{이슈번호}] {제목~~} -->
 
-## Progress
+### Issue
+
+- 
+
+### 무엇을 했나요?
+
 - [ ] todo1
-- [ ] tode2
-- [ ] todo3
 
-## ETC
-> etc
+### Other
+
+- [ ] etc
