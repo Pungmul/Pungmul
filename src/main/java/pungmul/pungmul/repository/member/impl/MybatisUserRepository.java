@@ -2,6 +2,7 @@ package pungmul.pungmul.repository.member.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import pungmul.pungmul.core.exception.custom.member.NoSuchUsernameException;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.repository.member.mapper.UserMapper;
@@ -31,8 +32,9 @@ public class MybatisUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> getUserByEmail(String email) {
-        return Optional.ofNullable(userMapper.getUserByEmail(email).masked());
+    public User getUserByEmail(String email) {
+        return userMapper.getUserByEmail(email).orElseThrow(() -> new NoSuchUsernameException(email)).masked();
+//        return Optional.ofNullable(userMapper.getUserByEmail(email).masked());
     }
 
     public Long getUserIdByAccountId(Long accountId) {

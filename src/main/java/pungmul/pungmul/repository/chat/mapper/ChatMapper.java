@@ -22,4 +22,6 @@ public interface ChatMapper {
     List<ChatMessage> getMessagesByChatRoom(@Param("chatRoomUUID") String chatRoomUUID,
                                             @Param("limit") int limit,
                                             @Param("offset") int offset);
+
+    Long getOpponentUserId(String chatRoomUUID, Long userId);
 }

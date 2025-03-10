@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Mapper;
 import pungmul.pungmul.domain.member.user.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Mapper
 public interface UserMapper {
@@ -13,7 +14,7 @@ public interface UserMapper {
 
     User getUserByAccountId(Long accountId);
 
-    User getUserByEmail(String email);
+    Optional<User> getUserByEmail(String email);
 
     List<User> searchUsersByKeyword(String keyword);
 

@@ -50,7 +50,7 @@
         SELECT *
         FROM chat_messages
         WHERE chat_room_uuid = #{chatRoomUUID}
-        ORDER BY id DESC
+        ORDER BY timestamp DESC
         LIMIT 1
     </select>
 

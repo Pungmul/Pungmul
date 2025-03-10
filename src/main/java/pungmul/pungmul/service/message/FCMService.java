@@ -146,7 +146,7 @@ public class FCMService {
     @Transactional
     public void saveFCMToken(UserDetailsImpl userDetails, FCMTokenRequestDTO fcmTokenRequestDTO) {
         FCMToken fcmToken = FCMToken.builder()
-                .userId(userRepository.getUserByEmail(userDetails.getUsername()).map(User::getId).orElseThrow(NoSuchElementException::new))
+                .userId(userRepository.getUserByEmail(userDetails.getUsername()).getId())
                 .token(fcmTokenRequestDTO.getFcmToken())
                 .deviceInfo(fcmTokenRequestDTO.getDeviceInfo())
                 .isValid(true)

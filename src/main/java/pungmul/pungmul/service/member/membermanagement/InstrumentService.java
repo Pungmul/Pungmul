@@ -35,9 +35,7 @@ public class InstrumentService {
     }
 
     public UpdateInstrumentResponseDTO updateInstrumentStatus(String email, UpdateInstrumentRequestDTO updateInstrumentRequestDTO) {
-        Long userId = userRepository.getUserByEmail(email)
-                .map(User::getId)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+        Long userId = userRepository.getUserByEmail(email).getId();
 
         InstrumentStatus instrumentStatus = InstrumentStatus.builder()
                 .userId(userId)

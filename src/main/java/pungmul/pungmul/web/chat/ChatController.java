@@ -18,32 +18,44 @@ import pungmul.pungmul.domain.chat.ChatMessage;
 import pungmul.pungmul.dto.chat.*;
 import pungmul.pungmul.service.chat.ChatService;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/chat")
+@RequestMapping("/api/chat")
 public class ChatController {
     private final ChatService chatService;
     private final SimpMessagingTemplate messagingTemplate;
     private final TokenProvider tokenProvider;
 
+//    // 개인 DM 방 생성
+//    @PreAuthorize("hasRole('USER')")
+//    @PostMapping("/personal")
+//    public ResponseEntity<BaseResponse<ChatRoomDTO>> createPersonalChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+//                                                                                    @RequestBody CreatePersonalChatRoomRequestDTO createPersonalChatRoomRequestDTO) {
+//        ChatRoomDTO chatRoomWithRoomCheck = chatService.createPersonalChatRoom(userDetails.getLoginId(), createPersonalChatRoomRequestDTO.getReceiverName());
+//        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
+//    }
+
     // 개인 DM 방 생성
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/personal")
-    public ResponseEntity<BaseResponse<ChatRoomDTO>> createPersonalChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                                                    @RequestBody CreatePersonalChatRoomRequestDTO createPersonalChatRoomRequestDTO) {
-        ChatRoomDTO chatRoomWithRoomCheck = chatService.createPersonalChatRoom(userDetails.getLoginId(), createPersonalChatRoomRequestDTO.getReceiverName());
-        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
+    public ResponseEntity<BaseResponse<CreateChatRoomResponseDTO>> createPersonalChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                                          @RequestBody CreatePersonalChatRoomRequestDTO createPersonalChatRoomRequestDTO) {
+        CreateChatRoomResponseDTO chatRoomWithRoomCheck = chatService.createPersonalChatRoom(userDetails.getLoginId(), createPersonalChatRoomRequestDTO.getReceiverName());
+
+        if (chatRoomWithRoomCheck.getIsCreated())
+            return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
+        else
+            return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, chatRoomWithRoomCheck));
+//        return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, chatRoomWithRoomCheck));
     }
 
     // 단체 채팅방 생성
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/multi")
-    public ResponseEntity<BaseResponse<ChatRoomDTO>> createMultiChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<BaseResponse<CreateChatRoomResponseDTO>> createMultiChatRoom(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                                  @RequestBody CreateMultiChatRoomRequestDTO createMultiChatRoomRequestDTO) {
-        ChatRoomDTO createMultiChatRoomResponseDTO = chatService.createMultiChatRoom(userDetails.getLoginId(), createMultiChatRoomRequestDTO.getReceiverNameList());
+        CreateChatRoomResponseDTO createMultiChatRoomResponseDTO = chatService.createMultiChatRoom(userDetails.getLoginId(), createMultiChatRoomRequestDTO.getReceiverNameList());
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.CREATED, createMultiChatRoomResponseDTO));
     }
 

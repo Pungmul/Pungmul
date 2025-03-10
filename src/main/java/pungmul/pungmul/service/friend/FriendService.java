@@ -42,9 +42,7 @@ public class FriendService {
 
 
     public FriendListResponseDTO getFriendList(UserDetails userDetails) {
-        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
 
         List<Friend> friendList = friendRepository.getFriendList(userId);
 
@@ -103,13 +101,9 @@ public class FriendService {
         isReqToSelfCheck(userDetails, receiverUserName);
 
         // 요청자와 수신자의 ID 가져오기
-        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(() -> new NoSuchElementException("User not found: " + userDetails.getUsername()));
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
 
-        Long receiverId = userRepository.getUserByEmail(receiverUserName)
-                .map(User::getId)
-                .orElseThrow(() -> new NoSuchElementException("User not found: " + receiverUserName));
+        Long receiverId = userRepository.getUserByEmail(receiverUserName).getId();
 
         // 기존 친구 요청 확인
         Friend friend = getFriend(userId, receiverId);
@@ -153,7 +147,7 @@ public class FriendService {
     }
 
     public FriendRequestInvitationMessageDTO getInvitationMessage(UserDetails userDetails,Long friendRequestId) {
-        String senderName = userRepository.getUserByEmail(userDetails.getUsername()).orElseThrow(NoSuchElementException::new).getName();
+        String senderName = userRepository.getUserByEmail(userDetails.getUsername()).getName();
         return FriendRequestInvitationMessageDTO.builder()
                 .friendRequestId(friendRequestId)
                 .senderUsername(userDetails.getUsername())  // 실제 이름이 필요하다면 User 엔티티에서 가져올 수 있음
@@ -165,9 +159,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public List<AvailableFriendDTO> searchUsersToReqFriend(String keyword, UserDetails userDetails) {
 
-        Long loginUserId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
+        Long loginUserId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
 
         // 사용자가 입력한 keyword로 사용자 검색
         List<User> users = userRepository.searchUsersByKeyword(keyword);
