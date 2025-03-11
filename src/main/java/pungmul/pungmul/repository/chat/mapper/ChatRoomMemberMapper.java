@@ -9,4 +9,6 @@ public interface ChatRoomMemberMapper {
     Long getOpponentUserId(String chatRoomUUID, Long userId);
 
     List<Long> getOpponentMultiMemberNameList(String chatRoomUUID, Long userId);
+
+    List<Long> findAllMembersByChatRoomId(String chatRoomUUID);
 }

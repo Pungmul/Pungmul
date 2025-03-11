@@ -9,7 +9,7 @@ import pungmul.pungmul.domain.chat.ChatType;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageRequestDTO {
-    private String receiverUsername;
+//    private String receiverUsername;
     private String content;
     private ChatType chatType;
     private String chatRoomUUID;

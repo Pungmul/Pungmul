@@ -116,8 +116,8 @@ public class LightningMeetingParticipantService {
                 MessageDomainType.LIGHTNING_MEETING,
                 LightningMeetingBusinessIdentifier.PARTICIPANTS,
                 meetingId.toString(),
-                meetingParticipants
-        );
+                meetingParticipants,
+                null);
     }
 
     public int getMeetingParticipantNum(Long meetingId) {

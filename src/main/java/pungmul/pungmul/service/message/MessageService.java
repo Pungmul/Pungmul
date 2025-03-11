@@ -1,6 +1,5 @@
     package pungmul.pungmul.service.message;
 
-    import jakarta.websocket.MessageHandler;
     import lombok.RequiredArgsConstructor;
     import lombok.extern.slf4j.Slf4j;
     import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -12,10 +11,8 @@
     import pungmul.pungmul.domain.message.StompMessageLog;
     import pungmul.pungmul.domain.message.StompMessageResponse;
     import pungmul.pungmul.dto.message.StompMessageDTO;
-    import pungmul.pungmul.repository.message.impl.MybatisStompSubscriptionRepository;
     import pungmul.pungmul.repository.message.repository.StompSubscriptionRepository;
 
-    import java.time.LocalDateTime;
     import java.util.List;
     import java.util.Objects;
     import java.util.stream.Stream;
@@ -32,13 +29,15 @@
 
         /**
          * 메시지를 전송하는 메서드.
-         * @param domainType 메시지 도메인
+         *
+         * @param domainType         메시지 도메인
          * @param businessIdentifier 비즈니스 식별자
-         * @param identifier 추가 식별자 (선택적)
-         * @param content 메시지 내용
+         * @param identifier         추가 식별자 (선택적)
+         * @param content            메시지 내용
+         * @param senderId
          */
         @Transactional
-        public void sendMessage(MessageDomainType domainType, String businessIdentifier, String identifier, Object content) {
+        public void sendMessage(MessageDomainType domainType, String businessIdentifier, String identifier, Object content, Long senderId) {
             // STOMP 메시지 전송 경로 구성
             String stompDest = getStompDest(domainType, businessIdentifier, identifier);
             log.info("STOMP 메시지 전송: {}", stompDest);
@@ -48,7 +47,7 @@
 
             // 3️⃣ 메시지 로그 저장 (DB에 먼저 기록하여 ID 생성)
             StompMessageLog stompMessageLog = stompMessageLogService.logStompMessageAndRecipients(
-                    null, // sender_id (필요하면 설정 가능)
+                    senderId, // sender_id (필요하면 설정 가능)
                     domainType,
                     businessIdentifier,
                     identifier,
@@ -74,7 +73,6 @@
 
             log.info("STOMP 메시지 전송: {}", stompDest);
             messagingTemplate.convertAndSend(stompDest, responseMessage);
-
 //            // ✅ STOMP 메시지 로그 저장
 //            try {
 //                stompMessageLogService.logStompMessage(
@@ -107,7 +105,7 @@
 //                        String.format("/sub/%s/%s/%s", domainType.getPath(), businessIdentifier.toLowerCase(), identifier),
 //                        content
 //                );
-//            }
+//
         }
 
         private static String getStompDest(MessageDomainType domainType, String businessIdentifier, String identifier) {

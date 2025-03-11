@@ -60,11 +60,16 @@ public class MybatisChatRoomRepository implements ChatRoomRepository {
 
     @Override
     public ChatRoom findChatRoomByUUID(String chatRoomUUID) {
-        return chatRoomMapper.findChatRoomByUUID(chatRoomUUID);
+        return chatRoomMapper.findChatRoomByUUID(chatRoomUUID).orElseThrow(NoSuchChatroomException::new);
     }
 
     @Override
     public List<Long> findChatRoomMemberList(String chatRoomUUID) {
         return chatRoomMapper.findChatRoomMemberList(chatRoomUUID);
     }
+
+//    @Override
+//    public ChatRoom getChatRoomByRoomUUID(String chatRoomUUID) {
+//        return chatRoomMapper.findChatRoomByUUID(chatRoomUUID);
+//    }
 }

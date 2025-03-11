@@ -41,7 +41,7 @@ public class MemberService {
                     .orElseThrow(NoSuchElementException::new);
     }
 
-    private SimpleUserDTO buildSimpleUserDTO(User user){
+    public SimpleUserDTO buildSimpleUserDTO(User user){
         log.info("user name : {}", user.getName());
         Image profile = imageRepository.getImagesByDomainIdAndType(DomainType.PROFILE, user.getId()).stream().findFirst().orElseGet(imageService::getAnonymousImage);
 
