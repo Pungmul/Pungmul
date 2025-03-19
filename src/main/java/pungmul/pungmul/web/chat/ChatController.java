@@ -90,8 +90,4 @@ public class ChatController {
         GetChatRoomInfoResponseDTO chatRoomInfo = chatService.getChatRoomInfo(chatRoomUUID, userDetails);
         return ResponseEntity.ok(BaseResponse.ofSuccess(BaseResponseCode.OK, chatRoomInfo));
     }
-
-
-
-
 }

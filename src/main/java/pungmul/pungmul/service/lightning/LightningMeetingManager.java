@@ -15,6 +15,7 @@ import pungmul.pungmul.dto.lightning.*;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingRepository;
 import pungmul.pungmul.service.member.membermanagement.UserService;
 import pungmul.pungmul.service.message.MessageService;
+import pungmul.pungmul.service.message.StompMessageUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class LightningMeetingManager {
     private final MessageService messageService;
 
     private static final int MIN_PARTICIPANTS_THRESHOLD = 3;
+    private final StompMessageUtils stompMessageUtils;
 
 @Transactional
 public CreateLightningMeetingResponseDTO createLightningMeeting(CreateLightningMeetingRequestDTO requestDTO,

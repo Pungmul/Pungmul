@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ import pungmul.pungmul.dto.friend.FriendReqResponseDTO;
 import pungmul.pungmul.dto.message.friend.FriendRequestInvitationMessageDTO;
 import pungmul.pungmul.service.friend.FriendService;
 import pungmul.pungmul.service.message.MessageService;
+import pungmul.pungmul.service.message.StompSessionManager;
 
 import java.util.List;
 
@@ -34,6 +36,7 @@ import java.util.List;
 @RequestMapping("/api/friends")
 public class FriendController {
     private final FriendService friendService;
+    private final StompSessionManager stompSessionManager;
     private final MessageService messageService;
 
     //  친구 목록 보기
@@ -76,14 +79,17 @@ public class FriendController {
     }
 
     // 친구 요청 알림을 받는 메서드
-    @MessageMapping("/friend/invitation/{username}")
+    @MessageMapping("/friend/invitation")
     public void receiveFriendRequestNotification(
-            @DestinationVariable String username,
-            @Payload FriendRequestInvitationMessageDTO message) {
+            @Payload FriendRequestInvitationMessageDTO message,
+            SimpMessageHeaderAccessor accessor
+            ) {
+        String sessionId = accessor.getSessionId();
+        String username = stompSessionManager.getUsernameFromSession(sessionId);
         log.info("Friend request notification received for user: {}", username);
 
         // 알림 전송 경로 생성 및 메시지 전송
-        messageService.sendMessage(MessageDomainType.FRIEND, FriendBusinessIdentifier.INVITATION, username, message, null);
+        friendService.receiveFriendMessage(username, message);
     }
 
     //  친구 요청 수락 -> 친구 목록 창에서 특정 사용자에게 와있는 pending 상태의 친구 관계를 ACCEPTED로 변경

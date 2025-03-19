@@ -74,6 +74,9 @@ dependencies {
 
 	implementation 'com.auth0:java-jwt:4.4.0' // 최신 버전 확인 후 적용
 
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'
+
+
 
 }
 

@@ -28,23 +28,9 @@ public class LightningMeetingStompController {
     /*
     url : ws://localhost:8080/ws
     sub dest : /sub/lightning-meeting/nearby/{username}
-    send header : {"Authorization": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyOEBleGFtcGxlLmNvbSIsImlhdCI6MTczNTc1NjE2OCwiZXhwIjoxNzM1NzU5NzY4fQ.GvZQFmbvPOtNy5IrlVFGZM6eLJvoQxRa672oXMicwtaoQyAiHo1tzX4csbSdTKlHk50d2Zw8H0d5YEwFkDIt5Q"}
     send dest : /pub/lightning-meeting/nearby
     content : {   "latitude": 37.5641,   "longitude": 126.9824,   "mapLevel":4 }
     */
-//    @PreAuthorize("hasRole('USER')")
-//    @MessageMapping("/lightning-meeting/nearby")
-//    public void getNearLightningMeeting(
-//            @Payload GetNearLightningMeetingRequestDTO getNearLightningMeetingRequestDTO,
-//            Principal principal
-////            @Header("Authorization") String authorizationToken
-////            @AuthenticationPrincipal UserDetailsImpl userDetails
-//    ) {
-////        String token = authorizationToken.replace("Bearer ", "");
-////        UserDetailsImpl userDetails = tokenProvider.getUserDetailsFromToken(token);
-//        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
-//        lightningMeetingManager.getNearLightningMeetings(getNearLightningMeetingRequestDTO, userDetails.getUsername());
-//    }
     @PreAuthorize("hasRole('USER')")
     @MessageMapping("/lightning-meeting/nearby")
     public void getNearLightningMeeting(

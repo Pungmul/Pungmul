@@ -24,6 +24,7 @@ import pungmul.pungmul.service.file.ImageService;
 import pungmul.pungmul.service.member.membermanagement.MemberService;
 import pungmul.pungmul.service.member.membermanagement.UserService;
 import pungmul.pungmul.service.message.MessageService;
+import pungmul.pungmul.service.message.StompMessageUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -41,6 +42,7 @@ public class ChatService {
     private final UserService userService;
     private final MemberService memberService;
     private final MessageService messageService;
+    private final StompMessageUtils stompMessageUtils;
 
 //    @Transactional
 //    public CreatePersonalChatRoomResponseDTO createPersonalChatRoom(String senderName, String receiverName) {
@@ -330,10 +332,8 @@ public class ChatService {
 
     public void sendChatMessage(ChatMessageRequestDTO chatMessageRequestDTO, String username) {
         Long userId = userService.getUserByEmail(username).getId();
-
         ChatMessage chatMessage = getChatMessage(chatMessageRequestDTO, username);
 
         messageService.sendMessage(MessageDomainType.CHAT, ChatBusinessIdentifier.MESSAGE, chatMessageRequestDTO.getChatRoomUUID(), chatMessage, userId);
-
     }
 }

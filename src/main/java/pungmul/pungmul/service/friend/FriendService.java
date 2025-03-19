@@ -25,6 +25,7 @@ import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.file.ImageService;
 import pungmul.pungmul.service.member.membermanagement.MemberService;
 import pungmul.pungmul.service.message.MessageService;
+import pungmul.pungmul.service.message.StompMessageUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,6 +40,7 @@ public class FriendService {
     private final ImageService imageService;
     private final ImageRepository imageRepository;
     private final MessageService messageService;
+    private final StompMessageUtils stompMessageUtils;
 
 
     public FriendListResponseDTO getFriendList(UserDetails userDetails) {
@@ -71,30 +73,6 @@ public class FriendService {
                 .build();
     }
 
-//    @Transactional(isolation = Isolation.READ_COMMITTED)  // 트랜잭션이 직렬화되어 동시에 실행되는 트랜잭션 충돌을 방지
-//    public FriendReqResponseDTO sendFriendRequest(UserDetails userDetails, String receiverUserName) {
-//        isReqToSelfCheck(userDetails, receiverUserName);
-//
-//        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-//                .map(User::getId)
-//                .orElseThrow(NoSuchElementException::new);
-//
-//        Long receiverId = userRepository.getUserByEmail(receiverUserName)
-//                .map(User::getId)
-//                .orElseThrow(NoSuchElementException::new);
-//
-//        Friend friend = getFriend(userId, receiverId);
-//        friendRepository.sendFriendRequest(friend);
-//
-//        // 알림 메시지 생성 및 전송
-//        FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, friend.getId(), userId);
-//        messageService.sendMessage(MessageType.INVITATION, MessageDomainType.FRIEND, receiverUserName, invitationMessage);
-//
-//        return FriendReqResponseDTO.builder()
-//                .friendId(friend.getId())
-//                .build();
-//    }
-
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public FriendReqResponseDTO sendFriendRequest(UserDetails userDetails, String receiverUserName) {
         // 요청이 자기 자신에게 보내졌는지 확인
@@ -121,13 +99,6 @@ public class FriendService {
     }
 
     private void sendFriendRequestNotification(UserDetails userDetails, String receiverUserName, Friend friend) {
-        // 알림 메시지 생성
-//        FriendRequestInvitationMessageDTO invitationMessage = FriendRequestInvitationMessageDTO.builder()
-//                .friendRequestId(friend.getId())
-//                .senderUsername(userDetails.getUsername())
-//                .receiverUsername(receiverUserName)
-//                .content(getInvitationMessage(userDetails, friend.getId()))
-//                .build();
         FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, friend.getId());
 
         // 메시지 전송
@@ -258,5 +229,11 @@ public class FriendService {
                                 .stream().findFirst().orElseGet(imageService::getAnonymousImage)
                 )
                 .build();
+    }
+
+    public void receiveFriendMessage(String username, FriendRequestInvitationMessageDTO message) {
+//        Map<String, Object> stringObjectMap = stompMessageUtils.convertToMap(message);
+        String serializeContent = stompMessageUtils.serializeContent(message.toMap());
+        messageService.sendMessage(MessageDomainType.FRIEND, FriendBusinessIdentifier.INVITATION, username, message, null);
     }
 }
