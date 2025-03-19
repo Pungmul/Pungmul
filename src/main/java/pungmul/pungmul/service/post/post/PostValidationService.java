@@ -56,7 +56,7 @@ public class PostValidationService {
 
     //  추후 구현
     public boolean isAuthor(UserDetailsImpl userDetails, Long postId) {
-        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).map(User::getId).orElseThrow(NoSuchElementException::new);
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
         Long writerId = postContentService.getContentByPostId(postId).getWriterId();
 
         return userId.equals(writerId);

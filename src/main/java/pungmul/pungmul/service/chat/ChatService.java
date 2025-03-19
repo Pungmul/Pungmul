@@ -1,5 +1,7 @@
 package pungmul.pungmul.service.chat;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,12 +12,19 @@ import pungmul.pungmul.domain.chat.ChatRoom;
 import pungmul.pungmul.domain.file.DomainType;
 import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.chat.ChatMessage;
+import pungmul.pungmul.domain.message.MessageDomainType;
+import pungmul.pungmul.domain.message.domain.ChatBusinessIdentifier;
 import pungmul.pungmul.dto.chat.*;
 import pungmul.pungmul.dto.file.RequestImageDTO;
+import pungmul.pungmul.dto.member.SimpleUserDTO;
 import pungmul.pungmul.repository.chat.repository.ChatRepository;
+import pungmul.pungmul.repository.chat.repository.ChatRoomMemberRepository;
 import pungmul.pungmul.repository.chat.repository.ChatRoomRepository;
 import pungmul.pungmul.service.file.ImageService;
+import pungmul.pungmul.service.member.membermanagement.MemberService;
 import pungmul.pungmul.service.member.membermanagement.UserService;
+import pungmul.pungmul.service.message.MessageService;
+import pungmul.pungmul.service.message.StompMessageUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -28,8 +37,12 @@ import java.util.stream.Collectors;
 public class ChatService {
     private final ChatRepository chatRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ImageService imageService;
     private final UserService userService;
+    private final MemberService memberService;
+    private final MessageService messageService;
+    private final StompMessageUtils stompMessageUtils;
 
 //    @Transactional
 //    public CreatePersonalChatRoomResponseDTO createPersonalChatRoom(String senderName, String receiverName) {
@@ -55,27 +68,38 @@ public class ChatService {
 //    }
 
     @Transactional
-    public ChatRoomDTO createPersonalChatRoom(String senderName, String receiverName) {
+    public CreateChatRoomResponseDTO createPersonalChatRoom(String senderName, String receiverName) {
         // 1. 기존 채팅방 조회
         Optional<ChatRoom> existingChatRoom = chatRoomRepository.findChatRoomByUsers(senderName, receiverName);
 
         // 2. 기존 채팅방이 존재하면 UUID 반환
         if (existingChatRoom.isPresent()) {
-            return buildChatRoomResponseDTO(existingChatRoom.get().getRoomUUID());
+//            return buildChatRoomResponseDTO(existingChatRoom.get().getRoomUUID());
+            return CreateChatRoomResponseDTO.builder()
+                    .isCreated(false)
+                    .roomUUID(existingChatRoom.get().getRoomUUID())
+                    .build();
         }
 
         // 3. 새 채팅방 생성 및 멤버 추가
         String newChatRoomUUID = createNewPersonalChatRoom(senderName, receiverName);
 
         // 4. 생성된 채팅방 정보 반환
-        return buildChatRoomResponseDTO(newChatRoomUUID);
+        return CreateChatRoomResponseDTO.builder()
+                .isCreated(true)
+                .roomUUID(newChatRoomUUID)
+                .build();
     }
 
     @Transactional
-    public ChatRoomDTO createMultiChatRoom(String senderName, List<String> receiverNameList){
+    public CreateChatRoomResponseDTO createMultiChatRoom(String senderName, List<String> receiverNameList){
         String newChatRoomUUID = createNewMultiChatRoom(senderName, receiverNameList);
 
-        return buildChatRoomResponseDTO(newChatRoomUUID);
+        return CreateChatRoomResponseDTO.builder()
+                .isCreated(true)
+                .roomUUID(newChatRoomUUID)
+                .build();
+//        return buildChatRoomResponseDTO(newChatRoomUUID);
     }
 
     private String createNewPersonalChatRoom(String senderName, String receiverName) {
@@ -129,19 +153,24 @@ public class ChatService {
                 .build();
     }
 
-    private ChatRoomDTO buildChatRoomResponseDTO(String chatRoomUUID) {
+    private SimpleChatRoomDTO buildChatRoomResponseDTO(String chatRoomUUID, Long userId) {
         // 채팅방 기본 정보 조회
         ChatRoom chatRoom = chatRoomRepository.findChatRoomByUUID(chatRoomUUID);
         ChatMessage lastMessage = chatRepository.getLastMessageByChatRoomUUID(chatRoomUUID);
 
         // 공통 데이터 설정
-        ChatRoomDTO.ChatRoomDTOBuilder builder = ChatRoomDTO.builder()
+        SimpleChatRoomDTO.SimpleChatRoomDTOBuilder builder = SimpleChatRoomDTO.builder()
                 .chatRoomUUID(chatRoomUUID)
                 .isGroup(chatRoom.isGroup())
-                .lastMessageTime(lastMessage != null ? lastMessage.getTimestamp() : null)
+                .lastMessageTime(lastMessage != null ? lastMessage.getCreatedAt() : null)
                 .lastMessageContent(lastMessage != null ? lastMessage.getContent() : null)
-                .unreadCount(chatRoom.getUnreadCount() != null ? chatRoom.getUnreadCount() : 0)
-                .roomName(chatRoom.getRoomName())
+                .unreadCount(null)  // unreadCount 로직 구현 후 추가
+//                .unreadCount(chatRoom.getUnreadCount() != null ? chatRoom.getUnreadCount() : 0)
+                .roomName(
+                        chatRoom.isGroup() ?
+                                (chatRoom.getRoomName() != null ? chatRoom.getRoomName() : String.join(", ", getOpponentMultiMemberNameList(chatRoomUUID, userId)))
+                                : getOpponentName(chatRoomUUID, userId)
+                )
                 .profileImageUrl(chatRoom.getProfileImageUrl());
 
         // 채팅방 유형별 데이터 설정
@@ -171,51 +200,26 @@ public class ChatService {
         return builder.build();
     }
 
-//    private String createDefaultChatRoom(String senderName) {
-//        String roomUUID = UUID.randomUUID().toString();
-//        ChatRoom chatRoom = ChatRoom.builder()
-//                .roomUUID(roomUUID)
-//                .createdBy(userService.getUserByEmail(senderName).getId()) // 생성자 ID
-//                .isGroup(false) // 개인 DM 방이므로 false
-//                .createdAt(LocalDateTime.now())
-//                .build();
-//        chatRoomRepository.createChatRoom(chatRoom);
-//        return roomUUID;
-//    }
-
-
-//    public String createPersonalChatRoom(String senderName, String receiverName) {
-//        // 1. 채팅방 생성
-//        String roomUUID = createDefaultChatRoom(senderName);
-//
-//        // 2. 채팅방 멤버 추가
-//        Long senderId = userService.getUserByEmail(senderName).getId();
-//        Long receiverId = userService.getUserByEmail(receiverName).getId();
-//        chatRoomRepository.addChatRoomMembers(roomUUID, List.of(senderId, receiverId));
-//
-//        return roomUUID;
-//    }
-/*
-    private CreatePersonalChatRoomResponseDTO getCreateChatRoomResponseDTO(String chatRoomUUID, String senderName, String receiverName) {
-        return CreatePersonalChatRoomResponseDTO.builder()
-                .roomUUID(chatRoomUUID)
-                .senderName(senderName)
-                .receiverName(receiverName)
-                .build();
+    private List<String> getOpponentMultiMemberNameList(String chatRoomUUID, Long userId) {
+        List<Long> opponentMultiMemberIdList = chatRoomMemberRepository.getOpponentMultiMemberNameList(chatRoomUUID, userId);
+        return opponentMultiMemberIdList.stream().map(userService::getUserById).map(User::getName).toList();
     }
 
- */
-
-    @Transactional
-    public ChatMessage saveMessage(String senderName, String chatRoomUUID, ChatMessageRequestDTO chatMessageRequestDTO) {
-        log.info("sender name: {}, chat room uuid: {}", senderName, chatRoomUUID);
-
-        ChatMessage message = chatRepository.save(getChatMessage(senderName, chatRoomUUID, chatMessageRequestDTO));
-        log.info("messageId : {}", message.getId());
-        chatRoomRepository.updateLastMessage(chatRoomUUID, message.getId());
-
-        return message;
+    private String getOpponentName(String chatRoomUUID, Long userId) {
+        Long opponentUserId = chatRoomMemberRepository.getOpponentUserId(chatRoomUUID, userId);
+        return userService.getUserById(opponentUserId).getName();
     }
+
+//    @Transactional
+//    public ChatMessage saveMessage(String senderName, String chatRoomUUID, ChatMessageRequestDTO chatMessageRequestDTO) {
+//        log.info("sender name: {}, chat room uuid: {}", senderName, chatRoomUUID);
+//
+//        ChatMessage message = chatRepository.save(getChatMessage(senderName, chatRoomUUID, chatMessageRequestDTO));
+//        log.info("messageId : {}", message.getId());
+//        chatRoomRepository.updateLastMessage(chatRoomUUID, message.getId());
+//
+//        return message;
+//    }
 
     private void saveChatImage(Long chatId, MultipartFile image, Long userId) throws IOException {
         imageService.saveImage(getRequestChatImageDTO(chatId, image, userId));
@@ -230,14 +234,14 @@ public class ChatService {
                 .build();
     }
 
-    private ChatMessage getChatMessage(String senderName, String chatRoomUUID, ChatMessageRequestDTO chatMessageRequestDTO) {
+    private ChatMessage getChatMessage(ChatMessageRequestDTO chatMessageRequestDTO, String senderName) {
         return ChatMessage.builder()
                 .senderUsername(senderName)
-                .receiverUsername(chatMessageRequestDTO.getReceiverUsername())
+//                .receiverUsername(chatMessageRequestDTO.getReceiverUsername())
                 .content(chatMessageRequestDTO.getContent())
                 .chatType(chatMessageRequestDTO.getChatType())
                 .imageUrl(chatMessageRequestDTO.getImageUrl())
-                .chatRoomUUID(chatRoomUUID)
+                .chatRoomUUID(chatMessageRequestDTO.getChatRoomUUID())
                 .build();
     }
 
@@ -252,40 +256,84 @@ public class ChatService {
         log.info("username : {}, offset:{}, size:{}", userDetails.getUsername(), offset, size);
         List<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsByUserId(user.getId(), userDetails.getUsername(), size, offset);
 
+        // 해당하는 채팅방 없음
         if (chatRooms.isEmpty()) {
             log.info("No chat room data found for user: {}", userDetails.getUsername());
             return ChatRoomListResponseDTO.builder()
-                    .chatRoomDTOList(Collections.emptyList()) // 빈 리스트 반환
+                    .simpleChatRoomDTOList(Collections.emptyList()) // 빈 리스트 반환
                     .build();
         }
 
         // ChatRoomDTO 리스트 생성
-        List<ChatRoomDTO> chatRoomDTOList = chatRooms.stream()
-                .map(chatRoom -> buildChatRoomResponseDTO(chatRoom.getRoomUUID())) // UUID를 기반으로 DTO 생성
+        List<SimpleChatRoomDTO> simpleChatRoomDTOList = chatRooms.stream()
+                .map(chatRoom -> buildChatRoomResponseDTO(chatRoom.getRoomUUID(), user.getId())) // UUID를 기반으로 DTO 생성
                 .toList();
 
         // 4. DTO를 ChatRoomListResponseDTO로 감싸서 반환
         return ChatRoomListResponseDTO.builder()
-                .chatRoomDTOList(chatRoomDTOList)
+                .simpleChatRoomDTOList(simpleChatRoomDTOList)
                 .build();
     }
 
-//    public GetMessagesByChatRoomResponseDTO getMessagesByChatRoom(String chatRoomUUID) {
-//        List<ChatMessage> messagesByChatRoom = chatRepository.getMessagesByChatRoom(chatRoomUUID);
+//    public GetMessagesByChatRoomResponseDTO getMessagesByChatRoom(String chatRoomUUID, int page, int size) {
+//        int offset = (page - 1) * size; // 역순으로 로드
+//        List<ChatMessage> messages = chatRepository.getMessagesByChatRoom(chatRoomUUID, size, offset);
+//        List<ChatMessage> chatMessageList = messages.stream()
+//                .sorted(Comparator.comparing(ChatMessage::getCreatedAt)) // 시간 순서로 정렬
+//                .toList();
+//
 //        return GetMessagesByChatRoomResponseDTO.builder()
-//                .chatMessageList(messagesByChatRoom)
+//                .chatMessageList(chatMessageList)
 //                .build();
 //    }
 
     public GetMessagesByChatRoomResponseDTO getMessagesByChatRoom(String chatRoomUUID, int page, int size) {
-        int offset = (page - 1) * size; // 역순으로 로드
-        List<ChatMessage> messages = chatRepository.getMessagesByChatRoom(chatRoomUUID, size, offset);
-        List<ChatMessage> chatMessageList = messages.stream()
-                .sorted(Comparator.comparing(ChatMessage::getTimestamp)) // 시간 순서로 정렬
-                .toList();
+        PageHelper.startPage(page, size);
+        List<ChatMessage> messages = chatRepository.getMessagesByChatRoomUUID(chatRoomUUID);
+
+//        List<ChatMessage> chatMessageList = messages.stream()
+//                .sorted(Comparator.comparing(ChatMessage::getCreatedAt)) // 시간 순서로 정렬
+//                .toList();
 
         return GetMessagesByChatRoomResponseDTO.builder()
-                .chatMessageList(chatMessageList)
+                .chatMessageList(new PageInfo<>(messages))
                 .build();
+    }
+
+    public GetChatRoomInfoResponseDTO getChatRoomInfo(String chatRoomUUID, UserDetailsImpl userDetails) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByUUID(chatRoomUUID);
+        ChatRoomDTO chatRoomDTO = charRoomDTO(chatRoomUUID, chatRoom, user);
+
+        List<Long> allMembersByChatRoomId = chatRoomMemberRepository.findAllMembersByChatRoomId(chatRoomUUID);
+        List<SimpleUserDTO> simpleUserDTOList = allMembersByChatRoomId.stream().map(memberService::getSimpleUserDTO).toList();
+
+        GetMessagesByChatRoomResponseDTO messagesByChatRoom = getMessagesByChatRoom(chatRoomUUID, 1, 20);
+
+        return GetChatRoomInfoResponseDTO.builder()
+                .chatRoomInfo(chatRoomDTO)
+                .userInfoList(simpleUserDTOList)
+                .messageList(messagesByChatRoom.getChatMessageList())
+                .build();
+    }
+
+    private ChatRoomDTO charRoomDTO(String chatRoomUUID, ChatRoom chatRoom, User user) {
+        return ChatRoomDTO.builder()
+                .chatRoomUUID(chatRoomUUID)
+                .isGroup(chatRoom.isGroup())
+                .roomName(
+                        chatRoom.isGroup() ?
+                        (chatRoom.getRoomName() != null ? chatRoom.getRoomName() : String.join(", ", getOpponentMultiMemberNameList(chatRoomUUID, user.getId())))
+                        : getOpponentName(chatRoomUUID, user.getId())
+                )
+                .profileImageUrl(chatRoom.getProfileImageUrl())
+                .build();
+    }
+
+    public void sendChatMessage(ChatMessageRequestDTO chatMessageRequestDTO, String username) {
+        Long userId = userService.getUserByEmail(username).getId();
+        ChatMessage chatMessage = getChatMessage(chatMessageRequestDTO, username);
+
+        messageService.sendMessage(MessageDomainType.CHAT, ChatBusinessIdentifier.MESSAGE, chatMessageRequestDTO.getChatRoomUUID(), chatMessage, userId);
     }
 }

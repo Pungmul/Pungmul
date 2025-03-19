@@ -42,7 +42,7 @@ public class KakaoLoginService {
 
         // 카카오 사용자 정보로 DB에서 해당 계정 조회 또는 신규 계정 생성
         Account account = accountRepository.getAccountByUsername(kakaoUserInfo.getKakaoAccount().email)
-                .orElseThrow(() -> new NoSuchUsernameException("해당 사용자 없음"));
+                .orElseThrow(NoSuchUsernameException::new);
 
         // LoginService의 기존 로직 활용하여 JWT 토큰 발급 및 세션 처리
         return loginService.authenticate(account.getUsername());

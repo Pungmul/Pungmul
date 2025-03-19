@@ -39,8 +39,15 @@ public class MybatisChatRepository implements ChatRepository {
     }
 
     @Override
-    public List<ChatMessage> getMessagesByChatRoom(String chatRoomUUID, int limit, int offset) {
-        return chatMapper.getMessagesByChatRoom(chatRoomUUID, limit, offset);
+    public List<ChatMessage> getMessagesByChatRoomUUID(String chatRoomUUID) {
+        return chatMapper.getMessagesByChatRoomUUID(chatRoomUUID);
     }
+
+//    @Override
+//    public List<ChatMessage> getMessagesByChatRoom(String chatRoomUUID, int limit, int offset) {
+//        return chatMapper.getMessagesByChatRoom(chatRoomUUID, limit, offset);
+//    }
+
+
 
 }

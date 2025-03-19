@@ -16,5 +16,5 @@ public class StompMessageResponse {
     private String businessIdentifier;
     private String identifier;
     private String stompDest;
-    private String content;
+    private Object content;
 }

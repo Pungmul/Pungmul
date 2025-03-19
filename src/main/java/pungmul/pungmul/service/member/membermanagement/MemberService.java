@@ -41,7 +41,7 @@ public class MemberService {
                     .orElseThrow(NoSuchElementException::new);
     }
 
-    private SimpleUserDTO buildSimpleUserDTO(User user){
+    public SimpleUserDTO buildSimpleUserDTO(User user){
         log.info("user name : {}", user.getName());
         Image profile = imageRepository.getImagesByDomainIdAndType(DomainType.PROFILE, user.getId()).stream().findFirst().orElseGet(imageService::getAnonymousImage);
 
@@ -54,17 +54,15 @@ public class MemberService {
     }
 
     public GetMemberResponseDTO getMemberInfo(String username) {
-        User user = userRepository.getUserByEmail(username)
-                .orElseThrow(NoSuchElementException::new);
-        List<InstrumentStatus> instrumentStatusList = instrumentStatusRepository.getAllInstrumentStatusByUserId(userRepository.getUserByEmail(username).map(User::getId).orElseThrow(NoSuchElementException::new))
+        User user = userRepository.getUserByEmail(username);
+        List<InstrumentStatus> instrumentStatusList = instrumentStatusRepository.getAllInstrumentStatusByUserId(userRepository.getUserByEmail(username).getId())
                 .orElse(Collections.emptyList());
 
         return getGetMemberResponseDTO(username, user, instrumentStatusList);
     }
 
     public SearchUserInfoResponseDTO searchUserInfo(String username) {
-        User user = userRepository.getUserByEmail(username)
-                .orElseThrow(NoSuchElementException::new);
+        User user = userRepository.getUserByEmail(username);
         List<Instrument> instrumentList = instrumentStatusRepository.getAllInstruments(user.getId());
 
         return getSearchUserInfoResponseDTO(user, instrumentList);

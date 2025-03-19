@@ -20,4 +20,5 @@ public interface ChatRoomRepository {
     ChatRoom findChatRoomByUUID(String chatRoomUUID);
 
     List<Long> findChatRoomMemberList(String chatRoomUUID);
+
 }

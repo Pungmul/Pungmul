@@ -15,14 +15,17 @@ import pungmul.pungmul.domain.member.user.User;
 import pungmul.pungmul.domain.message.MessageDomainType;
 import pungmul.pungmul.domain.message.domain.LightningMeetingBusinessIdentifier;
 import pungmul.pungmul.dto.lightning.AddLightningMeetingParticipantRequestDTO;
+import pungmul.pungmul.dto.lightning.GetLightningMeetingParticipantsRequestDTO;
 import pungmul.pungmul.dto.lightning.WithdrawLightningMeetingRequestDTO;
 import pungmul.pungmul.dto.lightning.WithdrawLightningMeetingResponseDTO;
 import pungmul.pungmul.repository.lightning.repository.LightningMeetingParticipantRepository;
 import pungmul.pungmul.repository.member.impl.MybatisInstrumentStatusRepository;
 import pungmul.pungmul.service.member.membermanagement.UserService;
 import pungmul.pungmul.service.message.MessageService;
+import pungmul.pungmul.service.message.StompMessageUtils;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -33,6 +36,7 @@ public class LightningMeetingParticipantService {
     private final LightningMeetingParticipantRepository participantRepository;
     private final LightningMeetingParticipantRepository lightningMeetingParticipantRepository;
     private final MybatisInstrumentStatusRepository instrumentStatusRepository;
+    private final StompMessageUtils stompMessageUtils;
 
     public void addLightningMeetingParticipant(LightningMeetingParticipant participant){
         lightningMeetingParticipantRepository.addLightningMeetingParticipant(participant);
@@ -110,14 +114,17 @@ public class LightningMeetingParticipantService {
     public void getLightningMeetingParticipants(Long meetingId) {
         log.info("meetingId : {}", meetingId);
         List<LatLong> meetingParticipants = lightningMeetingParticipantRepository.getMeetingParticipantLocations(meetingId);
+        GetLightningMeetingParticipantsRequestDTO content = GetLightningMeetingParticipantsRequestDTO.builder()
+                .meetingParticipants(meetingParticipants)
+                .build();
         log.info("meeting participants : {}", meetingParticipants.toString());
 
         messageService.sendMessage(
                 MessageDomainType.LIGHTNING_MEETING,
                 LightningMeetingBusinessIdentifier.PARTICIPANTS,
                 meetingId.toString(),
-                meetingParticipants
-        );
+                content,
+                null);
     }
 
     public int getMeetingParticipantNum(Long meetingId) {

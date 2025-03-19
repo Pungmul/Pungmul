@@ -22,7 +22,7 @@ public interface ChatRoomMapper {
 
     void updateLastMessage(UpdateLastMessageDTO updateLastMessageDTO);
 
-    ChatRoom findChatRoomByUUID(String chatRoomUUID);
+    Optional<ChatRoom> findChatRoomByUUID(String chatRoomUUID);
 
     List<Long> findChatRoomMemberList(String chatRoomUUID);
 }

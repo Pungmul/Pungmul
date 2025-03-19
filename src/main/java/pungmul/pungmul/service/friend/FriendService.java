@@ -25,6 +25,7 @@ import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.file.ImageService;
 import pungmul.pungmul.service.member.membermanagement.MemberService;
 import pungmul.pungmul.service.message.MessageService;
+import pungmul.pungmul.service.message.StompMessageUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,12 +40,11 @@ public class FriendService {
     private final ImageService imageService;
     private final ImageRepository imageRepository;
     private final MessageService messageService;
+    private final StompMessageUtils stompMessageUtils;
 
 
     public FriendListResponseDTO getFriendList(UserDetails userDetails) {
-        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
 
         List<Friend> friendList = friendRepository.getFriendList(userId);
 
@@ -73,43 +73,15 @@ public class FriendService {
                 .build();
     }
 
-//    @Transactional(isolation = Isolation.READ_COMMITTED)  // 트랜잭션이 직렬화되어 동시에 실행되는 트랜잭션 충돌을 방지
-//    public FriendReqResponseDTO sendFriendRequest(UserDetails userDetails, String receiverUserName) {
-//        isReqToSelfCheck(userDetails, receiverUserName);
-//
-//        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-//                .map(User::getId)
-//                .orElseThrow(NoSuchElementException::new);
-//
-//        Long receiverId = userRepository.getUserByEmail(receiverUserName)
-//                .map(User::getId)
-//                .orElseThrow(NoSuchElementException::new);
-//
-//        Friend friend = getFriend(userId, receiverId);
-//        friendRepository.sendFriendRequest(friend);
-//
-//        // 알림 메시지 생성 및 전송
-//        FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, friend.getId(), userId);
-//        messageService.sendMessage(MessageType.INVITATION, MessageDomainType.FRIEND, receiverUserName, invitationMessage);
-//
-//        return FriendReqResponseDTO.builder()
-//                .friendId(friend.getId())
-//                .build();
-//    }
-
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public FriendReqResponseDTO sendFriendRequest(UserDetails userDetails, String receiverUserName) {
         // 요청이 자기 자신에게 보내졌는지 확인
         isReqToSelfCheck(userDetails, receiverUserName);
 
         // 요청자와 수신자의 ID 가져오기
-        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(() -> new NoSuchElementException("User not found: " + userDetails.getUsername()));
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
 
-        Long receiverId = userRepository.getUserByEmail(receiverUserName)
-                .map(User::getId)
-                .orElseThrow(() -> new NoSuchElementException("User not found: " + receiverUserName));
+        Long receiverId = userRepository.getUserByEmail(receiverUserName).getId();
 
         // 기존 친구 요청 확인
         Friend friend = getFriend(userId, receiverId);
@@ -127,13 +99,6 @@ public class FriendService {
     }
 
     private void sendFriendRequestNotification(UserDetails userDetails, String receiverUserName, Friend friend) {
-        // 알림 메시지 생성
-//        FriendRequestInvitationMessageDTO invitationMessage = FriendRequestInvitationMessageDTO.builder()
-//                .friendRequestId(friend.getId())
-//                .senderUsername(userDetails.getUsername())
-//                .receiverUsername(receiverUserName)
-//                .content(getInvitationMessage(userDetails, friend.getId()))
-//                .build();
         FriendRequestInvitationMessageDTO invitationMessage = getInvitationMessage(userDetails, friend.getId());
 
         // 메시지 전송
@@ -141,8 +106,8 @@ public class FriendService {
                 MessageDomainType.FRIEND,
                 FriendBusinessIdentifier.REQUEST, // 메시지 도메인
                 receiverUserName,               // 수신자 식별자
-                invitationMessage               // 메시지 내용
-        );
+                invitationMessage,               // 메시지 내용
+                null);
     }
 
     private static Friend getFriend(Long userId, Long receiverId) {
@@ -153,7 +118,7 @@ public class FriendService {
     }
 
     public FriendRequestInvitationMessageDTO getInvitationMessage(UserDetails userDetails,Long friendRequestId) {
-        String senderName = userRepository.getUserByEmail(userDetails.getUsername()).orElseThrow(NoSuchElementException::new).getName();
+        String senderName = userRepository.getUserByEmail(userDetails.getUsername()).getName();
         return FriendRequestInvitationMessageDTO.builder()
                 .friendRequestId(friendRequestId)
                 .senderUsername(userDetails.getUsername())  // 실제 이름이 필요하다면 User 엔티티에서 가져올 수 있음
@@ -165,9 +130,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public List<AvailableFriendDTO> searchUsersToReqFriend(String keyword, UserDetails userDetails) {
 
-        Long loginUserId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
+        Long loginUserId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
 
         // 사용자가 입력한 keyword로 사용자 검색
         List<User> users = userRepository.searchUsersByKeyword(keyword);
@@ -266,5 +229,11 @@ public class FriendService {
                                 .stream().findFirst().orElseGet(imageService::getAnonymousImage)
                 )
                 .build();
+    }
+
+    public void receiveFriendMessage(String username, FriendRequestInvitationMessageDTO message) {
+//        Map<String, Object> stringObjectMap = stompMessageUtils.convertToMap(message);
+        String serializeContent = stompMessageUtils.serializeContent(message.toMap());
+        messageService.sendMessage(MessageDomainType.FRIEND, FriendBusinessIdentifier.INVITATION, username, message, null);
     }
 }

@@ -1,5 +1,6 @@
 package pungmul.pungmul.dto.chat;
 
+import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,5 +14,5 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetMessagesByChatRoomResponseDTO {
-    List<ChatMessage> chatMessageList;
+    PageInfo<ChatMessage> chatMessageList;
 }

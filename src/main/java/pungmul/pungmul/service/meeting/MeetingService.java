@@ -7,7 +7,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pungmul.pungmul.core.exception.custom.meeting.MeetingNameAlreadyExistsException;
-import pungmul.pungmul.domain.friend.Friend;
 import pungmul.pungmul.domain.friend.FriendStatus;
 import pungmul.pungmul.domain.meeting.*;
 import pungmul.pungmul.domain.member.user.User;
@@ -24,9 +23,9 @@ import pungmul.pungmul.repository.meeting.repository.MeetingRepository;
 import pungmul.pungmul.repository.member.repository.UserRepository;
 import pungmul.pungmul.service.friend.FriendService;
 import pungmul.pungmul.service.message.MessageService;
+import pungmul.pungmul.service.message.StompMessageUtils;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +42,7 @@ public class MeetingService {
     private final FriendRepository friendRepository;
     private final FriendService friendService;
     private final MessageService messageService;
+    private final StompMessageUtils stompMessageUtils;
 
     public CreateMeetingResponseDTO createMeeting(UserDetails userDetails, CreateMeetingRequestDTO createMeetingRequestDTO) {
 
@@ -55,7 +55,7 @@ public class MeetingService {
 
         MeetingParticipant founderParticipant = MeetingParticipant.builder()
                 .meetingId(meeting.getId())
-                .userId(userRepository.getUserByEmail(userDetails.getUsername()).map(User::getId).orElseThrow(NoSuchElementException::new))
+                .userId(userRepository.getUserByEmail(userDetails.getUsername()).getId())
                 .joinedAt(LocalDate.now())
                 .isHost(Boolean.TRUE)
                 .build();
@@ -68,15 +68,13 @@ public class MeetingService {
     public InviteUserToMeetingResponseDTO inviteUserToMeeting(UserDetails userDetails, InviteUserToMeetingRequestDTO inviteUserToMeetingRequestDTO) {
         List<String> inviteUserEmailList = inviteUserToMeetingRequestDTO.getInviteUserEmailList();
         Long meetingId = inviteUserToMeetingRequestDTO.getMeetingId();
-        User founder = userRepository.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(NoSuchElementException::new);
+        User founder = userRepository.getUserByEmail(userDetails.getUsername());
 
         InviteUserToMeetingResponseDTO inviteUserToMeetingResponseDTO = new InviteUserToMeetingResponseDTO();
 
         for (String email : inviteUserEmailList) {
             try {
-                User receiver = userRepository.getUserByEmail(email)
-                        .orElseThrow(() -> new NoSuchElementException("User not found: " + email));
+                User receiver = userRepository.getUserByEmail(email);
 
                 MeetingInvitation meetingInvitation = getMeetingInvitation(meetingId, founder, receiver);
                 meetingInvitationRepository.createMeetingInvitation(meetingInvitation);
@@ -105,8 +103,8 @@ public class MeetingService {
                 MessageDomainType.MEETING,
                 MeetingBusinessIdentifier.INVITATION,
                 receiver.getEmail(), // 수신자 identifier로 이메일 사용
-                invitationMessage // 초대 메시지 내용
-        );
+                invitationMessage, // 초대 메시지 내용
+                null);
     }
 
 
@@ -132,8 +130,7 @@ public class MeetingService {
     }
 
     private Meeting getMeeting(UserDetails userDetails, CreateMeetingRequestDTO createMeetingRequestDTO) {
-        User founder = userRepository.getUserByEmail(userDetails.getUsername())
-                .orElseThrow(NoSuchElementException::new);
+        User founder = userRepository.getUserByEmail(userDetails.getUsername());
 
         return Meeting.builder()
                 .meetingName(createMeetingRequestDTO.getMeetingName())
@@ -183,9 +180,7 @@ public class MeetingService {
                 .getInvitationById(replyRequest.getInvitationId())
                 .orElseThrow(() -> new NoSuchElementException("해당 초대가 존재하지 않습니다."));
 
-        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
 
         // 초대 상태 업데이트
         meetingInvitationRepository.updateInvitationStatus(invitation.getId(), replyRequest.getInvitationStatus());
@@ -219,9 +214,7 @@ public class MeetingService {
     }
 
     public FriendsToInviteResponseDTO getFriendsToInvite(UserDetails userDetails) {
-        Long userId = userRepository.getUserByEmail(userDetails.getUsername())
-                .map(User::getId)
-                .orElseThrow(NoSuchElementException::new);
+        Long userId = userRepository.getUserByEmail(userDetails.getUsername()).getId();
 
         List<SimpleUserDTO> friendList = friendRepository.getFriendList(userId).stream()
                 .filter(friend -> friend.getStatus() == FriendStatus.ACCEPTED)
@@ -249,7 +242,7 @@ public class MeetingService {
             log.info("Processing meeting invitation for user: {}", username);
 
             // MessageService를 통해 메시지를 전송
-            messageService.sendMessage(MessageDomainType.MEETING, FriendBusinessIdentifier.FRIENDS, username, message);
+            messageService.sendMessage(MessageDomainType.MEETING, FriendBusinessIdentifier.FRIENDS, username, message, null);
 
             log.info("Meeting invitation sent for user: {}", username);
         }
